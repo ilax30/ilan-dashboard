@@ -25,6 +25,7 @@ import { Blobs, Heart, Sparks, Sprig } from './components/Decor'
 import { CalendarDialog } from './components/CalendarDialog'
 import { DoneZone } from './components/DoneZone'
 import { HistoryDrawer, HistoryPanel } from './components/HistoryDrawer'
+import { ImportBanner } from './components/ImportBanner'
 import { OldestTask, WeekChart } from './components/Insights'
 import { Login } from './components/Login'
 import { ThemeToggle } from './components/ThemeToggle'
@@ -32,7 +33,7 @@ import { TodoCard, TodoCardView } from './components/TodoCard'
 import { Toast, type ToastData } from './components/Toast'
 import { burst } from './lib/effects'
 import { startOfToday, useNow } from './lib/relativeTime'
-import { store } from './lib/store'
+import { store, usingSupabase } from './lib/store'
 import { supabase } from './lib/supabase'
 import { useMediaQuery } from './lib/useMediaQuery'
 import { compareTodos, type Todo, type TodoPatch } from './lib/types'
@@ -316,6 +317,8 @@ function Board({ onLogout }: { onLogout?: () => void }) {
           <Sprig className="sprig" />
           <AddTodo onAdd={add} />
         </header>
+
+        {usingSupabase && <ImportBanner onImported={load} />}
 
         <DndContext
           sensors={sensors}

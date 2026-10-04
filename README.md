@@ -47,17 +47,24 @@ Losse HTML (om te delen/testen): `npm run build:single` → `dist-single/index.h
 
 Op een telefoon houd je een taak even vast om hem te slepen.
 
-## Supabase koppelen
+## Supabase (opslag + inloggen)
 
-1. Maak een project aan op [supabase.com](https://supabase.com).
-2. Ga naar **SQL Editor** en voer [`supabase/migrations/001_todos.sql`](supabase/migrations/001_todos.sql) uit.
-3. Kopieer `.env.example` naar `.env` en vul de Project URL en de anon/publishable key in (te vinden onder *Project Settings → API*).
-4. Start de app en log in via de e-mail-link.
-5. Zet daarna onder **Authentication → Sign In / Providers** de optie *Allow new users to sign up* uit, zodat alleen jij erin kunt.
+De app gebruikt de tabel `public.todos` in het Supabase-project **Woolley project** (zie [`supabase/migrations/001_todos.sql`](supabase/migrations/001_todos.sql)). Row Level Security staat aan: je ziet alleen je eigen taken, anoniem is er geen toegang.
 
-Row Level Security staat aan: iedere gebruiker ziet alleen zijn eigen taken. Afgeronde taken blijven in de database bewaard (`done_at`), ze worden alleen niet meer getoond.
+Lokaal: zet in `.env.local` (wordt niet gecommit):
 
-> Let op: taken die je lokaal (zonder Supabase) hebt aangemaakt, gaan niet automatisch mee naar Supabase.
+```
+VITE_SUPABASE_URL=https://ifyexmxsueatoaeoxici.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_…
+```
+
+Dit zijn publieke sleutels; de beveiliging zit in de database-regels.
+
+Eenmalig in het Supabase-dashboard (Authentication):
+1. **URL Configuration → Redirect URLs**: voeg `http://localhost:5173`, `https://ilax30.github.io/ilans-todo-lijst/` en je Cloudflare-adres toe.
+2. **Emails → Magic link** én **Confirm signup**: zet `{{ .Token }}` in de tekst, zodat je ook met een code kunt inloggen (nodig in de geïnstalleerde iPad-app).
+
+Inloggen gaat zonder wachtwoord: je krijgt een mail met een link en een code. Taken die nog alleen in je browser stonden, zet je na het inloggen over met de knop **Zet over naar mijn account**.
 
 ## Online zetten met Cloudflare Pages
 

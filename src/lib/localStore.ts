@@ -2,6 +2,11 @@ import { compareTodos, type Todo, type TodoStore } from './types'
 
 const KEY = 'notitie.todos.v1'
 
+/** Alles wat lokaal (in deze browser) is opgeslagen, ook afgeronde taken. */
+export function readLocalTodos(): Todo[] {
+  return read()
+}
+
 function read(): Todo[] {
   try {
     const raw = localStorage.getItem(KEY)
