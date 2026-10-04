@@ -5,7 +5,9 @@ import { viteSingleFile } from 'vite-plugin-singlefile'
 
 // Installeerbare app (PWA): werkt offline en krijgt een eigen venster + icoon.
 const pwa = VitePWA({
+  // Zelf registreren (src/lib/pwaUpdate.ts): update direct toepassen, maar niet midden in typen/slepen.
   registerType: 'autoUpdate',
+  injectRegister: false,
   includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'icon.svg'],
   manifest: {
     name: "Ilan's To-Do lijst",
@@ -26,6 +28,9 @@ const pwa = VitePWA({
     ],
   },
   workbox: {
+    // Nieuwe versie meteen actief; src/lib/pwaUpdate.ts herlaadt de pagina op een veilig moment.
+    skipWaiting: true,
+    clientsClaim: true,
     navigateFallback: 'index.html',
     globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
     runtimeCaching: [
@@ -47,6 +52,10 @@ const pwa = VitePWA({
 export default defineConfig(({ mode }) => ({
   // GitHub Pages zet BASE_PATH (bijv. /ilans-todo-lijst/); lokaal draait alles op /.
   base: process.env.BASE_PATH ?? '/',
+  // Versie = bouwtijdstip; zichtbaar als <html data-build> om te checken welke versie een apparaat draait.
+  define: { __BUILD__: JSON.stringify(new Date().toISOString()) },
+  // De losse HTML heeft geen service worker: vervang de PWA-registratie door een lege stub.
+  resolve: mode === 'single' ? { alias: { 'virtual:pwa-register': '/src/lib/pwaStub.ts' } } : {},
   plugins: [react(), ...(mode === 'single' ? [viteSingleFile()] : [pwa])],
   build: mode === 'single' ? { outDir: 'dist-single' } : {},
 }))

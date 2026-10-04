@@ -365,8 +365,53 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
     }
   }, [load])
 
+  // Live-sync: wijzigingen van andere apparaten komen binnen via Supabase Realtime.
+  const lastLocalWrite = useRef(0)
+  const activeIdRef = useRef<string | null>(null)
+  activeIdRef.current = activeId
+  const pendingRemote = useRef(false)
+
+  useEffect(() => {
+    const db = supabase
+    if (!db) return
+    let channel: ReturnType<typeof db.channel> | null = null
+    let timer = 0
+    let cancelled = false
+
+    const refreshFromRemote = () => {
+      // Niet midden in een sleepactie herladen; daarna alsnog.
+      if (activeIdRef.current) {
+        pendingRemote.current = true
+        return
+      }
+      load()
+    }
+
+    db.auth.getSession().then(({ data }) => {
+      const uid = data.session?.user.id
+      if (!uid || cancelled) return
+      channel = db
+        .channel(`todos-${uid}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'todos', filter: `user_id=eq.${uid}` }, () => {
+          // Eigen wijzigingen komen ook terug; wacht tot onze eigen animaties klaar zijn.
+          const wait = Math.max(400, lastLocalWrite.current + 1500 - Date.now())
+          window.clearTimeout(timer)
+          timer = window.setTimeout(refreshFromRemote, wait)
+        })
+        .subscribe()
+    })
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+      if (channel) void db.removeChannel(channel)
+    }
+  }, [load])
+
   /** Optimistisch: UI is al bijgewerkt; bij een fout halen we de echte stand opnieuw op. */
   function persist(p: Promise<unknown>) {
+    lastLocalWrite.current = Date.now()
+    p.finally(() => (lastLocalWrite.current = Date.now()))
     p.catch(() => {
       showToast('Opslaan mislukt. Probeer het nog eens.')
       load()
@@ -451,6 +496,10 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
   function onDragEnd({ active, over, activatorEvent, delta }: DragEndEvent) {
     // overDone pas bij de volgende sleep resetten: de drop-animatie leest hem nog.
     setActiveId(null)
+    if (pendingRemote.current) {
+      pendingRemote.current = false
+      window.setTimeout(load, 1500)
+    }
     if (!over) return
     const todo = todos.find((t) => t.id === active.id)
     if (!todo) return
