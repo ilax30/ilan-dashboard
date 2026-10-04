@@ -27,7 +27,6 @@ import { ImportBanner } from './components/ImportBanner'
 import { OldestTask, WeekChart } from './components/Insights'
 import { PinLogin } from './components/PinLogin'
 import { PinPad } from './components/PinPad'
-import { RefreshButton } from './components/RefreshButton'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TodoCard, TodoCardView } from './components/TodoCard'
 import { Toast, type ToastData } from './components/Toast'
@@ -102,7 +101,6 @@ export default function App() {
   return (
     <>
       <ThemeToggle />
-      <RefreshButton />
       <Gate />
     </>
   )
