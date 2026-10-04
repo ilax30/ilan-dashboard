@@ -1,6 +1,6 @@
 import { FunctionsHttpError } from '@supabase/supabase-js'
 import { useState } from 'react'
-import { savePinLocal } from '../lib/pin'
+import { consumeUnlockedByLogin, markUnlockedByLogin, savePinLocal } from '../lib/pin'
 import { supabase } from '../lib/supabase'
 import { Blobs } from './Decor'
 import { PinPad } from './PinPad'
@@ -37,11 +37,14 @@ export function PinLogin() {
       return false
     }
 
+    // Vóór het inwisselen zetten: de app schakelt direct door zodra de sessie er is.
+    markUnlockedByLogin()
     const { data: auth, error: otpError } = await supabase.auth.verifyOtp({
       token_hash: data!.token_hash,
       type: 'email',
     })
     if (otpError || !auth.user) {
+      consumeUnlockedByLogin()
       setError('Inloggen lukte niet. Probeer het opnieuw.')
       return false
     }

@@ -12,6 +12,17 @@ const failKey = (uid: string) => `notitie.pin.fails.${uid}`
 
 export const MAX_TRIES = 5
 
+// Net met de pincode ingelogd? Dan niet meteen nog eens om dezelfde pincode vragen.
+let unlockedByLogin = false
+export function markUnlockedByLogin() {
+  unlockedByLogin = true
+}
+export function consumeUnlockedByLogin() {
+  const was = unlockedByLogin
+  unlockedByLogin = false
+  return was
+}
+
 async function sha256(text: string) {
   const data = new TextEncoder().encode(text)
   const buf = await crypto.subtle.digest('SHA-256', data)

@@ -787,6 +787,16 @@ button {
   }
 }
 
+/* Boven Gedaan: kaart krimpt alsof hij erin valt, zodat de balk zichtbaar blijft. */
+.card-overlay {
+  transition: transform 220ms var(--ease-out), opacity 220ms ease;
+}
+
+.drag-over-done .card-overlay {
+  transform: rotate(-4deg) scale(0.62);
+  opacity: 0.85;
+}
+
 /* ---------- Confetti ---------- */
 
 .fx-layer {
@@ -2068,9 +2078,12 @@ button {
   }
 
   /* Gedaan wordt een balk die onderaan het scherm blijft plakken. */
+  /* Telefoon: Gedaan staat altijd vast onderaan in beeld (ook tijdens slepen). */
   .done {
-    position: sticky;
-    z-index: 2;
+    position: fixed;
+    z-index: 20;
+    left: 16px;
+    right: 16px;
     top: auto;
     bottom: 16px;
     flex-direction: row;
@@ -2091,8 +2104,9 @@ button {
     margin-top: 2px;
   }
 
+  /* Boven de vaste Gedaan-balk (± 76px hoog + 16px marge). */
   .toast {
-    bottom: 104px;
+    bottom: calc(108px + env(safe-area-inset-bottom, 0px));
   }
 
   .card-age {

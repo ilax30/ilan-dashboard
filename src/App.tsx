@@ -34,10 +34,11 @@ import { TodoCard, TodoCardView } from './components/TodoCard'
 import { Toast, type ToastData } from './components/Toast'
 import { burst } from './lib/effects'
 import { startOfToday, useNow } from './lib/relativeTime'
-import { checkPin, clearPin, failures, hasPin, MAX_TRIES, savePin, syncPinFromAccount } from './lib/pin'
+import { checkPin, clearPin, consumeUnlockedByLogin, failures, hasPin, MAX_TRIES, savePin, syncPinFromAccount } from './lib/pin'
 import { store, usingSupabase } from './lib/store'
 import { supabase } from './lib/supabase'
 import { useMediaQuery } from './lib/useMediaQuery'
+import { usePhoneAutoScroll } from './lib/usePhoneAutoScroll'
 import { compareTodos, type Todo, type TodoPatch } from './lib/types'
 
 const DONE = 'done'
@@ -125,7 +126,7 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
     if (mode !== 'checking') return
     syncPinFromAccount(uid)
       .catch(() => hasPin(uid))
-      .then((found) => setMode(found ? 'locked' : 'open'))
+      .then((found) => setMode(found && !consumeUnlockedByLogin() ? 'locked' : 'open'))
   }, [mode, uid])
   const [first, setFirst] = useState('')
   const [error, setError] = useState('')
@@ -262,6 +263,10 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
   // Wordt bij afronden/terugzetten lokaal bijgewerkt.
   const [history, setHistory] = useState<Todo[] | null>(null)
   const wide = useMediaQuery(WIDE)
+  const phone = useMediaQuery('(max-width: 720px)')
+  const [dragStartY, setDragStartY] = useState<number | null>(null)
+  // Telefoon: eigen scroll-logica tijdens slepen (zie usePhoneAutoScroll), zodat Gedaan bereikbaar blijft.
+  usePhoneAutoScroll(phone && activeId !== null, dragStartY, '.done')
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
@@ -472,7 +477,9 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
                 'Spatie pakt de taak op; pijltjes verplaatsen, spatie laat los, Escape annuleert. Enter klapt notities open, X rondt de taak af.',
             },
           }}
-          onDragStart={({ active }) => {
+          autoScroll={!phone}
+          onDragStart={({ active, activatorEvent }) => {
+            setDragStartY(getEventCoordinates(activatorEvent)?.y ?? null)
             setActiveId(String(active.id))
             setOverDone(false)
           }}
@@ -531,6 +538,7 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
 
           <DragOverlay
             dropAnimation={overDone ? doneDropAnimation : dropAnimation}
+            className={overDone ? 'drag-over-done' : undefined}
             modifiers={[keepGrabInCard]}
             style={{ width: overlayWidth(), height: 'auto' }}
           >

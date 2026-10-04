@@ -15,9 +15,10 @@ export function DoneZone({ doneToday, pop, dragging }: Props) {
       aria-label="Gedaan: sleep een taak hierheen om hem af te ronden"
     >
       <span className="done-icon">
-        <Heart key={pop} className={pop ? 'done-heart pop' : 'done-heart'} size={30} />
+        {/* Unieke keys per soort: zelfde key bij broertjes laat oude hartjes staan. */}
+        <Heart key={`heart-${pop}`} className={pop ? 'done-heart pop' : 'done-heart'} size={30} />
         {pop > 0 && (
-          <span className="done-plus" key={pop} aria-hidden="true">
+          <span className="done-plus" key={`plus-${pop}`} aria-hidden="true">
             +1
           </span>
         )}
