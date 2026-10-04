@@ -49,6 +49,8 @@ type ViewProps = {
   onStartEdit?: () => void
   onStopEdit?: (title: string | null) => void
   onSaveNotes?: (notes: string) => void
+  /** Kaart inklappen (knop "Klaar" op touchscreens). */
+  onCollapse?: () => void
   onToggleStar?: () => void
   onDelete?: () => void
 }
@@ -68,6 +70,7 @@ export function TodoCardView({
   onStartEdit,
   onStopEdit,
   onSaveNotes,
+  onCollapse,
   onToggleStar,
   onDelete,
 }: ViewProps) {
@@ -133,26 +136,7 @@ export function TodoCardView({
               {...noDrag}
             />
           ) : (
-            <span
-              className={expanded && !still ? 'card-title is-editable' : 'card-title'}
-              {...(expanded && !still
-                ? {
-                    role: 'button',
-                    tabIndex: 0,
-                    title: 'Tik om de titel aan te passen',
-                    'aria-label': `Titel "${todo.title}" aanpassen`,
-                    onClick: (e: MouseEvent) => {
-                      if ((e.target as HTMLElement).closest('a')) return
-                      e.stopPropagation()
-                      onStartEdit?.()
-                    },
-                    onKeyDown: (e: KeyboardEvent) => {
-                      e.stopPropagation()
-                      if (e.key === 'Enter') onStartEdit?.()
-                    },
-                  }
-                : {})}
-            >
+            <span className="card-title">
               <LinkifiedText text={todo.title} interactive={!still} />
             </span>
           )}
@@ -222,15 +206,22 @@ export function TodoCardView({
 
       {expanded && !still && (
         <div className="card-expanded">
-          <Notes notes={todo.notes} onSave={(n) => onSaveNotes?.(n)} />
+          <Notes notes={todo.notes} onSave={(n) => onSaveNotes?.(n)} onDone={onCollapse} onEditTitle={onStartEdit} />
         </div>
       )}
     </div>
   )
 }
 
+type NotesProps = {
+  notes: string
+  onSave: (notes: string) => void
+  onDone?: () => void
+  onEditTitle?: () => void
+}
+
 /** Notitieveld: leest als tekst met klikbare links, klik om te bewerken. */
-function Notes({ notes, onSave }: { notes: string; onSave: (notes: string) => void }) {
+function Notes({ notes, onSave, onDone, onEditTitle }: NotesProps) {
   const [writing, setWriting] = useState(notes === '')
   const areaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -247,7 +238,14 @@ function Notes({ notes, onSave }: { notes: string; onSave: (notes: string) => vo
     if (next) setWriting(false)
   }
 
+  /** "Klaar": opslaan (niet wachten op blur, dat komt niet altijd) en inklappen. */
+  function done() {
+    if (writing && areaRef.current) save(areaRef.current.value)
+    onDone?.()
+  }
+
   return (
+    <>
     <div className="card-notes" {...noDrag} onClick={stop} onKeyDown={stop}>
       {writing ? (
         <textarea
@@ -280,6 +278,32 @@ function Notes({ notes, onSave }: { notes: string; onSave: (notes: string) => vo
         </div>
       )}
     </div>
+    {/* Touchscreens: duidelijke knoppen i.p.v. ernaast tikken (zie CSS: alleen bij pointer: coarse). */}
+    <div className="notes-actions" {...noDrag} onClick={stop} onKeyDown={stop}>
+      <button className="notes-title-edit" type="button" onClick={onEditTitle}>
+        <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <path
+            d="M14.5 5.5l4 4M4 20l1-5L15.5 4.5a2.1 2.1 0 0 1 3 0l1 1a2.1 2.1 0 0 1 0 3L9 19z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+        Titel aanpassen
+      </button>
+      <button
+        className="notes-done"
+        type="button"
+        // Voorkom dat het tekstvak eerst focus verliest en de knop verspringt voordat de tik telt.
+        onPointerDown={(e) => e.preventDefault()}
+        onClick={done}
+      >
+        Klaar
+      </button>
+    </div>
+    </>
   )
 }
 
@@ -531,6 +555,7 @@ export function TodoCard({ todo, now, leaving, fresh, onComplete, onRename, onSa
             if (next && next !== todo.title) onRename(todo, next)
           }}
           onSaveNotes={(notes) => onSaveNotes(todo, notes)}
+          onCollapse={() => setExpanded(false)}
           onToggleStar={toggleStar}
           onDelete={tear}
         />

@@ -429,14 +429,6 @@ button {
   font-weight: 500;
 }
 
-/* In een opengeklapte kaart is de titel tikbaar om aan te passen. */
-.card-title.is-editable {
-  cursor: text;
-  text-decoration: underline dotted;
-  text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
-  text-underline-offset: 4px;
-}
-
 .card-preview {
   display: flex;
   align-items: center;
@@ -642,6 +634,50 @@ button {
 
 .complete:active {
   transform: scale(0.97);
+}
+
+/* Klaar / Titel aanpassen onder de notities: alleen op touchscreens. */
+.notes-actions {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  cursor: auto;
+}
+
+@media (pointer: coarse) {
+  .notes-actions {
+    display: flex;
+  }
+}
+
+.notes-title-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.notes-done {
+  min-width: 96px;
+  min-height: 42px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #2f2725;
+  font-weight: 600;
+  transition: transform 160ms var(--ease-out);
+}
+
+.notes-done:active {
+  transform: scale(0.96);
 }
 
 /* ---------- Sleepkaart (compact) ---------- */
