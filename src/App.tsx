@@ -27,15 +27,14 @@ import { DoneZone } from './components/DoneZone'
 import { HistoryDrawer, HistoryPanel } from './components/HistoryDrawer'
 import { ImportBanner } from './components/ImportBanner'
 import { OldestTask, WeekChart } from './components/Insights'
-import { Login } from './components/Login'
+import { PinLogin } from './components/PinLogin'
 import { PinPad } from './components/PinPad'
-import { SetPassword } from './components/SetPassword'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TodoCard, TodoCardView } from './components/TodoCard'
 import { Toast, type ToastData } from './components/Toast'
 import { burst } from './lib/effects'
 import { startOfToday, useNow } from './lib/relativeTime'
-import { checkPin, clearPin, failures, hasPin, MAX_TRIES, pinSkipped, savePin, skipPin, syncPinFromAccount } from './lib/pin'
+import { checkPin, clearPin, failures, hasPin, MAX_TRIES, savePin, syncPinFromAccount } from './lib/pin'
 import { store, usingSupabase } from './lib/store'
 import { supabase } from './lib/supabase'
 import { useMediaQuery } from './lib/useMediaQuery'
@@ -108,12 +107,7 @@ function Gate() {
 
   if (!supabase) return <Board />
   if (session === undefined) return <Blobs />
-  if (!session) return (
-    <>
-      <Blobs />
-      <Login />
-    </>
-  )
+  if (!session) return <PinLogin />
   return <PinGate uid={session.user.id} onLogout={() => supabase?.auth.signOut()} />
 }
 
@@ -131,7 +125,7 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
     if (mode !== 'checking') return
     syncPinFromAccount(uid)
       .catch(() => hasPin(uid))
-      .then((found) => setMode(found ? 'locked' : pinSkipped(uid) ? 'open' : 'setup'))
+      .then((found) => setMode(found ? 'locked' : 'open'))
   }, [mode, uid])
   const [first, setFirst] = useState('')
   const [error, setError] = useState('')
@@ -191,10 +185,10 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
       <>
         <Blobs />
         <PinPad
-          title={mode === 'setup' ? 'Kies een pincode' : 'Nog een keer'}
+          title={mode === 'setup' ? 'Nieuwe pincode' : 'Nog een keer'}
           hint={
             mode === 'setup'
-              ? 'Met 4 cijfers open je de app voortaan snel op dit apparaat.'
+              ? 'Kies 4 cijfers. Daarmee log je op al je apparaten in.'
               : 'Vul dezelfde 4 cijfers nog eens in.'
           }
           error={error}
@@ -210,7 +204,11 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
               setMode('setup')
               return false
             }
-            await savePin(uid, pin)
+            if (!(await savePin(uid, pin))) {
+              setError('Opslaan lukte niet (geen verbinding?). Je oude pincode blijft geldig.')
+              setMode('open')
+              return false
+            }
             setError('')
             setMode('open')
             return true
@@ -220,11 +218,11 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
               className="link"
               type="button"
               onClick={() => {
-                skipPin(uid)
+                setError('')
                 setMode('open')
               }}
             >
-              Overslaan
+              Annuleren
             </button>
           }
         />
@@ -300,6 +298,19 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
 
   useEffect(() => {
     load()
+  }, [load])
+
+  // Gesynchroniseerd tussen apparaten: ververs zodra de app weer in beeld komt.
+  useEffect(() => {
+    const refresh = () => {
+      if (!document.hidden) load()
+    }
+    document.addEventListener('visibilitychange', refresh)
+    window.addEventListener('focus', refresh)
+    return () => {
+      document.removeEventListener('visibilitychange', refresh)
+      window.removeEventListener('focus', refresh)
+    }
   }, [load])
 
   /** Optimistisch: UI is al bijgewerkt; bij een fout halen we de echte stand opnieuw op. */
@@ -529,7 +540,7 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
 
         {onLogout && (
           <footer className="footer">
-            {onLock ? (
+            {onLock && (
               <button className="footer-lock" type="button" onClick={onLock}>
                 <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
                   <rect x="5" y="10.5" width="14" height="10" rx="3" fill="none" stroke="currentColor" strokeWidth="2" />
@@ -537,21 +548,14 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
                 </svg>
                 Vergrendelen
               </button>
-            ) : (
-              <button className="link" type="button" onClick={onSetPin}>
-                Pincode instellen
-              </button>
             )}
             {/* Uitloggen is zelden nodig: weggestopt, zodat je er niet per ongeluk op drukt. */}
             <details className="footer-more">
               <summary>Meer…</summary>
               <div className="footer-more-items">
-                <SetPassword />
-                {onLock && (
-                  <button className="link" type="button" onClick={onSetPin}>
-                    Pincode wijzigen
-                  </button>
-                )}
+                <button className="link" type="button" onClick={onSetPin}>
+                  Pincode wijzigen
+                </button>
                 <button
                   className="link"
                   type="button"

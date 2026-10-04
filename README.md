@@ -60,11 +60,11 @@ VITE_SUPABASE_ANON_KEY=sb_publishable_…
 
 Dit zijn publieke sleutels; de beveiliging zit in de database-regels.
 
-Eenmalig in het Supabase-dashboard (Authentication):
-1. **URL Configuration → Redirect URLs**: voeg `http://localhost:5173`, `https://ilax30.github.io/ilans-todo-lijst/` en je Cloudflare-adres toe.
-2. **Emails → Magic link** én **Confirm signup**: zet `{{ .Token }}` in de tekst, zodat je ook met een code kunt inloggen (nodig in de geïnstalleerde iPad-app).
+**Inloggen gaat alleen met een pincode.** De Edge Function [`todo-pin-login`](supabase/functions/todo-pin-login/index.ts) controleert hem op de server (gehasht in `public.todo_pin`, zie [`002_pin_login.sql`](supabase/migrations/002_pin_login.sql)) en geeft bij een goede code een sessie uit, zonder e-mail. Na elke 5 foute pogingen volgt een slot dat steeds verdubbelt (15 min → max. 24 uur).
 
-Inloggen gaat zonder wachtwoord: je krijgt een mail met een link en een code. Taken die nog alleen in je browser stonden, zet je na het inloggen over met de knop **Zet over naar mijn account**.
+Daarna blijf je ingelogd; de app vraagt bij openen (en na 10 minuten op de achtergrond) dezelfde pincode als slot, ook offline. Pincode wijzigen: **Meer… → Pincode wijzigen** (geldt dan op alle apparaten).
+
+Alle apparaten gebruiken hetzelfde account en dus dezelfde lijst; de lijst ververst zodra je de app weer voor je haalt.
 
 ## Online zetten met Cloudflare Pages
 

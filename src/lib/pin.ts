@@ -47,14 +47,28 @@ export function skipPin(uid: string) {
   set(skipKey(uid), '1')
 }
 
-export async function savePin(uid: string, pin: string) {
+/** Pincode alleen op dit apparaat onthouden (voor het slot, ook offline). */
+export async function savePinLocal(uid: string, pin: string) {
   const salt = crypto.randomUUID()
   const stored: Stored = { salt, hash: await sha256(salt + pin) }
   set(key(uid), JSON.stringify(stored))
   set(skipKey(uid), null)
   set(failKey(uid), null)
-  // Ook in je account bewaren, zodat dezelfde pincode op al je apparaten geldt.
+  return stored
+}
+
+/**
+ * Pincode wijzigen: op de server (waar inloggen mee gebeurt), in je account (voor je andere
+ * apparaten) en op dit apparaat. Geeft false als de server weigert.
+ */
+export async function savePin(uid: string, pin: string) {
+  if (supabase) {
+    const { error } = await supabase.functions.invoke('todo-pin-login', { body: { action: 'change', newPin: pin } })
+    if (error) return false
+  }
+  const stored = await savePinLocal(uid, pin)
   await supabase?.auth.updateUser({ data: { pin: stored } })
+  return true
 }
 
 /**
