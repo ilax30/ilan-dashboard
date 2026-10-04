@@ -28,11 +28,13 @@ import { HistoryDrawer, HistoryPanel } from './components/HistoryDrawer'
 import { ImportBanner } from './components/ImportBanner'
 import { OldestTask, WeekChart } from './components/Insights'
 import { Login } from './components/Login'
+import { PinPad } from './components/PinPad'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TodoCard, TodoCardView } from './components/TodoCard'
 import { Toast, type ToastData } from './components/Toast'
 import { burst } from './lib/effects'
 import { startOfToday, useNow } from './lib/relativeTime'
+import { checkPin, clearPin, failures, hasPin, MAX_TRIES, pinSkipped, savePin, skipPin } from './lib/pin'
 import { store, usingSupabase } from './lib/store'
 import { supabase } from './lib/supabase'
 import { useMediaQuery } from './lib/useMediaQuery'
@@ -111,10 +113,129 @@ function Gate() {
       <Login />
     </>
   )
-  return <Board onLogout={() => supabase?.auth.signOut()} />
+  return <PinGate uid={session.user.id} onLogout={() => supabase?.auth.signOut()} />
 }
 
-function Board({ onLogout }: { onLogout?: () => void }) {
+const AUTO_LOCK_MS = 10 * 60 * 1000
+
+/**
+ * Pincode-slot rond het bord. Ingelogd blijf je via Supabase; de pincode is een snel slot
+ * per apparaat: bij openen, na 10 minuten op de achtergrond, of via "Vergrendelen".
+ */
+function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
+  const [mode, setMode] = useState<'locked' | 'setup' | 'confirm' | 'open'>(() =>
+    hasPin(uid) ? 'locked' : pinSkipped(uid) ? 'open' : 'setup',
+  )
+  const [first, setFirst] = useState('')
+  const [error, setError] = useState('')
+
+  // Automatisch vergrendelen als de app een tijd op de achtergrond stond.
+  useEffect(() => {
+    let hiddenAt = 0
+    const onVis = () => {
+      if (document.hidden) hiddenAt = Date.now()
+      else if (hiddenAt && Date.now() - hiddenAt > AUTO_LOCK_MS && hasPin(uid)) setMode('locked')
+    }
+    document.addEventListener('visibilitychange', onVis)
+    return () => document.removeEventListener('visibilitychange', onVis)
+  }, [uid])
+
+  function logout() {
+    clearPin(uid)
+    onLogout()
+  }
+
+  if (mode === 'locked') {
+    return (
+      <>
+        <Blobs />
+        <PinPad
+          title="Welkom terug"
+          hint="Vul je pincode in."
+          error={error}
+          onComplete={async (pin) => {
+            if (await checkPin(uid, pin)) {
+              setError('')
+              setMode('open')
+              return true
+            }
+            const left = MAX_TRIES - failures(uid)
+            if (left <= 0) {
+              logout()
+              return false
+            }
+            setError(`Onjuiste pincode. Nog ${left} ${left === 1 ? 'poging' : 'pogingen'}.`)
+            return false
+          }}
+          footer={
+            <button className="link" type="button" onClick={logout}>
+              Pincode vergeten? Log opnieuw in via e-mail
+            </button>
+          }
+        />
+      </>
+    )
+  }
+
+  if (mode === 'setup' || mode === 'confirm') {
+    return (
+      <>
+        <Blobs />
+        <PinPad
+          title={mode === 'setup' ? 'Kies een pincode' : 'Nog een keer'}
+          hint={
+            mode === 'setup'
+              ? 'Met 4 cijfers open je de app voortaan snel op dit apparaat.'
+              : 'Vul dezelfde 4 cijfers nog eens in.'
+          }
+          error={error}
+          onComplete={async (pin) => {
+            if (mode === 'setup') {
+              setFirst(pin)
+              setError('')
+              setMode('confirm')
+              return true
+            }
+            if (pin !== first) {
+              setError('Die codes waren niet hetzelfde. Begin opnieuw.')
+              setMode('setup')
+              return false
+            }
+            await savePin(uid, pin)
+            setError('')
+            setMode('open')
+            return true
+          }}
+          footer={
+            <button
+              className="link"
+              type="button"
+              onClick={() => {
+                skipPin(uid)
+                setMode('open')
+              }}
+            >
+              Overslaan
+            </button>
+          }
+        />
+      </>
+    )
+  }
+
+  return (
+    <Board
+      onLock={hasPin(uid) ? () => setMode('locked') : undefined}
+      onSetPin={() => setMode('setup')}
+      onLogout={logout}
+    />
+  )
+}
+
+type BoardProps = { onLock?: () => void; onSetPin?: () => void; onLogout?: () => void }
+
+function Board({ onLock, onSetPin, onLogout }: BoardProps) {
+  const [confirmLogout, setConfirmLogout] = useState(false)
   const now = useNow()
   const [todos, setTodos] = useState<Todo[]>([])
   const [loaded, setLoaded] = useState(false)
@@ -399,9 +520,41 @@ function Board({ onLogout }: { onLogout?: () => void }) {
 
         {onLogout && (
           <footer className="footer">
-            <button className="link" type="button" onClick={onLogout}>
-              Uitloggen
-            </button>
+            {onLock ? (
+              <button className="footer-lock" type="button" onClick={onLock}>
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                  <rect x="5" y="10.5" width="14" height="10" rx="3" fill="none" stroke="currentColor" strokeWidth="2" />
+                  <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+                Vergrendelen
+              </button>
+            ) : (
+              <button className="link" type="button" onClick={onSetPin}>
+                Pincode instellen
+              </button>
+            )}
+            {/* Uitloggen is zelden nodig: weggestopt, zodat je er niet per ongeluk op drukt. */}
+            <details className="footer-more">
+              <summary>Meer…</summary>
+              <div className="footer-more-items">
+                {onLock && (
+                  <button className="link" type="button" onClick={onSetPin}>
+                    Pincode wijzigen
+                  </button>
+                )}
+                <button
+                  className="link"
+                  type="button"
+                  onClick={() => {
+                    if (confirmLogout) return onLogout()
+                    setConfirmLogout(true)
+                    setTimeout(() => setConfirmLogout(false), 4000)
+                  }}
+                >
+                  {confirmLogout ? 'Zeker? Daarna moet je weer via e-mail inloggen. Klik nogmaals' : 'Uitloggen'}
+                </button>
+              </div>
+            </details>
           </footer>
         )}
       </div>

@@ -966,6 +966,139 @@ button {
   transform: scale(0.97);
 }
 
+/* ---------- Pincode-slot ---------- */
+
+.pin {
+  padding-top: 12vh;
+}
+
+.pin-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+}
+
+.pin .login-text {
+  margin: 6px 0 0;
+}
+
+.pin-dots {
+  display: flex;
+  gap: 16px;
+  margin: 26px 0 8px;
+}
+
+.pin-dots[data-shake] {
+  animation: pin-shake 360ms ease;
+}
+
+@keyframes pin-shake {
+  20% {
+    transform: translateX(-10px);
+  }
+  40% {
+    transform: translateX(9px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.pin-dot {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  transition: background-color 120ms ease, transform 160ms var(--ease-out);
+}
+
+.pin-dot[data-on] {
+  background: radial-gradient(circle at 35% 30%, var(--gold-hi), var(--gold) 60%, var(--gold-deep));
+  border-color: var(--gold);
+  transform: scale(1.15);
+}
+
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  gap: 14px 22px;
+  margin-top: 22px;
+}
+
+.pin-key {
+  width: 72px;
+  height: 72px;
+  border: 1.5px solid var(--card-edge);
+  border-radius: 50%;
+  background: linear-gradient(160deg, var(--card-hi), var(--card) 60%);
+  box-shadow: var(--shadow), inset 0 1px 0 var(--card-gloss);
+  font-size: 1.6rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition: transform 120ms var(--ease-out), background-color 120ms ease;
+  touch-action: manipulation;
+}
+
+.pin-key:active {
+  transform: scale(0.92);
+  background: var(--accent-soft);
+}
+
+.pin-footer {
+  margin-top: 26px;
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 18px;
+}
+
+.footer-lock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  font-weight: 500;
+  transition: transform 160ms var(--ease-out);
+}
+
+.footer-more summary {
+  padding: 4px 8px;
+  color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+}
+
+.footer-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.footer-more-items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  margin-top: 6px;
+}
+
+.footer-lock svg {
+  color: var(--accent);
+}
+
+.footer-lock:active {
+  transform: scale(0.97);
+}
+
 /* ---------- Lokale taken overzetten ---------- */
 
 .import-banner {
