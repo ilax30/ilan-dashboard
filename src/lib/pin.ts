@@ -12,6 +12,19 @@ const failKey = (uid: string) => `notitie.pin.fails.${uid}`
 
 export const MAX_TRIES = 5
 
+// Laatste keer dat de app gebruikt werd (per apparaat). Een refresh binnen deze tijd vraagt geen pincode.
+const ACTIVE_KEY = 'notitie.lastActive'
+export function touchActive() {
+  set(ACTIVE_KEY, String(Date.now()))
+}
+export function forgetActive() {
+  set(ACTIVE_KEY, null)
+}
+export function recentlyActive(withinMs: number) {
+  const last = Number(get(ACTIVE_KEY) ?? 0)
+  return last > 0 && Date.now() - last < withinMs
+}
+
 // Net met de pincode ingelogd? Dan niet meteen nog eens om dezelfde pincode vragen.
 let unlockedByLogin = false
 export function markUnlockedByLogin() {

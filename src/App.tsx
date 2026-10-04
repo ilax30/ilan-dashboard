@@ -5,9 +5,7 @@ import {
   DragOverlay,
   KeyboardSensor,
   MeasuringStrategy,
-  MouseSensor,
   pointerWithin,
-  TouchSensor,
   useSensor,
   useSensors,
   type Announcements,
@@ -33,8 +31,21 @@ import { ThemeToggle } from './components/ThemeToggle'
 import { TodoCard, TodoCardView } from './components/TodoCard'
 import { Toast, type ToastData } from './components/Toast'
 import { burst } from './lib/effects'
+import { SteadyMouseSensor, SteadyTouchSensor } from './lib/sensors'
 import { startOfToday, useNow } from './lib/relativeTime'
-import { checkPin, clearPin, consumeUnlockedByLogin, failures, hasPin, MAX_TRIES, savePin, syncPinFromAccount } from './lib/pin'
+import {
+  checkPin,
+  clearPin,
+  consumeUnlockedByLogin,
+  failures,
+  forgetActive,
+  hasPin,
+  MAX_TRIES,
+  recentlyActive,
+  savePin,
+  syncPinFromAccount,
+  touchActive,
+} from './lib/pin'
 import { store, usingSupabase } from './lib/store'
 import { supabase } from './lib/supabase'
 import { useMediaQuery } from './lib/useMediaQuery'
@@ -116,7 +127,7 @@ const AUTO_LOCK_MS = 10 * 60 * 1000
 
 /**
  * Pincode-slot rond het bord. Ingelogd blijf je via Supabase; de pincode is een snel slot
- * per apparaat: bij openen, na 10 minuten op de achtergrond, of via "Vergrendelen".
+ * per apparaat. Hij komt pas na 10 minuten niet gebruiken (ook bij openen/refresh), of via "Vergrendelen".
  */
 function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
   const [mode, setMode] = useState<'checking' | 'locked' | 'setup' | 'confirm' | 'open'>('checking')
@@ -126,21 +137,45 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
     if (mode !== 'checking') return
     syncPinFromAccount(uid)
       .catch(() => hasPin(uid))
-      .then((found) => setMode(found && !consumeUnlockedByLogin() ? 'locked' : 'open'))
+      .then((found) => {
+        const justLoggedIn = consumeUnlockedByLogin()
+        const unlocked = !found || justLoggedIn || recentlyActive(AUTO_LOCK_MS)
+        if (unlocked) touchActive()
+        setMode(unlocked ? 'open' : 'locked')
+      })
   }, [mode, uid])
   const [first, setFirst] = useState('')
   const [error, setError] = useState('')
 
-  // Automatisch vergrendelen als de app een tijd op de achtergrond stond.
+  // Bijhouden wanneer je de app gebruikt; na 10 minuten niets doen gaat hij op slot.
   useEffect(() => {
-    let hiddenAt = 0
-    const onVis = () => {
-      if (document.hidden) hiddenAt = Date.now()
-      else if (hiddenAt && Date.now() - hiddenAt > AUTO_LOCK_MS && hasPin(uid)) setMode('locked')
+    if (mode !== 'open') return
+    let last = 0
+    const active = () => {
+      if (Date.now() - last < 15_000) return
+      last = Date.now()
+      touchActive()
     }
+    const onVis = () => {
+      if (document.hidden) return touchActive()
+      if (hasPin(uid) && !recentlyActive(AUTO_LOCK_MS)) setMode('locked')
+      else active()
+    }
+    const check = setInterval(() => {
+      if (!document.hidden && hasPin(uid) && !recentlyActive(AUTO_LOCK_MS)) setMode('locked')
+    }, 30_000)
+    window.addEventListener('pointerdown', active, { passive: true })
+    window.addEventListener('keydown', active)
+    window.addEventListener('scroll', active, { passive: true })
     document.addEventListener('visibilitychange', onVis)
-    return () => document.removeEventListener('visibilitychange', onVis)
-  }, [uid])
+    return () => {
+      clearInterval(check)
+      window.removeEventListener('pointerdown', active)
+      window.removeEventListener('keydown', active)
+      window.removeEventListener('scroll', active)
+      document.removeEventListener('visibilitychange', onVis)
+    }
+  }, [mode, uid])
 
   function logout() {
     clearPin(uid)
@@ -160,6 +195,7 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
           onComplete={async (pin) => {
             if (await checkPin(uid, pin)) {
               setError('')
+              touchActive()
               setMode('open')
               return true
             }
@@ -233,7 +269,14 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
 
   return (
     <Board
-      onLock={hasPin(uid) ? () => setMode('locked') : undefined}
+      onLock={
+        hasPin(uid)
+          ? () => {
+              forgetActive()
+              setMode('locked')
+            }
+          : undefined
+      }
       onSetPin={() => setMode('setup')}
       onLogout={logout}
     />
@@ -264,14 +307,18 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
   const [history, setHistory] = useState<Todo[] | null>(null)
   const wide = useMediaQuery(WIDE)
   const phone = useMediaQuery('(max-width: 720px)')
+  // Touchscreen: slepen gaat via de greep (direct, zonder vasthouden); de rest van de kaart scrollt/veegt.
+  const coarse = useMediaQuery('(pointer: coarse)')
   const [dragStartY, setDragStartY] = useState<number | null>(null)
   // Telefoon: eigen scroll-logica tijdens slepen (zie usePhoneAutoScroll), zodat Gedaan bereikbaar blijft.
   usePhoneAutoScroll(phone && activeId !== null, dragStartY, '.done')
 
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(SteadyMouseSensor, { activationConstraint: { distance: 6 } }),
     // Touch: even vasthouden om te slepen; snel horizontaal bewegen is vegen (zie TodoCard).
-    useSensor(TouchSensor, { activationConstraint: { delay: 230, tolerance: 8 } }),
+    useSensor(SteadyTouchSensor, {
+      activationConstraint: coarse ? { distance: 4 } : { delay: 230, tolerance: 8 },
+    }),
     // Enter is voor open/dichtklappen van notities; spatie pakt een taak op.
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -498,7 +545,7 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
                 To do {todos.length > 0 && <span className="badge">{todos.length}</span>}
               </h2>
               {todos.length > 0 && (
-                <p className="swipe-hint">Veeg → om af te ronden, ← om te verwijderen. Houd vast om te slepen.</p>
+                <p className="swipe-hint">Sleep aan ⋮⋮ om te verplaatsen of naar Gedaan te brengen. Veeg → om af te ronden, ← om te verwijderen.</p>
               )}
 
               {loaded && todos.length === 0 ? (
@@ -542,25 +589,21 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
             modifiers={[keepGrabInCard]}
             style={{ width: overlayWidth(), height: 'auto' }}
           >
-            {active ? <TodoCardView todo={active} now={now} overlay /> : null}
+            {active ? <TodoCardView todo={active} now={now} overlay showGrip={coarse} /> : null}
           </DragOverlay>
         </DndContext>
 
         {onLogout && (
           <footer className="footer">
-            {onLock && (
-              <button className="footer-lock" type="button" onClick={onLock}>
-                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                  <rect x="5" y="10.5" width="14" height="10" rx="3" fill="none" stroke="currentColor" strokeWidth="2" />
-                  <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                Vergrendelen
-              </button>
-            )}
             {/* Uitloggen is zelden nodig: weggestopt, zodat je er niet per ongeluk op drukt. */}
             <details className="footer-more">
               <summary>Meer…</summary>
               <div className="footer-more-items">
+                {onLock && (
+                  <button className="link" type="button" onClick={onLock}>
+                    Vergrendelen
+                  </button>
+                )}
                 <button className="link" type="button" onClick={onSetPin}>
                   Pincode wijzigen
                 </button>

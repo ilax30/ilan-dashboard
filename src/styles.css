@@ -1069,19 +1069,6 @@ button {
   gap: 8px 18px;
 }
 
-.footer-lock {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 18px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--card);
-  box-shadow: var(--shadow);
-  font-weight: 500;
-  transition: transform 160ms var(--ease-out);
-}
-
 .footer-more summary {
   padding: 4px 8px;
   color: var(--muted);
@@ -1099,14 +1086,6 @@ button {
   justify-content: center;
   gap: 4px 14px;
   margin-top: 6px;
-}
-
-.footer-lock svg {
-  color: var(--accent);
-}
-
-.footer-lock:active {
-  transform: scale(0.97);
 }
 
 /* ---------- Lokale taken overzetten ---------- */
@@ -2229,11 +2208,46 @@ button {
   font-size: 0.85rem;
 }
 
+/* ---------- Greep om te slepen (touchscreens) ---------- */
+
+.grip {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 48px;
+  margin: -6px -6px -6px 0;
+  border-radius: 12px;
+  color: var(--muted);
+  cursor: grab;
+  /* Hier mag de browser nooit scrollen: dan kan hij het slepen ook niet afbreken. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.grip:active {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.card-overlay .grip {
+  color: var(--accent);
+}
+
 /* ---------- Touchscreens (telefoon / tablet) ---------- */
 
 @media (pointer: coarse) {
   .swipe-hint {
     display: block;
+  }
+
+  /* Lang drukken op een kaart: geen tekstselectie of iOS-menu. */
+  .item {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
 
   /* Vingervriendelijke knoppen, altijd zichtbaar. */

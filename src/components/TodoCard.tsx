@@ -12,6 +12,7 @@ import {
   type SyntheticEvent,
 } from 'react'
 import { burstAt } from '../lib/effects'
+import { useMediaQuery } from '../lib/useMediaQuery'
 import { fullDate, sinceLabel } from '../lib/relativeTime'
 import type { Todo } from '../lib/types'
 import { LinkifiedText } from './LinkifiedText'
@@ -42,6 +43,9 @@ type ViewProps = {
   expanded?: boolean
   shine?: number
   starRef?: Ref<HTMLButtonElement>
+  /** Greep om te slepen (touchscreens). */
+  grip?: { ref: (el: HTMLElement | null) => void; listeners: Record<string, unknown> | undefined }
+  showGrip?: boolean
   onStartEdit?: () => void
   onStopEdit?: (title: string | null) => void
   onSaveNotes?: (notes: string) => void
@@ -60,6 +64,8 @@ export function TodoCardView({
   expanded,
   shine = 0,
   starRef,
+  grip,
+  showGrip,
   onStartEdit,
   onStopEdit,
   onSaveNotes,
@@ -172,6 +178,26 @@ export function TodoCardView({
             </svg>
           </button>
         )}
+
+        {showGrip && (
+          <span
+            ref={grip?.ref}
+            className="grip"
+            aria-hidden="true"
+            {...(grip?.listeners as object | undefined)}
+          >
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <g fill="currentColor">
+                <circle cx="9" cy="6" r="1.7" />
+                <circle cx="15" cy="6" r="1.7" />
+                <circle cx="9" cy="12" r="1.7" />
+                <circle cx="15" cy="12" r="1.7" />
+                <circle cx="9" cy="18" r="1.7" />
+                <circle cx="15" cy="18" r="1.7" />
+              </g>
+            </svg>
+          </span>
+        )}
       </div>
 
       {expanded && !still && (
@@ -276,7 +302,8 @@ export function TodoCard({ todo, now, leaving, fresh, onComplete, onRename, onSa
   // Veeg-status buiten React om, zodat de kaart soepel met je vinger meebeweegt.
   const swipe = useRef<{ x: number; y: number; t: number; mode: 'idle' | 'swipe' | 'scroll'; armed: boolean; dx: number } | null>(null)
   const justSwiped = useRef(false)
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const coarse = useMediaQuery('(pointer: coarse)')
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } = useSortable({
     id: todo.id,
     disabled: editing || leaving || tearing,
   })
@@ -341,7 +368,7 @@ export function TodoCard({ todo, now, leaving, fresh, onComplete, onRename, onSa
 
   function onSwipeStart(e: PointerEvent<HTMLLIElement>) {
     if (e.pointerType !== 'touch' || editing || tearing || leaving) return
-    if ((e.target as HTMLElement).closest('button, a, input, textarea, .card-notes')) return
+    if ((e.target as HTMLElement).closest('button, a, input, textarea, .card-notes, .grip')) return
     swipe.current = { x: e.clientX, y: e.clientY, t: performance.now(), mode: 'idle', armed: false, dx: 0 }
   }
 
@@ -428,6 +455,7 @@ export function TodoCard({ todo, now, leaving, fresh, onComplete, onRename, onSa
     listeners?.onKeyDown?.(e)
   }
 
+  // Muis: hele kaart sleepbaar. Touch: alleen via de greep (anders breekt scrollen het slepen af).
   return (
     <li
       ref={(node) => {
@@ -441,7 +469,7 @@ export function TodoCard({ todo, now, leaving, fresh, onComplete, onRename, onSa
       data-fresh={fresh || undefined}
       style={{ transform: CSS.Translate.toString(transform), transition }}
       {...attributes}
-      {...listeners}
+      {...(coarse ? {} : listeners)}
       onKeyDown={onKeyDown}
       onClick={onClick}
       onPointerDown={onSwipeStart}
@@ -489,6 +517,8 @@ export function TodoCard({ todo, now, leaving, fresh, onComplete, onRename, onSa
           expanded={expanded}
           shine={shine}
           starRef={starRef}
+          showGrip={coarse}
+          grip={{ ref: setActivatorNodeRef, listeners: coarse ? listeners : undefined }}
           onStartEdit={() => setEditing(true)}
           onStopEdit={(title) => {
             setEditing(false)
