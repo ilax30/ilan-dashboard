@@ -594,7 +594,7 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
                 To do {todos.length > 0 && <span className="badge">{todos.length}</span>}
               </h2>
               {todos.length > 0 && (
-                <p className="swipe-hint">Sleep aan ⋮⋮ om te verplaatsen of naar Gedaan te brengen. Veeg → om af te ronden, ← om te verwijderen.</p>
+                <p className="swipe-hint">Tik voor notities · sleep aan ⋮⋮ naar Gedaan · veeg → afronden, ← verwijderen.</p>
               )}
 
               {loaded && todos.length === 0 ? (

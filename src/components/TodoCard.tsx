@@ -49,7 +49,6 @@ type ViewProps = {
   onStartEdit?: () => void
   onStopEdit?: (title: string | null) => void
   onSaveNotes?: (notes: string) => void
-  onComplete?: () => void
   onToggleStar?: () => void
   onDelete?: () => void
 }
@@ -69,19 +68,21 @@ export function TodoCardView({
   onStartEdit,
   onStopEdit,
   onSaveNotes,
-  onComplete,
   onToggleStar,
   onDelete,
 }: ViewProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (editing) inputRef.current?.select()
+    if (!editing) return
+    inputRef.current?.focus()
+    inputRef.current?.select()
   }, [editing])
 
   function onKey(e: KeyboardEvent<HTMLInputElement>) {
     e.stopPropagation()
-    if (e.key === 'Enter') e.currentTarget.blur()
+    // Enter slaat direct op (niet via blur: dat event komt niet altijd, bijv. als het venster geen focus heeft).
+    if (e.key === 'Enter') onStopEdit?.(e.currentTarget.value)
     if (e.key === 'Escape') onStopEdit?.(null)
   }
 
@@ -132,7 +133,26 @@ export function TodoCardView({
               {...noDrag}
             />
           ) : (
-            <span className="card-title">
+            <span
+              className={expanded && !still ? 'card-title is-editable' : 'card-title'}
+              {...(expanded && !still
+                ? {
+                    role: 'button',
+                    tabIndex: 0,
+                    title: 'Tik om de titel aan te passen',
+                    'aria-label': `Titel "${todo.title}" aanpassen`,
+                    onClick: (e: MouseEvent) => {
+                      if ((e.target as HTMLElement).closest('a')) return
+                      e.stopPropagation()
+                      onStartEdit?.()
+                    },
+                    onKeyDown: (e: KeyboardEvent) => {
+                      e.stopPropagation()
+                      if (e.key === 'Enter') onStartEdit?.()
+                    },
+                  }
+                : {})}
+            >
               <LinkifiedText text={todo.title} interactive={!still} />
             </span>
           )}
@@ -203,21 +223,6 @@ export function TodoCardView({
       {expanded && !still && (
         <div className="card-expanded">
           <Notes notes={todo.notes} onSave={(n) => onSaveNotes?.(n)} />
-          <div className="card-actions" {...noDrag} onClick={stop}>
-            {/* Op telefoons staan bewerken/verwijderen hier i.p.v. in de (smalle) rij. */}
-            <button className="action-secondary" type="button" onClick={onStartEdit} onKeyDown={stop}>
-              Bewerken
-            </button>
-            <button className="action-secondary" type="button" onClick={onDelete} onKeyDown={stop}>
-              Verwijderen
-            </button>
-            <button className="complete" type="button" onClick={onComplete} onKeyDown={stop}>
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                <path d="M5 12.5l4.2 4.2L19 7" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Afronden
-            </button>
-          </div>
         </div>
       )}
     </div>
@@ -526,7 +531,6 @@ export function TodoCard({ todo, now, leaving, fresh, onComplete, onRename, onSa
             if (next && next !== todo.title) onRename(todo, next)
           }}
           onSaveNotes={(notes) => onSaveNotes(todo, notes)}
-          onComplete={complete}
           onToggleStar={toggleStar}
           onDelete={tear}
         />

@@ -429,6 +429,14 @@ button {
   font-weight: 500;
 }
 
+/* In een opengeklapte kaart is de titel tikbaar om aan te passen. */
+.card-title.is-editable {
+  cursor: text;
+  text-decoration: underline dotted;
+  text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
+  text-underline-offset: 4px;
+}
+
 .card-preview {
   display: flex;
   align-items: center;
@@ -564,11 +572,11 @@ button {
   }
 }
 
-/* Op touch is er geen hover: knoppen altijd (zacht) zichtbaar. */
-@media (hover: none) {
-  .edit,
-  .delete {
-    opacity: 0.55;
+/* Touch: geen potlood/kruisje. Verwijderen = naar links vegen, titel = tik erop in de open kaart. */
+@media (pointer: coarse) {
+  .card-row .edit,
+  .card-row .delete {
+    display: none;
   }
 }
 
@@ -618,14 +626,6 @@ button {
   cursor: text;
 }
 
-.card-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 10px;
-  cursor: auto;
-}
-
 .complete {
   display: flex;
   align-items: center;
@@ -638,17 +638,6 @@ button {
   font-size: 0.9rem;
   font-weight: 600;
   transition: transform 160ms var(--ease-out);
-}
-
-.action-secondary {
-  display: none;
-  padding: 7px 14px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--bg);
-  color: var(--ink);
-  font-size: 0.9rem;
-  font-weight: 500;
 }
 
 .complete:active {
@@ -2250,15 +2239,6 @@ button {
     -webkit-touch-callout: none;
   }
 
-  /* Vingervriendelijke knoppen, altijd zichtbaar. */
-  .edit,
-  .delete {
-    width: 40px;
-    height: 40px;
-    margin-left: -8px;
-    opacity: 0.6;
-  }
-
   .fav {
     width: 44px;
     height: 44px;
@@ -2309,17 +2289,5 @@ button {
   .card-row .edit,
   .card-row .delete {
     display: none;
-  }
-
-  .action-secondary {
-    display: block;
-  }
-
-  .card-actions {
-    flex-wrap: wrap;
-  }
-
-  .complete {
-    margin-left: auto;
   }
 }
