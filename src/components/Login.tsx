@@ -1,30 +1,54 @@
 import { useState, type FormEvent } from 'react'
+import type { AuthError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
 import { Sprig } from './Decor'
 
-type Step = 'email' | 'sending' | 'code' | 'checking'
+type Method = 'password' | 'code'
+type Step = 'email' | 'busy' | 'code'
+
+/** Supabase-fouten vertalen naar iets wat je kunt oplossen. */
+function explain(error: AuthError, method: Method): string {
+  if (error.status === 429 || error.code === 'over_email_send_rate_limit') {
+    return 'Er zijn net te veel inlogmails verstuurd (max. ± 2 per uur). Gebruik de code of link uit je vorige mail, log in met je wachtwoord, of probeer het over een uur opnieuw.'
+  }
+  if (error.code === 'invalid_credentials') {
+    return 'E-mailadres of wachtwoord klopt niet. Nog geen wachtwoord? Log één keer in met een e-mailcode en stel het in via "Meer…" onderaan.'
+  }
+  if (error.code === 'otp_expired') return 'Die code is verlopen. Vraag een nieuwe aan.'
+  return method === 'code'
+    ? 'Versturen lukte niet. Probeer het zo nog eens.'
+    : 'Inloggen lukte niet. Probeer het zo nog eens.'
+}
 
 /**
- * Inloggen zonder wachtwoord: je krijgt een mail met een link én een 6-cijferige code.
- * De code is handig in een geïnstalleerde app (iPad), waar de link in Safari zou openen.
+ * Inloggen met wachtwoord (geen mail nodig) of met een e-mailcode/-link.
+ * De code is handig in een geïnstalleerde app (iPad), waar een link in Safari zou openen.
  */
 export function Login() {
+  const [method, setMethod] = useState<Method>('password')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [code, setCode] = useState('')
   const [step, setStep] = useState<Step>('email')
   const [error, setError] = useState('')
 
-  async function sendMail(e: FormEvent) {
+  async function submitEmail(e: FormEvent) {
     e.preventDefault()
     if (!supabase) return
     setError('')
-    setStep('sending')
+    setStep('busy')
+    if (method === 'password') {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) setError(explain(error, 'password'))
+      setStep('email')
+      return // Bij succes schakelt App vanzelf door.
+    }
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
     })
     if (error) {
-      setError('Versturen lukte niet. Controleer je e-mailadres en probeer het opnieuw.')
+      setError(explain(error, 'code'))
       setStep('email')
       return
     }
@@ -35,13 +59,18 @@ export function Login() {
     e.preventDefault()
     if (!supabase) return
     setError('')
-    setStep('checking')
+    setStep('busy')
     const { error } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
     if (error) {
-      setError('Die code klopt niet of is verlopen. Vraag een nieuwe aan.')
+      setError(explain(error, 'code'))
       setStep('code')
     }
-    // Bij succes schakelt App vanzelf door via onAuthStateChange.
+  }
+
+  function switchTo(m: Method) {
+    setMethod(m)
+    setError('')
+    setStep('email')
   }
 
   return (
@@ -49,31 +78,18 @@ export function Login() {
       <h1 className="title">Ilan's To-Do lijst</h1>
       <Sprig className="sprig" />
 
-      {step === 'email' || step === 'sending' ? (
+      <div className="login-tabs" role="tablist" aria-label="Manier van inloggen">
+        <button type="button" role="tab" aria-selected={method === 'password'} onClick={() => switchTo('password')}>
+          Wachtwoord
+        </button>
+        <button type="button" role="tab" aria-selected={method === 'code'} onClick={() => switchTo('code')}>
+          Code per e-mail
+        </button>
+      </div>
+
+      {step === 'code' ? (
         <>
-          <p className="login-text">Log in om je lijst op al je apparaten te zien.</p>
-          <form className="add" onSubmit={sendMail}>
-            <input
-              id="login-email"
-              className="add-input"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jouw@email.nl"
-              aria-label="E-mailadres"
-              autoComplete="email"
-            />
-            <button className="add-button" type="submit" disabled={step === 'sending'}>
-              {step === 'sending' ? 'Versturen…' : 'Stuur code'}
-            </button>
-          </form>
-        </>
-      ) : (
-        <>
-          <p className="login-text">
-            Check je mail ({email}). Klik op de link, of vul hieronder de code in.
-          </p>
+          <p className="login-text">Check je mail ({email}). Klik op de link, of vul hieronder de code in.</p>
           <form className="add" onSubmit={verify}>
             <input
               id="login-code"
@@ -87,14 +103,44 @@ export function Login() {
               placeholder="123456"
               aria-label="Code uit de mail"
             />
-            <button className="add-button" type="submit" disabled={step === 'checking'}>
-              {step === 'checking' ? 'Controleren…' : 'Inloggen'}
+            <button className="add-button" type="submit">
+              Inloggen
             </button>
           </form>
           <button className="link" type="button" onClick={() => setStep('email')}>
             Ander e-mailadres of nieuwe code
           </button>
         </>
+      ) : (
+        <form className="login-form" onSubmit={submitEmail}>
+          <input
+            id="login-email"
+            className="login-input"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="jouw@email.nl"
+            aria-label="E-mailadres"
+            autoComplete="email"
+          />
+          {method === 'password' && (
+            <input
+              id="login-password"
+              className="login-input"
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Wachtwoord"
+              aria-label="Wachtwoord"
+              autoComplete="current-password"
+            />
+          )}
+          <button className="complete login-submit" type="submit" disabled={step === 'busy'}>
+            {step === 'busy' ? 'Even geduld…' : method === 'password' ? 'Inloggen' : 'Stuur code'}
+          </button>
+        </form>
       )}
 
       {error && <p className="login-text error">{error}</p>}

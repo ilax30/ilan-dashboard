@@ -2,6 +2,8 @@
  * Pincode-slot per apparaat. Het account zelf blijft ingelogd (Supabase-sessie);
  * de pincode is een snel slot op dit apparaat, opgeslagen als gezouten hash.
  */
+import { supabase } from './supabase'
+
 type Stored = { salt: string; hash: string }
 
 const key = (uid: string) => `notitie.pin.${uid}`
@@ -51,6 +53,23 @@ export async function savePin(uid: string, pin: string) {
   set(key(uid), JSON.stringify(stored))
   set(skipKey(uid), null)
   set(failKey(uid), null)
+  // Ook in je account bewaren, zodat dezelfde pincode op al je apparaten geldt.
+  await supabase?.auth.updateUser({ data: { pin: stored } })
+}
+
+/**
+ * Pincode uit je account (ingesteld op een ander apparaat) overnemen op dit apparaat.
+ * Geeft true als er nu een pincode is.
+ */
+export async function syncPinFromAccount(uid: string) {
+  if (!supabase) return hasPin(uid)
+  const { data } = await supabase.auth.getUser()
+  const stored = data.user?.user_metadata?.pin as Stored | undefined
+  if (stored?.salt && stored?.hash) {
+    set(key(uid), JSON.stringify(stored))
+    return true
+  }
+  return hasPin(uid)
 }
 
 export function clearPin(uid: string) {

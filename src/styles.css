@@ -966,6 +966,66 @@ button {
   transform: scale(0.97);
 }
 
+/* ---------- Inloggen ---------- */
+
+.login-tabs {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.login-tabs button {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.login-tabs button[aria-selected='true'] {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.login-form,
+.set-password {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 380px;
+}
+
+.set-password {
+  margin-top: 6px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid var(--card-edge);
+  border-radius: 14px;
+  background: var(--card);
+  font-size: 16px;
+  outline: none;
+}
+
+.login-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.login-submit {
+  justify-content: center;
+  min-height: 44px;
+  font-size: 1rem;
+}
+
 /* ---------- Pincode-slot ---------- */
 
 .pin {

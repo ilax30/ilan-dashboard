@@ -29,12 +29,13 @@ import { ImportBanner } from './components/ImportBanner'
 import { OldestTask, WeekChart } from './components/Insights'
 import { Login } from './components/Login'
 import { PinPad } from './components/PinPad'
+import { SetPassword } from './components/SetPassword'
 import { ThemeToggle } from './components/ThemeToggle'
 import { TodoCard, TodoCardView } from './components/TodoCard'
 import { Toast, type ToastData } from './components/Toast'
 import { burst } from './lib/effects'
 import { startOfToday, useNow } from './lib/relativeTime'
-import { checkPin, clearPin, failures, hasPin, MAX_TRIES, pinSkipped, savePin, skipPin } from './lib/pin'
+import { checkPin, clearPin, failures, hasPin, MAX_TRIES, pinSkipped, savePin, skipPin, syncPinFromAccount } from './lib/pin'
 import { store, usingSupabase } from './lib/store'
 import { supabase } from './lib/supabase'
 import { useMediaQuery } from './lib/useMediaQuery'
@@ -123,9 +124,15 @@ const AUTO_LOCK_MS = 10 * 60 * 1000
  * per apparaat: bij openen, na 10 minuten op de achtergrond, of via "Vergrendelen".
  */
 function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
-  const [mode, setMode] = useState<'locked' | 'setup' | 'confirm' | 'open'>(() =>
-    hasPin(uid) ? 'locked' : pinSkipped(uid) ? 'open' : 'setup',
-  )
+  const [mode, setMode] = useState<'checking' | 'locked' | 'setup' | 'confirm' | 'open'>('checking')
+
+  // De pincode van je account geldt op elk apparaat (offline: de laatst bekende op dit apparaat).
+  useEffect(() => {
+    if (mode !== 'checking') return
+    syncPinFromAccount(uid)
+      .catch(() => hasPin(uid))
+      .then((found) => setMode(found ? 'locked' : pinSkipped(uid) ? 'open' : 'setup'))
+  }, [mode, uid])
   const [first, setFirst] = useState('')
   const [error, setError] = useState('')
 
@@ -144,6 +151,8 @@ function PinGate({ uid, onLogout }: { uid: string; onLogout: () => void }) {
     clearPin(uid)
     onLogout()
   }
+
+  if (mode === 'checking') return <Blobs />
 
   if (mode === 'locked') {
     return (
@@ -537,6 +546,7 @@ function Board({ onLock, onSetPin, onLogout }: BoardProps) {
             <details className="footer-more">
               <summary>Meer…</summary>
               <div className="footer-more-items">
+                <SetPassword />
                 {onLock && (
                   <button className="link" type="button" onClick={onSetPin}>
                     Pincode wijzigen
