@@ -85,6 +85,11 @@ export function TodoWidget({ size, onOpen }: WidgetProps) {
     timers.current.note = window.setTimeout(() => setNote(null), 3000)
   }
 
+  // Mislukt opslaan (bijv. offline): eerst lokaal terugdraaien, want opnieuw laden lukt dan meestal ook niet.
+  const putBack = (todo: Todo) =>
+    setTodos((list) => list && [...list.filter((t) => t.id !== todo.id), todo].sort(compareTodos))
+  const takeOut = (id: string) => setTodos((list) => list && list.filter((t) => t.id !== id))
+
   function complete(todo: Todo) {
     setTodos((list) => list && list.filter((t) => t.id !== todo.id))
     setUndo(todo)
@@ -95,6 +100,7 @@ export function TodoWidget({ size, onOpen }: WidgetProps) {
       .then(() => emit('todos-changed'))
       .catch(() => {
         setUndo(null)
+        putBack(todo)
         load()
         flash('Opslaan mislukt. Probeer het nog eens.')
       })
@@ -109,6 +115,7 @@ export function TodoWidget({ size, onOpen }: WidgetProps) {
       .update(todo.id, { done_at: null })
       .then(() => emit('todos-changed'))
       .catch(() => {
+        takeOut(todo.id)
         load()
         flash('Opslaan mislukt. Probeer het nog eens.')
       })
@@ -133,6 +140,7 @@ export function TodoWidget({ size, onOpen }: WidgetProps) {
       .create(todo)
       .then(() => emit('todos-changed'))
       .catch(() => {
+        takeOut(todo.id)
         setTitle(text)
         load()
         flash('Opslaan mislukt. Probeer het nog eens.')

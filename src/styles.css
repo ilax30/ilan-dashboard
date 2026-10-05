@@ -3517,9 +3517,21 @@ button {
   margin-top: 24px;
   margin-bottom: 24px;
   border-radius: 32px;
+}
+
+/* De plaat (met vervaging) als laag erachter: backdrop-filter op .app zelf zou vaste elementen erin
+   (zoals de gesleepte kaart van dnd-kit en de Gedaan-balk) aan .app vastpinnen i.p.v. aan het scherm. */
+.app::before,
+.topic-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
+  pointer-events: none;
 }
 
 @media (max-width: 720px) {
@@ -3549,9 +3561,9 @@ button {
   }
 }
 
+/* Geen eigen z-index: dan kunnen lades, toasts en lagen van de pagina boven de zijbalk komen. */
 .shell-main {
   position: relative;
-  z-index: 1;
   min-height: 100dvh;
   margin-left: var(--sidebar-w);
 }
