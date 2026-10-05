@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Timeline } from '../dashboard/Timeline'
 import { TodayHeader } from '../dashboard/TodayHeader'
 import { TodoSummaryCard } from '../dashboard/TodoSummaryCard'
+import { WeatherCard } from '../dashboard/WeatherCard'
 import { emit, useAppEvent } from '../lib/appEvents'
 import { useCalendar } from '../lib/calendar'
 import { getSettings, rememberedPlace, type DashboardSettings } from '../lib/settings'
@@ -20,6 +21,7 @@ export function DashboardPage(_props: PageProps) {
     return place ? { icalUrl: null, layout: null, ...place } : null
   })
   const calendar = useCalendar(Boolean(supabase))
+  const [editing, setEditing] = useState(false)
   const { weather, stale } = useWeather(settings?.latitude ?? null, settings?.longitude ?? null)
 
   const loadSettings = useCallback(() => {
@@ -50,8 +52,13 @@ export function DashboardPage(_props: PageProps) {
         <TodayHeader
           events={calendar.events}
           calendarStatus={calendar.status}
+          onOpenSettings={() => emit('open-settings')}
+          editing={editing}
+          onToggleEditing={() => setEditing((e) => !e)}
+        />
+        <WeatherCard
           weather={weather}
-          weatherStale={stale}
+          stale={stale}
           hasCity={settings === null || settings.latitude !== null}
           onOpenSettings={() => emit('open-settings')}
         />

@@ -2,21 +2,19 @@ import { useEffect, useState } from 'react'
 import type { CalendarStatus } from '../lib/calendar'
 import type { CalEvent } from '../lib/calendarTypes'
 import { formatCountdown, greeting, headline } from '../lib/dayMath'
-import { describeWeather, type Weather } from '../lib/weather'
-import { WeatherIcon } from './WeatherIcon'
+import { dayProgress } from '../lib/dayPart'
 
 type Props = {
   events: CalEvent[]
   calendarStatus: CalendarStatus
-  weather: Weather | null
-  weatherStale: boolean
-  hasCity: boolean
   onOpenSettings: () => void
+  /** Aanpas-stand van de tegels. */
+  editing: boolean
+  onToggleEditing: () => void
 }
 
 const dateFmt = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })
 const timeFmt = new Intl.DateTimeFormat('nl-NL', { hour: '2-digit', minute: '2-digit' })
-const hourFmt = new Intl.DateTimeFormat('nl-NL', { hour: '2-digit' })
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 const hhmm = (iso: string) => timeFmt.format(new Date(iso))
@@ -66,48 +64,10 @@ function AgendaLine({ events, status, now, onOpenSettings }: { events: CalEvent[
   return <span className="today-muted">Geen afspraken meer vandaag</span>
 }
 
-function WeatherBlock({ weather, stale, hasCity, now, onOpenSettings }: { weather: Weather | null; stale: boolean; hasCity: boolean; now: Date; onOpenSettings: () => void }) {
-  if (!hasCity) {
-    return (
-      <button className="today-link today-weather-empty" type="button" onClick={onOpenSettings}>
-        Stel je woonplaats in
-      </button>
-    )
-  }
-  if (!weather) return null // ophalen mislukt en niets in de cache: weer verbergen
-  const { text, icon } = describeWeather(weather.code)
-  const upcoming = weather.hourly.filter((h) => new Date(h.time).getTime() > now.getTime()).slice(0, 4)
-  return (
-    <div className="today-weather">
-      <WeatherIcon icon={icon} />
-      <div className="today-weather-main">
-        <span className="today-temp">{Math.round(weather.temp)}°</span>
-        <span className="today-weather-text">
-          {text}
-          <span className="today-minmax">
-            {Math.round(weather.max)}° / {Math.round(weather.min)}°
-          </span>
-          {stale && <span className="stale-label">niet bijgewerkt</span>}
-        </span>
-      </div>
-      {upcoming.length > 0 && (
-        <ol className="today-hours" aria-label="De komende uren">
-          {upcoming.map((h) => (
-            <li key={h.time}>
-              <span className="today-hour">{hourFmt.format(new Date(h.time))}u</span>
-              <span className="today-hour-temp">{Math.round(h.temp)}°</span>
-              {h.rainChance >= 20 && <span className="today-hour-rain">{h.rainChance}%</span>}
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
-  )
-}
-
-/** Bovenste kaart van het dashboard: klok, begroeting, volgende afspraak en het weer. */
-export function TodayHeader({ events, calendarStatus, weather, weatherStale, hasCity, onOpenSettings }: Props) {
+/** Bovenste kaart van het dashboard: klok, begroeting, volgende afspraak en hoeveel van de dag voorbij is. */
+export function TodayHeader({ events, calendarStatus, onOpenSettings, editing, onToggleEditing }: Props) {
   const now = useClock()
+  const progress = dayProgress(now)
   return (
     <section className="today dash-card" aria-label="Vandaag">
       <div className="today-main">
@@ -119,18 +79,22 @@ export function TodayHeader({ events, calendarStatus, weather, weatherStale, has
           <AgendaLine events={events} status={calendarStatus} now={now} onOpenSettings={onOpenSettings} />
           {calendarStatus === 'stale' && <span className="stale-label">niet bijgewerkt</span>}
         </p>
+        <div className="today-progress">
+          <div
+            className="today-progress-bar"
+            role="progressbar"
+            aria-label="Hoeveel van je dag voorbij is"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={progress}
+          >
+            <span style={{ width: `${progress}%` }} />
+          </div>
+          <span className="today-progress-label">{progress}% van je dag</span>
+        </div>
       </div>
-      <WeatherBlock weather={weather} stale={weatherStale} hasCity={hasCity} now={now} onOpenSettings={onOpenSettings} />
-      <button className="icon-button today-gear" type="button" onClick={onOpenSettings} aria-label="Instellingen">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-          <circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" strokeWidth="2" />
-          <path
-            d="M12 2.8v2.6M12 18.6v2.6M21.2 12h-2.6M5.4 12H2.8M18.5 5.5l-1.8 1.8M7.3 16.7l-1.8 1.8M18.5 18.5l-1.8-1.8M7.3 7.3L5.5 5.5"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </svg>
+      <button className="layout-edit" type="button" aria-pressed={editing} onClick={onToggleEditing}>
+        {editing ? 'Klaar' : 'Indeling aanpassen'}
       </button>
     </section>
   )
