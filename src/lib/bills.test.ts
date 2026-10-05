@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dueDayFor, dueLabel, dueSoon, formatEuro, monthlyTotal, nextDueAfter, openThisMonth, parseAmount, type Bill } from './bills'
+import { CADENCES, dueDayFor, dueLabel, dueSoon, formatEuro, monthlyTotal, nextDueAfter, openThisMonth, parseAmount, type Bill } from './bills'
 
 const bill = (id: string, over: Partial<Bill> = {}): Bill => ({
   id,
@@ -86,5 +86,16 @@ describe('dueDayFor', () => {
   it('neemt de dag van de gekozen datum bij een nieuwe last of een andere dag', () => {
     expect(dueDayFor('2026-11-15', huur)).toBe(15)
     expect(dueDayFor('2026-11-30')).toBe(30)
+  })
+})
+
+describe('eenmalige betaling', () => {
+  const now = new Date('2026-10-05T12:00')
+  const once = bill('Tandarts', { amount: 80, cadence: 'eenmalig', next_due: '2026-10-20', due_day: 20 })
+  it('telt één keer mee in openstaand deze maand, niet in vaste lasten per maand', () => {
+    expect(CADENCES).toContain('eenmalig')
+    expect(openThisMonth([once], now)).toBe(80)
+    expect(openThisMonth([{ ...once, next_due: '2026-11-02' }], now)).toBe(0)
+    expect(monthlyTotal([once, bill('Netflix', { amount: 10 })])).toBe(10)
   })
 })

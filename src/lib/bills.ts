@@ -3,8 +3,8 @@ import { supabase } from './supabase'
 
 // Financiën: vaste lasten (abonnementen, huur, verzekeringen) met bedrag, frequentie en volgende betaaldatum.
 
-export type Cadence = 'week' | 'maand' | 'kwartaal' | 'jaar'
-export const CADENCES: Cadence[] = ['week', 'maand', 'kwartaal', 'jaar']
+export type Cadence = 'week' | 'maand' | 'kwartaal' | 'jaar' | 'eenmalig'
+export const CADENCES: Cadence[] = ['week', 'maand', 'kwartaal', 'jaar', 'eenmalig']
 export const CATEGORIES = ['Wonen', 'Abonnementen', 'Verzekering', 'Overig'] as const
 
 export type Bill = {
@@ -50,15 +50,16 @@ export function openThisMonth(bills: Bill[], now: Date): number {
     let due = b.next_due
     for (let i = 0; due <= end && i < 60; i++) {
       total += b.amount
+      if (b.cadence === 'eenmalig') break
       due = nextDueAfter(due, b.cadence, b.due_day)
     }
   }
   return Math.round(total * 100) / 100
 }
 
-const PER_MONTH: Record<Cadence, number> = { week: 52 / 12, maand: 1, kwartaal: 1 / 3, jaar: 1 / 12 }
+const PER_MONTH: Record<Cadence, number> = { week: 52 / 12, maand: 1, kwartaal: 1 / 3, jaar: 1 / 12, eenmalig: 0 }
 
-/** Alle actieve vaste lasten omgerekend naar per maand. */
+/** Alle actieve vaste lasten omgerekend naar per maand (eenmalige betalingen tellen niet mee). */
 export function monthlyTotal(bills: Bill[]): number {
   return Math.round(bills.filter((b) => b.active).reduce((sum, b) => sum + b.amount * PER_MONTH[b.cadence], 0) * 100) / 100
 }

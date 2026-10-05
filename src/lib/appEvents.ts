@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 // Kleine app-brede seintjes tussen zijbalk, vensters en pagina's (zonder props door alle lagen heen).
-export type AppEvent = 'open-settings' | 'settings-saved' | 'todos-changed' | 'notes-changed' | 'bills-changed' | 'edit-layout'
+export type AppEvent = 'open-settings' | 'settings-saved' | 'todos-changed' | 'notes-changed' | 'bills-changed' | 'wishlist-changed' | 'edit-layout'
 
 export function emit(name: AppEvent) {
   window.dispatchEvent(new Event(`app:${name}`))

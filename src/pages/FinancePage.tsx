@@ -16,11 +16,12 @@ import {
   type Cadence,
 } from '../lib/bills'
 import { billsChanged, useBills } from '../lib/useBills'
+import { Wishlist, type UndoOffer } from './Wishlist'
 
 const UNDO_MS = 5000
 export const NEW_BILL_FLAG = 'bills.new'
 
-const CADENCE_LABEL: Record<Cadence, string> = { week: 'Per week', maand: 'Per maand', kwartaal: 'Per kwartaal', jaar: 'Per jaar' }
+const CADENCE_LABEL: Record<Cadence, string> = { week: 'Per week', maand: 'Per maand', kwartaal: 'Per kwartaal', jaar: 'Per jaar', eenmalig: 'Eenmalig' }
 const dateFmt = new Intl.DateTimeFormat('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })
 const shortFmt = new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'short' })
 
@@ -39,7 +40,7 @@ const todayIso = () => {
 const byDue = (list: Bill[]) =>
   [...list].sort((a, b) => Number(b.active) - Number(a.active) || a.next_due.localeCompare(b.next_due) || a.name.localeCompare(b.name))
 
-type Undo = { text: string; restore: Bill; removed: boolean }
+type Undo = UndoOffer
 
 /** Financiën (#/financien): drie kerncijfers en de lijst met vaste lasten (handmatig bijgehouden). */
 export function FinancePage() {
@@ -83,15 +84,17 @@ export function FinancePage() {
   }
 
   async function markPaid(bill: Bill) {
+    // Eenmalig: na betalen klaar, dus uit de lijst (wel ongedaan te maken).
+    if (bill.cadence === 'eenmalig') return remove(bill, `${bill.name} betaald`)
     const next = { ...bill, next_due: nextDueAfter(bill.next_due, bill.cadence, bill.due_day) }
-    showUndo({ text: `${bill.name} betaald · volgende ${formatDueShort(next.next_due)}`, restore: bill, removed: false })
+    showUndo({ text: `${bill.name} betaald · volgende ${formatDueShort(next.next_due)}`, restore: () => void put(bill) })
     await put(next)
   }
 
-  async function remove(bill: Bill) {
+  async function remove(bill: Bill, text = `${bill.name} verwijderd`) {
     setEditing(null)
     setBills((list) => list && list.filter((b) => b.id !== bill.id))
-    showUndo({ text: `${bill.name} verwijderd`, restore: bill, removed: true })
+    showUndo({ text, restore: () => void put(bill) })
     try {
       await billsStore.remove(bill.id)
       billsChanged()
@@ -106,13 +109,14 @@ export function FinancePage() {
     if (!u) return
     window.clearTimeout(undoTimer.current)
     setUndo(null)
-    await put(u.restore)
+    u.restore()
   }
 
   const list = bills ?? []
   const active = list.filter((b) => b.active)
   const next = dueSoon(active, now, 3650)[0]
   const soon = dueSoon(active, now, 7).length
+  const fixedCount = active.filter((b) => b.cadence !== 'eenmalig').length
 
   return (
     <main className="fin-page">
@@ -132,7 +136,7 @@ export function FinancePage() {
         <div className="fin-stat dash-card">
           <span className="fin-stat-label">Vaste lasten per maand</span>
           <span className="fin-stat-value">{bills ? formatEuro(monthlyTotal(list)) : '–'}</span>
-          <span className="fin-stat-sub">{active.length === 1 ? '1 vaste last' : `${active.length} vaste lasten`}</span>
+          <span className="fin-stat-sub">{fixedCount === 1 ? '1 vaste last' : `${fixedCount} vaste lasten`}</span>
         </div>
         <div className="fin-stat dash-card">
           <span className="fin-stat-label">Volgende betaling</span>
@@ -149,58 +153,62 @@ export function FinancePage() {
         </div>
       </section>
 
-      <section className="fin-list dash-card" aria-label="Vaste lasten">
-        {bills === null ? (
-          <p className="widget-muted">{failed ? 'Vaste lasten konden niet laden.' : 'Laden…'}</p>
-        ) : list.length === 0 ? (
-          <div className="fin-empty">
-            <Wallet size={56} weight="duotone" aria-hidden="true" />
-            <p>Nog geen vaste lasten. Voeg je huur, abonnementen en verzekeringen toe.</p>
-            <button className="settings-button" type="button" onClick={() => setEditing('new')}>
-              <Plus size={16} weight="bold" /> Vaste last toevoegen
-            </button>
-          </div>
-        ) : (
-          <ul className="fin-rows">
-            {byDue(list).map((b) => {
-              const label = b.active ? dueLabel(b.next_due, now) : null
-              return (
-                <li key={b.id} className="fin-row" data-inactive={!b.active || undefined}>
-                  <span className="fin-avatar" aria-hidden="true">
-                    {b.name.trim().charAt(0).toUpperCase()}
-                  </span>
-                  <span className="fin-row-main">
-                    <span className="fin-row-name">{b.name}</span>
-                    <span className="fin-row-meta">
-                      {b.category} · {CADENCE_LABEL[b.cadence].toLowerCase()}
-                      {!b.active && ' · gestopt'}
+      <div className="fin-columns">
+        <section className="fin-list dash-card" aria-label="Vaste lasten">
+          {bills === null ? (
+            <p className="widget-muted">{failed ? 'Vaste lasten konden niet laden.' : 'Laden…'}</p>
+          ) : list.length === 0 ? (
+            <div className="fin-empty">
+              <Wallet size={56} weight="duotone" aria-hidden="true" />
+              <p>Nog geen vaste lasten. Voeg je huur, abonnementen, verzekeringen of een eenmalige betaling toe.</p>
+              <button className="settings-button" type="button" onClick={() => setEditing('new')}>
+                <Plus size={16} weight="bold" /> Vaste last toevoegen
+              </button>
+            </div>
+          ) : (
+            <ul className="fin-rows">
+              {byDue(list).map((b) => {
+                const label = b.active ? dueLabel(b.next_due, now) : null
+                return (
+                  <li key={b.id} className="fin-row" data-inactive={!b.active || undefined}>
+                    <span className="fin-avatar" aria-hidden="true">
+                      {b.name.trim().charAt(0).toUpperCase()}
                     </span>
-                  </span>
-                  <span className="fin-row-due">
-                    {formatDue(b.next_due)}
-                    {label && (
-                      <span className="fin-badge" data-tone={label.tone}>
-                        {label.text}
+                    <span className="fin-row-main">
+                      <span className="fin-row-name">{b.name}</span>
+                      <span className="fin-row-meta">
+                        {b.category} · {CADENCE_LABEL[b.cadence].toLowerCase()}
+                        {!b.active && ' · gestopt'}
                       </span>
-                    )}
-                  </span>
-                  <span className="fin-row-amount">{formatEuro(b.amount)}</span>
-                  <span className="fin-row-actions">
-                    {b.active && (
-                      <button className="settings-button fin-paid" data-variant="ghost" type="button" onClick={() => void markPaid(b)}>
-                        <Check size={15} weight="bold" /> Betaald
+                    </span>
+                    <span className="fin-row-due">
+                      {formatDue(b.next_due)}
+                      {label && (
+                        <span className="fin-badge" data-tone={label.tone}>
+                          {label.text}
+                        </span>
+                      )}
+                    </span>
+                    <span className="fin-row-amount">{formatEuro(b.amount)}</span>
+                    <span className="fin-row-actions">
+                      {b.active && (
+                        <button className="settings-button fin-paid" data-variant="ghost" type="button" onClick={() => void markPaid(b)}>
+                          <Check size={15} weight="bold" /> Betaald
+                        </button>
+                      )}
+                      <button className="icon-button" type="button" title="Bewerken" aria-label={`${b.name} bewerken`} onClick={() => setEditing(b)}>
+                        <PencilSimple size={18} />
                       </button>
-                    )}
-                    <button className="icon-button" type="button" title="Bewerken" aria-label={`${b.name} bewerken`} onClick={() => setEditing(b)}>
-                      <PencilSimple size={18} />
-                    </button>
-                  </span>
-                </li>
-              )
-            })}
-          </ul>
-        )}
-      </section>
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </section>
+
+        <Wishlist onUndo={showUndo} onError={setError} />
+      </div>
 
       {(undo || error) && (
         <p className="notes-status" role="status">

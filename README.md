@@ -28,6 +28,9 @@ op de telefoon een menuknop.
 - **Financiën** (`#/financien`): je vaste lasten (huur, abonnementen, verzekeringen), met de hand bijgehouden,
   zonder bankkoppeling. Bovenaan openstaand deze maand, vaste lasten per maand en de volgende betaling. Met
   **Betaald** schuift een last door naar de volgende datum (een last op de 31e komt na februari weer op de 31e).
+  Een **eenmalige** betaling telt mee in "openstaand" maar niet in "per maand", en verdwijnt na Betaald.
+  Daarnaast het **verlanglijstje**: wat je wilt kopen met prijs, link en een optionele groep (bijv. "Computer"),
+  met het totaal en een subtotaal per groep. Gekocht = doorgestreept; na 24 uur verdwijnt hij.
 - Doelen en Projecten zijn er nog als lege pagina; de inhoud volgt later.
 
 **Look**: licht thema "Zandsteen", donker thema neutraal antraciet, lettertype Inter en Phosphor-iconen. Op de achtergrond

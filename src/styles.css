@@ -6136,3 +6136,136 @@ body {
 .widget-notities .widget-list li {
   width: 100%;
 }
+
+/* Financiën: vaste lasten en verlanglijstje naast elkaar op brede schermen. */
+.fin-page {
+  max-width: 2200px;
+}
+
+.fin-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--gap);
+}
+
+@media (min-width: 1700px) {
+  .fin-columns {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  }
+}
+
+/* Verlanglijstje */
+.wish {
+  padding: 16px 18px 12px;
+}
+
+.wish-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 2px 8px;
+}
+
+.wish-heading {
+  flex: 1;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.wish-total {
+  font-size: 1.35rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.wish-group + .wish-group {
+  margin-top: 10px;
+}
+
+.wish-group-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 8px 0 0;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-soft) 55%, transparent);
+  color: var(--accent-ink);
+  font-size: 0.9rem;
+  font-weight: 650;
+}
+
+.wish-group-total {
+  font-variant-numeric: tabular-nums;
+}
+
+.wish-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wish-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.wish-row:last-child {
+  border-bottom: 0;
+}
+
+.wish-check {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.wish-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.wish-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+a.wish-title:hover {
+  color: var(--accent-ink);
+  text-decoration: underline;
+}
+
+.wish-meta {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.wish-price {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.wish-row[data-bought] .wish-title,
+.wish-row[data-bought] .wish-price {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
