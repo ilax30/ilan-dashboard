@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { Blobs } from './Decor'
+import { Landscape } from './Landscape'
 import { PinPad } from './PinPad'
 import {
   checkPin,
@@ -84,12 +84,12 @@ export function PinGate({
     onLogout()
   }
 
-  if (mode === 'checking') return <Blobs />
+  if (mode === 'checking') return <Landscape />
 
   if (mode === 'locked') {
     return (
       <>
-        <Blobs />
+        <Landscape />
         <PinPad
           title="Welkom terug"
           hint="Vul je pincode in."
@@ -122,7 +122,7 @@ export function PinGate({
   if (mode === 'setup' || mode === 'confirm') {
     return (
       <>
-        <Blobs />
+        <Landscape />
         <PinPad
           title={mode === 'setup' ? 'Nieuwe pincode' : 'Nog een keer'}
           hint={

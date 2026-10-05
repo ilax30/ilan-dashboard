@@ -1,6 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
-import { Blobs } from './components/Decor'
+import { Landscape } from './components/Landscape'
 import { PinGate, type PageControls } from './components/PinGate'
 import { PinLogin } from './components/PinLogin'
 import { ThemeToggle } from './components/ThemeToggle'
@@ -39,7 +39,7 @@ function Gate() {
   }, [])
 
   if (!supabase) return <Page route={route} />
-  if (session === undefined) return <Blobs />
+  if (session === undefined) return <Landscape />
   if (!session) return <PinLogin />
   return (
     <PinGate uid={session.user.id} onLogout={() => supabase?.auth.signOut()}>

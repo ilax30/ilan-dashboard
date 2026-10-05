@@ -7,6 +7,9 @@ export type Weather = {
   code: number
   max: number
   min: number
+  /** Lokale tijd van zonsopkomst/-ondergang vandaag, bijv. "2026-10-05T07:58". */
+  sunrise: string | null
+  sunset: string | null
   hourly: { time: string; temp: number; rainChance: number }[]
 }
 
@@ -34,7 +37,7 @@ export function describeWeather(code: number): { text: string; icon: WeatherIcon
 type Forecast = {
   current?: { temperature_2m?: number; weather_code?: number }
   hourly?: { time?: string[]; temperature_2m?: number[]; precipitation_probability?: (number | null)[] }
-  daily?: { temperature_2m_max?: number[]; temperature_2m_min?: number[] }
+  daily?: { temperature_2m_max?: number[]; temperature_2m_min?: number[]; sunrise?: string[]; sunset?: string[] }
 }
 
 /** Open-Meteo-antwoord → Weather. Gooit als er iets wezenlijks ontbreekt. */
@@ -53,6 +56,8 @@ export function parseForecast(raw: Forecast): Weather {
     code,
     max,
     min,
+    sunrise: daily?.sunrise?.[0] ?? null,
+    sunset: daily?.sunset?.[0] ?? null,
     hourly: times.map((time, i) => ({
       time,
       temp: hourly?.temperature_2m?.[i] ?? temp,
@@ -66,7 +71,7 @@ function forecastUrl(lat: number, lon: number) {
   return (
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
     '&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability' +
-    '&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FAmsterdam&forecast_days=2'
+    '&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FAmsterdam&forecast_days=2'
   )
 }
 

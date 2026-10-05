@@ -18,7 +18,8 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { CSS, getEventCoordinates } from '@dnd-kit/utilities'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AddTodo } from '../components/AddTodo'
-import { Blobs, Heart, Sparks, Sprig } from '../components/Decor'
+import { Heart, Sparks, Sprig } from '../components/Decor'
+import { Landscape } from '../components/Landscape'
 import { CalendarDialog } from '../components/CalendarDialog'
 import { DoneZone } from '../components/DoneZone'
 import { HistoryDrawer, HistoryPanel } from '../components/HistoryDrawer'
@@ -337,7 +338,7 @@ export function TodoPage({ onLock, onSetPin, onLogout }: PageProps) {
 
   return (
     <>
-      <Blobs />
+      <Landscape />
       <button className="back-button" type="button" onClick={() => navigate('/')} aria-label="Terug naar het dashboard">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
           <path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />

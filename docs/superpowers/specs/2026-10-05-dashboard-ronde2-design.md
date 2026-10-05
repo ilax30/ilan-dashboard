@@ -30,17 +30,17 @@ passen zich aan de plek aan. De agenda kan **5 weken vooruit** (Dag/Week/Maand) 
 
 ## Kleuren
 
-Twee thema's via het bestaande dag/nacht-schuifje (standaard volgt het systeem, zoals nu). De oude crème- en
+Donker gewijzigd van blauw naar warm espresso op Ilans verzoek (voorbeeldafbeelding). Twee thema's via het bestaande dag/nacht-schuifje (standaard volgt het systeem, zoals nu). De oude crème- en
 cacao-thema's vervallen. Startwaarden (fijnafstemming in de browser mag, de sfeer niet):
 
-| Token | Licht — Zandsteen | Donker — diep schemerblauw |
+| Token | Licht — Zandsteen | Donker — warm espresso |
 |---|---|---|
-| `--bg` | `#cbbfae` | `#1c2430` |
-| `--card` / `--card-hi` | `#d9cfc1` / `#e2d9cc` | `#283241` / `#313d4e` |
-| `--card-edge` / `--line` | `#c9bba8` / `#b8aa97` | `#3a4657` / `#3a4657` |
-| `--ink` / `--muted` | `#2f2725` / `#5f5149` | `#e9edf2` / `#a3aebb` |
-| `--accent` (terracotta) | `#b9714f` | `#e3a586` |
-| `--tint-0..5` | `#e7b8a0 #b8c9a8 #a9c3d1 #cdb9d6 #e5cf9a #e6b9bf` | `#6b4a3a #3f6f5c #3a5684 #6a5088 #7a6436 #7a4a52` |
+| `--bg` | `#cbbfae` | `#221d1b` |
+| `--card` / `--card-hi` | `#d9cfc1` / `#e2d9cc` | `#2e2825` / `#37302c` |
+| `--card-edge` / `--line` | `#c9bba8` / `#b8aa97` | `#463c37` / `#443b36` |
+| `--ink` / `--muted` | `#2f2725` / `#5f5149` | `#f1e9e2` / `#b4a79d` |
+| `--accent` (terracotta) | `#b9714f` | `#f2b79a` (abrikoos) |
+| `--tint-0..5` | `#e7b8a0 #b8c9a8 #a9c3d1 #cdb9d6 #e5cf9a #e6b9bf` | `#7a5644 #4d684b #4b5370 #5f4c6b #7d6640 #85504f` |
 
 Tekstcontrast minimaal WCAG AA op kaarten. `theme-color`-meta volgt `--bg`.
 

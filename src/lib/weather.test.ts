@@ -36,11 +36,19 @@ describe('parseForecast', () => {
       code: 3,
       max: 17.2,
       min: 9.8,
+      sunrise: null,
+      sunset: null,
       hourly: [
         { time: '2026-10-05T10:00', temp: 14.1, rainChance: 10 },
         { time: '2026-10-05T11:00', temp: 15.4, rainChance: 40 },
       ],
     })
+  })
+
+  it('neemt zonsopkomst en -ondergang mee als ze er zijn', () => {
+    const withSun = { ...raw, daily: { ...raw.daily, sunrise: ['2026-10-05T07:58'], sunset: ['2026-10-05T19:05'] } }
+    expect(parseForecast(withSun)).toMatchObject({ sunrise: '2026-10-05T07:58', sunset: '2026-10-05T19:05' })
+    expect(parseForecast(raw)).toMatchObject({ sunrise: null, sunset: null })
   })
 
   it('gooit bij een onvolledig antwoord', () => {

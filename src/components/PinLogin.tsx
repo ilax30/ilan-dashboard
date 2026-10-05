@@ -2,7 +2,7 @@ import { FunctionsHttpError } from '@supabase/supabase-js'
 import { useState } from 'react'
 import { consumeUnlockedByLogin, markUnlockedByLogin, savePinLocal } from '../lib/pin'
 import { supabase } from '../lib/supabase'
-import { Blobs } from './Decor'
+import { Landscape } from './Landscape'
 import { PinPad } from './PinPad'
 
 function minutes(seconds: number) {
@@ -55,7 +55,7 @@ export function PinLogin() {
 
   return (
     <>
-      <Blobs />
+      <Landscape />
       <PinPad title="Welkom" hint="Vul je pincode in." error={error} onComplete={login} />
     </>
   )

@@ -37,58 +37,58 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #1c2430;
-    --blob: #222c3a;
-    --ink: #e9edf2;
-    --muted: #a3aebb;
-    --accent: #e3a586;
-    --accent-ink: #edb99f;
-    --accent-soft: #4b3a3c;
-    --card: #283241;
-    --line: #3a4657;
+    --bg: #221d1b;
+    --blob: #2a2421;
+    --ink: #f1e9e2;
+    --muted: #b4a79d;
+    --accent: #f2b79a;
+    --accent-ink: #f6c7ae;
+    --accent-soft: #4a3a33;
+    --card: #2e2825;
+    --line: #443b36;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 8px 20px -10px rgb(0 0 0 / 0.5);
     --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 20px 40px -12px rgb(0 0 0 / 0.6);
-    --card-hi: #313d4e;
-    --card-edge: #3a4657;
-    --card-gloss: rgb(255 255 255 / 0.06);
-    --gloss: rgb(255 255 255 / 0.05);
-    --glare: rgb(220 235 255 / 0.08);
-    --shine: rgb(235 240 255 / 0.25);
+    --card-hi: #37302c;
+    --card-edge: #463c37;
+    --card-gloss: rgb(255 245 235 / 0.06);
+    --gloss: rgb(255 245 235 / 0.05);
+    --glare: rgb(255 236 220 / 0.08);
+    --shine: rgb(255 240 225 / 0.25);
     --shine-gold: rgb(255 210 130 / 0.3);
     --gold: #e6b25c;
     --gold-hi: #f8d98f;
     --gold-deep: #b97a2c;
     --blush: #e3a49c;
-    --holo: linear-gradient(125deg, #d9a85c, #c97e66, #a98ac5, #6fa0b0, #d9a85c);
+    --holo: linear-gradient(125deg, #d9a85c, #c97e66, #c58aa6, #7fa89f, #d9a85c);
     --holo-tint: rgb(233 169 198 / 0.07);
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --bg: #1c2430;
-  --blob: #222c3a;
-  --ink: #e9edf2;
-  --muted: #a3aebb;
-  --accent: #e3a586;
-  --accent-ink: #edb99f;
-  --accent-soft: #4b3a3c;
-  --card: #283241;
-  --line: #3a4657;
+  --bg: #221d1b;
+  --blob: #2a2421;
+  --ink: #f1e9e2;
+  --muted: #b4a79d;
+  --accent: #f2b79a;
+  --accent-ink: #f6c7ae;
+  --accent-soft: #4a3a33;
+  --card: #2e2825;
+  --line: #443b36;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 8px 20px -10px rgb(0 0 0 / 0.5);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 20px 40px -12px rgb(0 0 0 / 0.6);
-  --card-hi: #313d4e;
-  --card-edge: #3a4657;
-  --card-gloss: rgb(255 255 255 / 0.06);
-  --gloss: rgb(255 255 255 / 0.05);
-  --glare: rgb(220 235 255 / 0.08);
-  --shine: rgb(235 240 255 / 0.25);
+  --card-hi: #37302c;
+  --card-edge: #463c37;
+  --card-gloss: rgb(255 245 235 / 0.06);
+  --gloss: rgb(255 245 235 / 0.05);
+  --glare: rgb(255 236 220 / 0.08);
+  --shine: rgb(255 240 225 / 0.25);
   --shine-gold: rgb(255 210 130 / 0.3);
   --gold: #e6b25c;
   --gold-hi: #f8d98f;
   --gold-deep: #b97a2c;
   --blush: #e3a49c;
-  --holo: linear-gradient(125deg, #d9a85c, #c97e66, #a98ac5, #6fa0b0, #d9a85c);
+  --holo: linear-gradient(125deg, #d9a85c, #c97e66, #c58aa6, #7fa89f, #d9a85c);
   --holo-tint: rgb(233 169 198 / 0.07);
   color-scheme: dark;
 }
@@ -132,30 +132,7 @@ button {
 
 /* ---------- Achtergrond ---------- */
 
-.blobs {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.blob {
-  position: absolute;
-  width: min(520px, 90vw);
-  fill: var(--blob);
-}
-
-.blob-tr {
-  top: -18%;
-  right: -14%;
-}
-
-.blob-bl {
-  bottom: -22%;
-  left: -18%;
-  transform: rotate(160deg);
-}
+/* Achtergrond: zie "Landschap" onderaan. */
 
 /* ---------- Layout ---------- */
 
@@ -2803,24 +2780,24 @@ button {
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --tint-0: #6b4a3a;
-    --tint-1: #3f6f5c;
-    --tint-2: #3a5684;
-    --tint-3: #6a5088;
-    --tint-4: #7a6436;
-    --tint-5: #7a4a52;
-    --now: #f08a72;
+    --tint-0: #7a5644;
+    --tint-1: #4d684b;
+    --tint-2: #4b5370;
+    --tint-3: #5f4c6b;
+    --tint-4: #7d6640;
+    --tint-5: #85504f;
+    --now: #ec6f5a;
   }
 }
 
 :root[data-theme='dark'] {
-  --tint-0: #6b4a3a;
-  --tint-1: #3f6f5c;
-  --tint-2: #3a5684;
-  --tint-3: #6a5088;
-  --tint-4: #7a6436;
-  --tint-5: #7a4a52;
-  --now: #f08a72;
+  --tint-0: #7a5644;
+  --tint-1: #4d684b;
+  --tint-2: #4b5370;
+  --tint-3: #5f4c6b;
+  --tint-4: #7d6640;
+  --tint-5: #85504f;
+  --now: #ec6f5a;
 }
 
 [data-tint='0'] { --tint: var(--tint-0); }
@@ -3475,5 +3452,185 @@ button {
   .topic-art svg {
     width: 104px;
     height: 104px;
+  }
+}
+
+/* ---------- Landschap (achtergrond, per dagdeel) ---------- */
+
+.landscape {
+  --sky-top: #b9cdd6;
+  --sky-bottom: #e4d8c4;
+  --sun: #f0c060;
+  --hill-1: #c6b79d;
+  --hill-2: #b4a385;
+  --hill-3: #a08f72;
+  --tree: #7f8a62;
+  --trunk: #7a6450;
+  --sun-x: 1150px;
+  --sun-y: 190px;
+  --star-opacity: 0;
+  --sun-opacity: 1;
+  --moon-opacity: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landscape svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.landscape[data-dagdeel='ochtend'] {
+  --sky-top: #e6c3b3;
+  --sky-bottom: #f1dcc5;
+  --sun: #f2b36d;
+  --hill-1: #cdb9a2;
+  --hill-2: #bea78d;
+  --hill-3: #ad977c;
+  --tree: #8b8a66;
+  --sun-x: 330px;
+  --sun-y: 520px;
+}
+
+.landscape[data-dagdeel='avond'] {
+  --sky-top: #cf8f7c;
+  --sky-bottom: #ebbf96;
+  --sun: #e8855a;
+  --hill-1: #b99a86;
+  --hill-2: #a3836f;
+  --hill-3: #8c6e5c;
+  --tree: #6e5d48;
+  --trunk: #5e4838;
+  --sun-x: 1290px;
+  --sun-y: 540px;
+}
+
+.landscape[data-dagdeel='nacht'] {
+  --sky-top: #232c44;
+  --sky-bottom: #444a64;
+  --hill-1: #3d4258;
+  --hill-2: #33374b;
+  --hill-3: #2a2d3f;
+  --tree: #262a3b;
+  --trunk: #20232f;
+  --sun-y: 900px;
+  --star-opacity: 0.9;
+  --sun-opacity: 0;
+  --moon-opacity: 1;
+}
+
+.ls-sky-top,
+.ls-sky-bottom {
+  transition: stop-color 60s linear;
+}
+
+.ls-sky-top {
+  stop-color: var(--sky-top);
+}
+
+.ls-sky-bottom {
+  stop-color: var(--sky-bottom);
+}
+
+.ls-stars {
+  fill: #f4ecd8;
+  opacity: var(--star-opacity);
+  transition: opacity 60s linear;
+}
+
+.ls-sun {
+  fill: var(--sun);
+  opacity: var(--sun-opacity);
+  transform: translate(var(--sun-x), var(--sun-y));
+  transition: transform 60s ease-in-out, opacity 60s linear, fill 60s linear;
+}
+
+.ls-moon {
+  fill: #f2e6c9;
+  opacity: var(--moon-opacity);
+  transform: translate(1260px, 170px);
+  transition: opacity 60s linear;
+}
+
+.ls-crater {
+  fill: #ddd0b2;
+}
+
+.ls-hill-1,
+.ls-hill-2,
+.ls-hill-3,
+.ls-canopy,
+.ls-trunk {
+  transition: fill 60s linear;
+}
+
+.ls-hill-1 {
+  fill: var(--hill-1);
+}
+
+.ls-hill-2 {
+  fill: var(--hill-2);
+}
+
+.ls-hill-3 {
+  fill: var(--hill-3);
+}
+
+.ls-canopy {
+  fill: var(--tree);
+}
+
+.ls-trunk {
+  fill: var(--trunk);
+}
+
+/* Donker thema: landschap gedimd zodat het rustig blijft. */
+.landscape::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .landscape::after {
+    opacity: 0.55;
+  }
+}
+
+:root[data-theme='dark'] .landscape::after {
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landscape *,
+  .landscape::after {
+    transition: none !important;
+  }
+}
+
+/* Pagina's met losse tekst (to-do, onderwerpen) krijgen een zachte plaat, zodat tekst in elk dagdeel leesbaar is. */
+.app,
+.topic-page {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  border-radius: 32px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 720px) {
+  .app,
+  .topic-page {
+    margin-top: 0;
+    margin-bottom: 0;
+    border-radius: 0;
   }
 }

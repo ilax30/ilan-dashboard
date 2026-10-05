@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Blobs } from '../components/Decor'
+import { Landscape } from '../components/Landscape'
 import { MoreFooter } from '../components/MoreFooter'
 import { SettingsDialog } from '../dashboard/SettingsDialog'
 import { Timeline } from '../dashboard/Timeline'
@@ -45,7 +45,7 @@ export function DashboardPage({ onLock, onSetPin, onLogout }: PageProps) {
 
   return (
     <>
-      <Blobs />
+      <Landscape />
       <main className="dash">
         <TodayHeader
           events={calendar.events}

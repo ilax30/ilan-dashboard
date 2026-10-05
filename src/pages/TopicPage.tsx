@@ -1,4 +1,5 @@
-import { Blobs, Sprig } from '../components/Decor'
+import { Sprig } from '../components/Decor'
+import { Landscape } from '../components/Landscape'
 import type { Topic } from '../dashboard/topics'
 import { navigate } from '../lib/router'
 
@@ -7,7 +8,7 @@ export function TopicPage({ topic }: { topic: Topic }) {
   const { Art } = topic
   return (
     <>
-      <Blobs />
+      <Landscape />
       <button className="back-button" type="button" onClick={() => navigate('/')} aria-label="Terug naar het dashboard">
         <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
           <path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />

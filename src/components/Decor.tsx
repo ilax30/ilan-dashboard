@@ -35,15 +35,3 @@ export function Sparks({ className }: { className?: string }) {
   )
 }
 
-export function Blobs() {
-  return (
-    <div className="blobs" aria-hidden="true">
-      <svg className="blob blob-tr" viewBox="0 0 400 400">
-        <path d="M321 61c45 39 63 110 37 165s-95 94-160 96-121-36-139-90 4-125 48-166 169-44 214-5Z" />
-      </svg>
-      <svg className="blob blob-bl" viewBox="0 0 400 400">
-        <path d="M296 90c43 33 74 92 56 142s-82 91-148 97-126-26-148-77 1-123 50-160 147-35 190-2Z" />
-      </svg>
-    </div>
-  )
-}
