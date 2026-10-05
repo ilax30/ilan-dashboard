@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dueLabel, dueSoon, formatEuro, monthlyTotal, nextDueAfter, openThisMonth, parseAmount, type Bill } from './bills'
+import { dueDayFor, dueLabel, dueSoon, formatEuro, monthlyTotal, nextDueAfter, openThisMonth, parseAmount, type Bill } from './bills'
 
 const bill = (id: string, over: Partial<Bill> = {}): Bill => ({
   id,
@@ -74,5 +74,17 @@ describe('dueLabel', () => {
     expect(dueLabel('2026-10-06', now)).toEqual({ text: 'Morgen', tone: 'soon' })
     expect(dueLabel('2026-10-12', now)).toEqual({ text: 'Over 7 dagen', tone: 'soon' })
     expect(dueLabel('2026-10-13', now)).toBeNull()
+  })
+})
+
+describe('dueDayFor', () => {
+  const huur = bill('Huur', { next_due: '2026-11-30', due_day: 31 })
+  it('houdt de vaste dag als de datum niet verandert of op de laatste dag van een kortere maand valt', () => {
+    expect(dueDayFor('2026-11-30', huur)).toBe(31)
+    expect(dueDayFor('2027-02-28', huur)).toBe(31)
+  })
+  it('neemt de dag van de gekozen datum bij een nieuwe last of een andere dag', () => {
+    expect(dueDayFor('2026-11-15', huur)).toBe(15)
+    expect(dueDayFor('2026-11-30')).toBe(30)
   })
 })

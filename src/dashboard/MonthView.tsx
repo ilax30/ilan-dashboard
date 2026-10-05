@@ -16,11 +16,13 @@ type Props = {
   days: Date[]
   /** Maandnummer (0–11) van de getoonde maand: dagen daarbuiten worden vager. */
   month?: number
+  /** Opgehaald bereik: dagen daarbuiten zijn niet geladen (niet klikbaar, niet als 'vrij' tonen). */
+  bounds?: { first: Date; last: Date }
   onPickDay: (day: Date) => void
 }
 
 /** Maandweergave; klik op een dag opent die dag. */
-export function MonthView({ events, now, days, month, onPickDay }: Props) {
+export function MonthView({ events, now, days, month, bounds, onPickDay }: Props) {
   const grid = days
   const today = startOfDay(now).getTime()
   return (
@@ -31,7 +33,8 @@ export function MonthView({ events, now, days, month, onPickDay }: Props) {
         </span>
       ))}
       {grid.map((day, i) => {
-        const list = eventsOnDay(events, day)
+        const unloaded = bounds !== undefined && (day < bounds.first || day > bounds.last)
+        const list = unloaded ? [] : eventsOnDay(events, day)
         const showMonth = i === 0 || day.getDate() === 1
         return (
           <button
@@ -41,8 +44,14 @@ export function MonthView({ events, now, days, month, onPickDay }: Props) {
             data-today={day.getTime() === today || undefined}
             data-past={day.getTime() < today || undefined}
             data-outside={(month !== undefined && day.getMonth() !== month) || undefined}
+            data-unloaded={unloaded || undefined}
+            disabled={unloaded}
             onClick={() => onPickDay(day)}
-            aria-label={`${longFmt.format(day)}: ${list.length} ${list.length === 1 ? 'afspraak' : 'afspraken'}`}
+            aria-label={
+              unloaded
+                ? `${longFmt.format(day)}: buiten het bereik van de agenda`
+                : `${longFmt.format(day)}: ${list.length} ${list.length === 1 ? 'afspraak' : 'afspraken'}`
+            }
           >
             <span className="mv-num">
               {day.getDate()}

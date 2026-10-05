@@ -90,7 +90,19 @@ export function daysUntil(date: string, now: Date): number {
   return Math.round((parse(date).getTime() - today.getTime()) / 86_400_000)
 }
 
-export type DueTone = 'late' | 'today' | 'soon'
+/**
+ * Vaste dag van de maand bij opslaan: de dag van de gekozen datum, maar de bestaande vaste dag blijft
+ * als de datum niet verandert of op de laatste dag van een kortere maand valt (31 → 30 nov → weer 31).
+ */
+export function dueDayFor(date: string, existing?: Pick<Bill, 'next_due' | 'due_day'>): number {
+  const day = Number(date.slice(8, 10))
+  if (!existing) return day
+  if (date === existing.next_due) return existing.due_day
+  const [y, m] = date.split('-').map(Number)
+  return day === daysIn(y, m - 1) && existing.due_day > day ? existing.due_day : day
+}
+
+export type DueTone ='late' | 'today' | 'soon'
 
 /** Label voor betalingen die te laat zijn of binnen 7 dagen vallen; anders null. */
 export function dueLabel(date: string, now: Date): { text: string; tone: DueTone } | null {

@@ -1,28 +1,36 @@
 # Ilan Dashboard
 
-Een persoonlijk dashboard: agenda, taken, weer en (later) doelen, financiën, notities en projecten. Op de takenpagina zet je taken erin, zie je hoe lang ze er al staan, en sleep je ze naar **Gedaan**. Ze verdwijnen dan meteen, en tot 5 seconden later kun je dat nog ongedaan maken.
+Een persoonlijk dashboard: agenda, taken, notities, financiën, weer en (later) doelen en projecten. Op de takenpagina zet je taken erin, zie je hoe lang ze er al staan, en sleep je ze naar **Gedaan**. Ze verdwijnen dan meteen, en tot 5 seconden later kun je dat nog ongedaan maken.
 
 Gebouwd met Vite, React en TypeScript, `@dnd-kit` voor het slepen en (optioneel) Supabase voor opslag en login.
 
 ## Dashboard
 
-Na het inloggen kom je op het **dashboard** (`#/`). Links staat op elke pagina een **zijbalk** met Home, Agenda,
-Taken (`#/todo`), Doelen, Financiën, Notities en Projecten, plus snel een taak toevoegen, het dag/nacht-schuifje,
-Instellingen en Meer… (vergrendelen, pincode, uitloggen). Op de iPad is de zijbalk een icoonbalk (⋯ klapt hem uit),
+Na het inloggen kom je op het **dashboard** (`#/`). Links staat op elke pagina een **zijbalk** met Home, Taken
+(`#/todo`), Agenda, Notities, Financiën, Doelen en Projecten (die twee volgen later), plus snel een taak toevoegen,
+het dag/nacht-schuifje, Instellingen (ook vergrendelen, pincode en uitloggen) en Indeling aanpassen. Op de iPad is de zijbalk een icoonbalk (⋯ klapt hem uit),
 op de telefoon een menuknop.
 
 - **Kop**: datum en klok, begroeting, je volgende afspraak met aftellen ("over 1u 14m") en hoeveel van je dag
-  (07:00–23:00) voorbij is. Rechts het **weer** voor je woonplaats.
+  (07:00–23:00) voorbij is. Daarnaast de eerstvolgende afspraak en betaling, ook als die pas over dagen zijn.
+  Rechts het **weer** voor je woonplaats.
 - **Tegels** op vaste plekken: 1 groot, 1 middel en 4 klein. Standaard Agenda groot, To-do middel en Financiën,
   Doelen, Notities en Projecten klein. Elke tegel past zich aan de maat aan (Agenda klein = volgende afspraak +
   dagbalk, groot = uurrooster; To-do middel = 5 taken met vinkje, groot = 10 + toevoegen).
-- **Indeling aanpassen** (knop in de kop): sleep een tegel op een andere plek en ze ruilen. "Standaardindeling"
+- **Indeling aanpassen** (in de zijbalk): sleep een tegel op een andere plek en ze ruilen. "Standaardindeling"
   zet alles terug. Je indeling wordt in je account bewaard (zelfde op pc en iPad) én op het apparaat.
-- **Agendavenster** (Agenda-tegel of Agenda in de zijbalk): Dag, Week en Maand, 5 weken vooruit vanaf deze
-  maandag. Klik in de maand op een dag om die dag te openen.
-- Doelen, Financiën, Notities en Projecten zijn er nog als lege pagina; de inhoud volgt later.
+- **Agenda** (`#/agenda`): links een mini-maand en de komende 14 dagen, rechts Dag, Week en Maand met een
+  NU-lijn. 13 weken vooruit vanaf deze maandag; dagen daarbuiten zijn gearceerd.
+- **Notities** (`#/notities`): simpel zoals Apple Notes. Zoeken, vastpinnen, verwijderen met ongedaan maken,
+  automatisch opslaan en vinkjes met `[ ]` / `[x]` aan het begin van een regel. Lukt opslaan niet (offline), dan
+  blijft je tekst op het apparaat bewaard en wordt hij bij het volgende bezoek alsnog opgeslagen.
+  **Let op: notities zijn niet versleuteld. Zet er geen wachtwoorden of pincodes in.**
+- **Financiën** (`#/financien`): je vaste lasten (huur, abonnementen, verzekeringen), met de hand bijgehouden,
+  zonder bankkoppeling. Bovenaan openstaand deze maand, vaste lasten per maand en de volgende betaling. Met
+  **Betaald** schuift een last door naar de volgende datum (een last op de 31e komt na februari weer op de 31e).
+- Doelen en Projecten zijn er nog als lege pagina; de inhoud volgt later.
 
-**Look**: licht thema "Zandsteen", donker thema warm espresso, lettertype Inter en Phosphor-iconen. Op de achtergrond
+**Look**: licht thema "Zandsteen", donker thema neutraal antraciet, lettertype Inter en Phosphor-iconen. Op de achtergrond
 een natuurfoto per dagdeel (ochtend, dag, avond, nacht; op basis van zonsopkomst en -ondergang in je woonplaats) en
 in de weerkaart een foto bij het weer. Bronnen: `public/landschap/BRONNEN.md`. Tijdens het
 ontwikkelen kun je een dagdeel bekijken met `?dagdeel=ochtend|dag|avond|nacht` in de adresbalk.
@@ -99,7 +107,7 @@ Dit zijn publieke sleutels; de beveiliging zit in de database-regels.
 
 **Inloggen gaat alleen met een pincode.** De Edge Function [`todo-pin-login`](supabase/functions/todo-pin-login/index.ts) controleert hem op de server (gehasht in `public.todo_pin`, zie [`002_pin_login.sql`](supabase/migrations/002_pin_login.sql)) en geeft bij een goede code een sessie uit, zonder e-mail. Na elke 5 foute pogingen volgt een slot dat steeds verdubbelt (15 min → max. 24 uur).
 
-Daarna blijf je ingelogd; de app vraagt bij openen (en na 10 minuten op de achtergrond) dezelfde pincode als slot, ook offline. Pincode wijzigen: **Meer… → Pincode wijzigen** (geldt dan op alle apparaten).
+Daarna blijf je ingelogd; de app vraagt bij openen dezelfde pincode als slot, ook offline (op de pc pas na 2 uur weg, op telefoon/iPad na 10 minuten op de achtergrond). Pincode wijzigen: **Instellingen → Account → Pincode wijzigen** (geldt dan op alle apparaten).
 
 Alle apparaten gebruiken hetzelfde account en dus dezelfde lijst; de lijst ververst zodra je de app weer voor je haalt.
 

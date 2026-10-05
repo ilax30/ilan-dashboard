@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canStep, step } from './agendaNav'
+import { canStep, clampDay, step } from './agendaNav'
 
 const at = (s: string) => new Date(s)
 // Bereik zoals op de agendapagina: maandag 5 okt t/m zondag 3 jan.
@@ -31,5 +31,14 @@ describe('step', () => {
   })
   it('klopt over de wintertijd heen', () => {
     expect(step('day', at('2026-10-25T00:00'), 1)).toEqual(at('2026-10-26T00:00'))
+  })
+})
+
+describe('clampDay', () => {
+  const bounds = { first: at('2026-10-05T00:00'), last: at('2027-01-03T00:00') }
+  it('houdt een gekozen dag binnen het opgehaalde bereik', () => {
+    expect(clampDay(at('2026-10-01T00:00'), bounds)).toEqual(bounds.first)
+    expect(clampDay(at('2027-01-20T00:00'), bounds)).toEqual(bounds.last)
+    expect(clampDay(at('2026-11-11T00:00'), bounds)).toEqual(at('2026-11-11T00:00'))
   })
 })

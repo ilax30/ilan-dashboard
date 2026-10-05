@@ -54,11 +54,26 @@ export function noteTitle(note: Pick<Note, 'title' | 'body'>): string {
   return parseChecklist(first)?.text.trim() || first.trim()
 }
 
+type OpenNote = Pick<Note, 'id' | 'title' | 'body' | 'pinned'> & { dirty: boolean; isNew: boolean }
+
+/**
+ * Is de open notitie elders (ander apparaat) gewijzigd? Alleen als hier niets onopgeslagen staat:
+ * de serverversie (als die verschilt), 'gone' als hij verwijderd is, anders null.
+ */
+export function remoteUpdate(open: OpenNote, notes: Note[]): Note | 'gone' | null {
+  if (open.dirty || open.isNew) return null
+  const server = notes.find((n) => n.id === open.id)
+  if (!server) return 'gone'
+  return server.title !== open.title || server.body !== open.body || server.pinned !== open.pinned ? server : null
+}
+
 // ---------- Opslag: Supabase (met login) of localStorage (lokale testmodus) ----------
 
 export interface NotesStore {
   list(): Promise<Note[]>
   create(note: Note): Promise<void>
+  /** Hele notitie neerzetten (aanmaken of overschrijven): ook als hij intussen elders verwijderd is. */
+  save(note: Note): Promise<void>
   update(id: string, patch: NotePatch & { updated_at: string }): Promise<void>
   remove(id: string): Promise<void>
 }
@@ -74,6 +89,10 @@ function createSupabaseNotes(db: SupabaseClient): NotesStore {
       return data as Note[]
     },
     async create(note) {
+      const { error } = await notes().upsert(note)
+      if (error) throw error
+    },
+    async save(note) {
       const { error } = await notes().upsert(note)
       if (error) throw error
     },
@@ -111,6 +130,9 @@ const localNotes: NotesStore = {
     return readLocal()
   },
   async create(note) {
+    writeLocal([note, ...readLocal().filter((n) => n.id !== note.id)])
+  },
+  async save(note) {
     writeLocal([note, ...readLocal().filter((n) => n.id !== note.id)])
   },
   async update(id, patch) {

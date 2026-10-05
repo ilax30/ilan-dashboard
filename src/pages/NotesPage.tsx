@@ -1,12 +1,32 @@
 import { ListChecks, MagnifyingGlass, NotePencil, Plus, PushPin, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LinkifiedText } from '../components/LinkifiedText'
-import { isEmptyNote, noteTitle, notesStore, parseChecklist, searchNotes, sortNotes, toggleLine, type Note } from '../lib/notes'
+import { isEmptyNote, noteTitle, notesStore, parseChecklist, remoteUpdate, searchNotes, sortNotes, toggleLine, type Note } from '../lib/notes'
 import { notesChanged, useNotes } from '../lib/useNotes'
 
 const SAVE_MS = 600
 const UNDO_MS = 5000
 export const NEW_NOTE_FLAG = 'notes.new'
+/** Onopgeslagen tekst bij weggaan (bijv. offline): komt terug bij het volgende bezoek. */
+const CONCEPT_KEY = 'notities.concept'
+
+function writeConcept(d: Draft | null) {
+  try {
+    if (d) localStorage.setItem(CONCEPT_KEY, JSON.stringify(d))
+    else localStorage.removeItem(CONCEPT_KEY)
+  } catch {
+    // opslag vol of geblokkeerd
+  }
+}
+
+function readConcept(): Draft | null {
+  try {
+    const d = JSON.parse(localStorage.getItem(CONCEPT_KEY) ?? 'null') as Draft | null
+    return d && typeof d.id === 'string' && typeof d.body === 'string' ? { ...d, dirty: true } : null
+  } catch {
+    return null
+  }
+}
 
 const timeFmt = new Intl.DateTimeFormat('nl-NL', { hour: '2-digit', minute: '2-digit' })
 const dateFmt = new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'short' })
@@ -47,39 +67,48 @@ export function NotesPage() {
   const titleRef = useRef<HTMLInputElement>(null)
   const bodyRef = useRef<HTMLTextAreaElement>(null)
 
-  /** Concept opslaan (nieuw → aanmaken zodra er iets in staat; bestaand → bijwerken). */
-  const save = useCallback(async (d: Draft) => {
+  /**
+   * Concept opslaan: altijd de hele notitie (aanmaken of overschrijven), zodat een mislukte eerste keer
+   * of een notitie die elders verwijderd is niet stil verloren gaat. Geeft terug of het gelukt is.
+   */
+  const save = useCallback(async (d: Draft): Promise<boolean> => {
     window.clearTimeout(saveTimer.current)
-    if (!d.dirty) return
+    if (!d.dirty) return true
+    if (d.isNew && isEmptyNote(d)) {
+      writeConcept(null)
+      return true
+    }
     const now = new Date().toISOString()
     const saved: Note = { id: d.id, title: d.title, body: d.body, pinned: d.pinned, created_at: d.created_at, updated_at: now }
-    if (d.isNew && isEmptyNote(d)) return
     setDraft((cur) => (cur && cur.id === d.id ? { ...cur, isNew: false, dirty: false } : cur))
     setNotes((list) => list && sortNotes([saved, ...list.filter((n) => n.id !== d.id)]))
     try {
-      if (d.isNew) await notesStore.create(saved)
-      else await notesStore.update(d.id, { title: d.title, body: d.body, updated_at: now })
+      await notesStore.save(saved)
       setError(null)
+      writeConcept(null)
       notesChanged()
+      return true
     } catch {
-      setDraft((cur) => (cur && cur.id === d.id ? { ...cur, dirty: true } : cur))
+      setDraft((cur) => (cur && cur.id === d.id ? { ...cur, isNew: d.isNew, dirty: true } : cur))
+      writeConcept(d)
       setError('Opslaan mislukt. Je tekst staat er nog; ik probeer het opnieuw bij de volgende wijziging.')
+      return false
     }
   }, [setNotes])
 
-  /** Bij weggaan van een notitie: opslaan, of weggooien als hij leeg is. */
-  const leave = useCallback(async () => {
+  /** Bij weggaan van een notitie: opslaan, of weggooien als hij leeg is. False = opslaan mislukt, blijf hier. */
+  const leave = useCallback(async (): Promise<boolean> => {
     const d = draftRef.current
-    if (!d) return
+    if (!d) return true
     if (isEmptyNote(d)) {
       if (!d.isNew) {
         setNotes((list) => list && list.filter((n) => n.id !== d.id))
         await notesStore.remove(d.id).catch(() => load())
         notesChanged()
       }
-      return
+      return true
     }
-    await save(d)
+    return save(d)
   }, [save, setNotes, load])
 
   function update(patch: Partial<Pick<Draft, 'title' | 'body'>>) {
@@ -94,13 +123,13 @@ export function NotesPage() {
 
   async function select(note: Note) {
     if (draft?.id === note.id) return
-    await leave()
+    if (!(await leave())) return
     setDraft(toDraft(note))
     setEditing(false)
   }
 
   async function createNote() {
-    await leave()
+    if (!(await leave())) return
     const now = new Date().toISOString()
     setDraft({ id: crypto.randomUUID(), title: '', body: '', pinned: false, created_at: now, isNew: true, dirty: false })
     setEditing(true)
@@ -184,12 +213,44 @@ export function NotesPage() {
     } catch {
       // geen sessie-opslag
     }
-    if (wantsNew) void createNote()
+    const concept = readConcept()
+    if (concept) {
+      // Tekst die vorige keer niet opgeslagen kon worden: terugzetten en opnieuw proberen.
+      setDraft(concept)
+      void save(concept)
+    } else if (wantsNew) void createNote()
     else if (notes[0]) setDraft(toDraft(notes[0]))
   }, [notes])
 
-  // Bij weggaan van de pagina het concept bewaren.
-  useEffect(() => () => void leave(), [leave])
+  // Open notitie elders (ander apparaat) gewijzigd of verwijderd en hier niets onopgeslagen: bijwerken.
+  useEffect(() => {
+    const d = draftRef.current
+    if (!notes || !d) return
+    const remote = remoteUpdate(d, notes)
+    if (remote === 'gone') setDraft(null)
+    else if (remote) setDraft(toDraft(remote))
+  }, [notes])
+
+  // Bij weggaan van de pagina of het sluiten van het tabblad het concept bewaren.
+  useEffect(() => {
+    const flush = () => {
+      const d = draftRef.current
+      if (!d?.dirty) return
+      writeConcept(d)
+      void save(d)
+    }
+    const onHidden = () => {
+      if (document.hidden) flush()
+    }
+    document.addEventListener('visibilitychange', onHidden)
+    window.addEventListener('pagehide', flush)
+    return () => {
+      document.removeEventListener('visibilitychange', onHidden)
+      window.removeEventListener('pagehide', flush)
+      if (draftRef.current?.dirty) writeConcept(draftRef.current)
+      void leave()
+    }
+  }, [leave, save])
   useEffect(() => () => window.clearTimeout(undoTimer.current), [])
 
   const shown = searchNotes(notes ?? [], query)

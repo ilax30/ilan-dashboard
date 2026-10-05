@@ -25,3 +25,10 @@ export function canStep(view: AgendaView, anchor: Date, dir: -1 | 1, bounds: Bou
   const target = step(view, from, dir).getTime()
   return target >= first && target <= last
 }
+
+/** Een dag binnen het opgehaalde bereik houden (bijv. na terugbladeren naar de 1e van de maand). */
+export function clampDay(day: Date, bounds: Bounds): Date {
+  if (day < bounds.first) return bounds.first
+  if (day > bounds.last) return bounds.last
+  return day
+}

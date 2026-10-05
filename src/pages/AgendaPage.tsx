@@ -1,6 +1,6 @@
 import { CaretLeft, CaretRight } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { canStep, step, type AgendaView } from '../dashboard/agendaNav'
+import { canStep, clampDay, step, type AgendaView } from '../dashboard/agendaNav'
 import { MonthView } from '../dashboard/MonthView'
 import { Timeline } from '../dashboard/Timeline'
 import { emit } from '../lib/appEvents'
@@ -65,7 +65,8 @@ export function AgendaPage() {
   }
 
   function goTo(day: Date) {
-    setAnchor(startOfDay(day))
+    // Binnen het opgehaalde bereik blijven: daarbuiten weten we niet of je vrij bent.
+    setAnchor(clampDay(startOfDay(day), bounds))
     setMiniMonth(new Date(day.getFullYear(), day.getMonth(), 1))
   }
 
@@ -211,6 +212,7 @@ export function AgendaPage() {
               now={now}
               days={monthMatrix(anchor)}
               month={anchor.getMonth()}
+              bounds={bounds}
               onPickDay={(d) => {
                 goTo(d)
                 choose('day')
