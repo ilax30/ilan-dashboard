@@ -6,8 +6,10 @@ import { PinLogin } from './components/PinLogin'
 import { ThemeToggle } from './components/ThemeToggle'
 import { useHashRoute, type Route } from './lib/router'
 import { supabase } from './lib/supabase'
+import { topicFor } from './dashboard/topics'
 import { DashboardPage } from './pages/DashboardPage'
 import { TodoPage } from './pages/TodoPage'
+import { TopicPage } from './pages/TopicPage'
 
 export default function App() {
   return (
@@ -19,7 +21,9 @@ export default function App() {
 }
 
 function Page({ route, controls }: { route: Route; controls?: PageControls }) {
-  return route === '/todo' ? <TodoPage {...controls} /> : <DashboardPage {...controls} />
+  if (route === '/todo') return <TodoPage {...controls} />
+  const topic = topicFor(route)
+  return topic ? <TopicPage topic={topic} /> : <DashboardPage {...controls} />
 }
 
 /** Zonder Supabase direct de pagina's; met Supabase eerst inloggen en het pincode-slot. */

@@ -11,4 +11,11 @@ describe('parseRoute', () => {
     expect(parseRoute('#/bestaat-niet')).toBe('/')
     expect(parseRoute('#todo')).toBe('/')
   })
+  it("herkent de onderwerp-pagina's", () => {
+    expect(parseRoute('#/doelen')).toBe('/doelen')
+    expect(parseRoute('#/financien')).toBe('/financien')
+    expect(parseRoute('#/notities')).toBe('/notities')
+    expect(parseRoute('#/projecten')).toBe('/projecten')
+    expect(parseRoute('#/onbekend')).toBe('/')
+  })
 })

@@ -3355,3 +3355,125 @@ button {
     font-size: 1.8rem;
   }
 }
+
+/* ---------- Onderwerpen: tegels en (lege) pagina's ---------- */
+
+.tile-value[data-muted] {
+  color: var(--muted);
+  font-size: 1.45rem;
+  font-weight: 500;
+}
+
+.topic-page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 120px 24px 64px;
+  text-align: center;
+}
+
+.topic-art {
+  display: grid;
+  place-items: center;
+  width: 180px;
+  height: 180px;
+  margin-bottom: 18px;
+  border-radius: 44px;
+  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+}
+
+.topic-art svg {
+  width: 136px;
+  height: 136px;
+}
+
+.topic-empty {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.art-hill {
+  fill: color-mix(in srgb, var(--tint-1) 80%, var(--muted));
+}
+
+.art-pole {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.art-flag {
+  fill: var(--accent);
+}
+
+.art-sun {
+  fill: var(--gold);
+}
+
+.art-pig {
+  fill: var(--blush);
+}
+
+.art-dot {
+  fill: var(--ink);
+}
+
+.art-slot {
+  fill: color-mix(in srgb, var(--ink) 55%, var(--blush));
+}
+
+.art-coin {
+  fill: var(--gold);
+  stroke: var(--gold-deep);
+  stroke-width: 2;
+}
+
+.art-page {
+  fill: var(--card-hi);
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.art-ruling {
+  stroke: color-mix(in srgb, var(--muted) 55%, transparent);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.art-pencil {
+  fill: var(--gold);
+}
+
+.art-pencil-tip {
+  fill: var(--accent-ink);
+}
+
+.art-folder-back {
+  fill: color-mix(in srgb, var(--accent) 55%, var(--card-hi));
+}
+
+.art-folder {
+  fill: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .topic-page {
+    padding-top: 96px;
+  }
+
+  .topic-art {
+    width: 140px;
+    height: 140px;
+  }
+
+  .topic-art svg {
+    width: 104px;
+    height: 104px;
+  }
+}
