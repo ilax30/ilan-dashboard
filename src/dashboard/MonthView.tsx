@@ -1,5 +1,5 @@
 import type { CalEvent } from '../lib/calendarTypes'
-import { colorIndex, eventsOnDay, monthGrid } from '../lib/dayMath'
+import { colorIndex, eventsOnDay } from '../lib/dayMath'
 
 const WEEKDAYS = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo']
 const timeFmt = new Intl.DateTimeFormat('nl-NL', { hour: '2-digit', minute: '2-digit' })
@@ -9,12 +9,22 @@ const SHOWN = 3
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
 
-/** Maandweergave: 5 weken vanaf maandag van deze week; klik op een dag opent die dag. */
-export function MonthView({ events, now, onPickDay }: { events: CalEvent[]; now: Date; onPickDay: (day: Date) => void }) {
-  const grid = monthGrid(now)
+type Props = {
+  events: CalEvent[]
+  now: Date
+  /** De dagen in het raster (hele weken, maandag eerst). */
+  days: Date[]
+  /** Maandnummer (0–11) van de getoonde maand: dagen daarbuiten worden vager. */
+  month?: number
+  onPickDay: (day: Date) => void
+}
+
+/** Maandweergave; klik op een dag opent die dag. */
+export function MonthView({ events, now, days, month, onPickDay }: Props) {
+  const grid = days
   const today = startOfDay(now).getTime()
   return (
-    <div className="month-view">
+    <div className="month-view" style={{ gridTemplateRows: `auto repeat(${grid.length / 7}, minmax(0, 1fr))` }}>
       {WEEKDAYS.map((w) => (
         <span key={w} className="mv-weekday" aria-hidden="true">
           {w}
@@ -30,6 +40,7 @@ export function MonthView({ events, now, onPickDay }: { events: CalEvent[]; now:
             className="mv-day"
             data-today={day.getTime() === today || undefined}
             data-past={day.getTime() < today || undefined}
+            data-outside={(month !== undefined && day.getMonth() !== month) || undefined}
             onClick={() => onPickDay(day)}
             aria-label={`${longFmt.format(day)}: ${list.length} ${list.length === 1 ? 'afspraak' : 'afspraken'}`}
           >

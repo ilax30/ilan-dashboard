@@ -53,7 +53,7 @@ export function DashboardPage(_props: PageProps) {
       return (
         <AgendaWidget
           size={size}
-          onOpen={() => emit('open-agenda')}
+          onOpen={() => navigate('/agenda')}
           events={calendar.events}
           status={calendar.status}
           onConnect={() => emit('open-settings')}

@@ -5158,3 +5158,242 @@ body {
 .side-link[data-later] {
   opacity: 0.5;
 }
+
+/* ---------- Agendapagina (#/agenda) ---------- */
+
+.agenda-page {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: var(--gap);
+  max-width: 2300px;
+  height: 100dvh;
+  min-height: 640px;
+  margin: 0 auto;
+  padding: 22px 26px;
+}
+
+.agenda-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 16px 16px 12px;
+}
+
+.mini-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mini-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+
+.mini-head .icon-button {
+  width: 30px;
+  height: 30px;
+  box-shadow: none;
+}
+
+.mini-head .icon-button:disabled,
+.agenda-nav .icon-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.mini-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  text-align: center;
+}
+
+.mini-weekday {
+  padding-bottom: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.mini-day {
+  position: relative;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-day[data-outside] {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.mini-day:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.mini-day[data-selected] {
+  background: var(--accent-soft);
+}
+
+.mini-day[data-today] {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 650;
+}
+
+@media (hover: hover) {
+  .mini-day:not(:disabled):not([data-today]):hover {
+    background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+  }
+}
+
+.mini-dot {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  transform: translateX(-50%);
+}
+
+.mini-day[data-today] .mini-dot {
+  background: #fff;
+}
+
+.agenda-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  padding: 10px 2px 4px;
+  overflow-y: auto;
+  border-top: 1px solid var(--line);
+  scrollbar-width: thin;
+}
+
+.agenda-list-day {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.agenda-list-head {
+  margin: 0;
+}
+
+.agenda-list-head button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.agenda-list-head[data-today] button {
+  color: var(--accent-ink);
+}
+
+.agenda-list-allday {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 2px 8px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--tint);
+  font-size: 0.84rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-list-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.agenda-list-item[data-past] {
+  opacity: 0.5;
+}
+
+.agenda-list-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-list-time {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.agenda-main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px 18px 18px;
+}
+
+.agenda-main .agenda-head {
+  flex-wrap: nowrap;
+}
+
+.agenda-main .agenda-title {
+  font-size: 1.5rem;
+}
+
+.agenda-main .agenda-body {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.agenda-main .timeline[data-embedded] {
+  --ppm: 0.95px;
+}
+
+.month-view .mv-day[data-outside] {
+  opacity: 0.4;
+}
+
+@media (max-width: 1100px) {
+  .agenda-page {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+  }
+
+  .agenda-main {
+    min-height: 640px;
+  }
+}
+
+.agenda-main .agenda-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

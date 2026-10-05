@@ -16,6 +16,7 @@ describe('parseRoute', () => {
     expect(parseRoute('#/financien')).toBe('/financien')
     expect(parseRoute('#/notities')).toBe('/notities')
     expect(parseRoute('#/projecten')).toBe('/projecten')
+    expect(parseRoute('#/agenda')).toBe('/agenda')
     expect(parseRoute('#/onbekend')).toBe('/')
   })
 })

@@ -85,7 +85,7 @@ export function Sidebar({ route, controls }: Props) {
         <ul className="side-nav">
           {item('home', 'Home', route === '/', () => navigate('/'))}
           {item('todo', 'Taken', route === '/todo', () => navigate('/todo'))}
-          {item('agenda', 'Agenda', false, () => emit('open-agenda'))}
+          {item('agenda', 'Agenda', route === '/agenda', () => navigate('/agenda'))}
           {TOPICS.map((t) => item(t.id, t.title, route === t.route, () => navigate(t.route), t.later))}
         </ul>
 
