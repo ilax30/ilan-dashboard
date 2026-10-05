@@ -3,27 +3,43 @@ import { useEffect, useState } from 'react'
 import { Landscape } from './components/Landscape'
 import { PinGate, type PageControls } from './components/PinGate'
 import { PinLogin } from './components/PinLogin'
+import { Sidebar } from './components/Sidebar'
 import { ThemeToggle } from './components/ThemeToggle'
+import { SettingsDialog } from './dashboard/SettingsDialog'
+import { topicFor } from './dashboard/topics'
+import { emit, useAppEvent } from './lib/appEvents'
 import { useHashRoute, type Route } from './lib/router'
 import { supabase } from './lib/supabase'
-import { topicFor } from './dashboard/topics'
 import { DashboardPage } from './pages/DashboardPage'
 import { TodoPage } from './pages/TodoPage'
 import { TopicPage } from './pages/TopicPage'
 
 export default function App() {
-  return (
-    <>
-      <ThemeToggle />
-      <Gate />
-    </>
-  )
+  return <Gate />
 }
 
 function Page({ route, controls }: { route: Route; controls?: PageControls }) {
   if (route === '/todo') return <TodoPage {...controls} />
   const topic = topicFor(route)
   return topic ? <TopicPage topic={topic} /> : <DashboardPage {...controls} />
+}
+
+/** Alles na het inloggen: landschap, zijbalk, de pagina en de app-brede vensters. */
+function Shell({ route, controls }: { route: Route; controls?: PageControls }) {
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  useAppEvent('open-settings', () => setSettingsOpen(true))
+  return (
+    <>
+      <Landscape />
+      <div className="shell">
+        <Sidebar route={route} controls={controls} />
+        <div className="shell-main">
+          <Page route={route} controls={controls} />
+        </div>
+      </div>
+      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onSaved={() => emit('settings-saved')} />
+    </>
+  )
 }
 
 /** Zonder Supabase direct de pagina's; met Supabase eerst inloggen en het pincode-slot. */
@@ -38,12 +54,24 @@ function Gate() {
     return () => data.subscription.unsubscribe()
   }, [])
 
-  if (!supabase) return <Page route={route} />
-  if (session === undefined) return <Landscape />
-  if (!session) return <PinLogin />
+  if (!supabase) return <Shell route={route} />
+  if (session === undefined)
+    return (
+      <>
+        <ThemeToggle />
+        <Landscape />
+      </>
+    )
+  if (!session)
+    return (
+      <>
+        <ThemeToggle />
+        <PinLogin />
+      </>
+    )
   return (
     <PinGate uid={session.user.id} onLogout={() => supabase?.auth.signOut()}>
-      {(controls) => <Page route={route} controls={controls} />}
+      {(controls) => <Shell route={route} controls={controls} />}
     </PinGate>
   )
 }

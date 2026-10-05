@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Landscape } from './Landscape'
+import { ThemeToggle } from './ThemeToggle'
 import { PinPad } from './PinPad'
 import {
   checkPin,
@@ -84,11 +85,18 @@ export function PinGate({
     onLogout()
   }
 
-  if (mode === 'checking') return <Landscape />
+  if (mode === 'checking')
+    return (
+      <>
+        <ThemeToggle />
+        <Landscape />
+      </>
+    )
 
   if (mode === 'locked') {
     return (
       <>
+        <ThemeToggle />
         <Landscape />
         <PinPad
           title="Welkom terug"
@@ -122,6 +130,7 @@ export function PinGate({
   if (mode === 'setup' || mode === 'confirm') {
     return (
       <>
+        <ThemeToggle />
         <Landscape />
         <PinPad
           title={mode === 'setup' ? 'Nieuwe pincode' : 'Nog een keer'}

@@ -19,7 +19,6 @@ import { CSS, getEventCoordinates } from '@dnd-kit/utilities'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AddTodo } from '../components/AddTodo'
 import { Heart, Sparks, Sprig } from '../components/Decor'
-import { Landscape } from '../components/Landscape'
 import { CalendarDialog } from '../components/CalendarDialog'
 import { DoneZone } from '../components/DoneZone'
 import { HistoryDrawer, HistoryPanel } from '../components/HistoryDrawer'
@@ -27,7 +26,6 @@ import { ImportBanner } from '../components/ImportBanner'
 import { OldestTask, WeekChart } from '../components/Insights'
 import { TodoCard, TodoCardView } from '../components/TodoCard'
 import { Toast, type ToastData } from '../components/Toast'
-import { MoreFooter } from '../components/MoreFooter'
 import { burst } from '../lib/effects'
 import { SteadyMouseSensor, SteadyTouchSensor } from '../lib/sensors'
 import { startOfToday, useNow } from '../lib/relativeTime'
@@ -35,7 +33,7 @@ import { store, usingSupabase } from '../lib/store'
 import { supabase } from '../lib/supabase'
 import { useMediaQuery } from '../lib/useMediaQuery'
 import { usePhoneAutoScroll } from '../lib/usePhoneAutoScroll'
-import { navigate } from '../lib/router'
+import { useAppEvent } from '../lib/appEvents'
 import { compareTodos, type Todo, type TodoPatch } from '../lib/types'
 
 const DONE = 'done'
@@ -86,7 +84,7 @@ const keepGrabInCard: Modifier = ({ activatorEvent, draggingNodeRect, transform 
 export type PageProps = { onLock?: () => void; onSetPin?: () => void; onLogout?: () => void }
 
 /** De to-do pagina (#/todo). */
-export function TodoPage({ onLock, onSetPin, onLogout }: PageProps) {
+export function TodoPage(_props: PageProps) {
   const now = useNow()
   const [todos, setTodos] = useState<Todo[]>([])
   const [loaded, setLoaded] = useState(false)
@@ -151,6 +149,7 @@ export function TodoPage({ onLock, onSetPin, onLogout }: PageProps) {
   useEffect(() => {
     load()
   }, [load])
+  useAppEvent('todos-changed', load)
 
   // Gesynchroniseerd tussen apparaten: ververs zodra de app weer in beeld komt.
   useEffect(() => {
@@ -338,13 +337,6 @@ export function TodoPage({ onLock, onSetPin, onLogout }: PageProps) {
 
   return (
     <>
-      <Landscape />
-      <button className="back-button" type="button" onClick={() => navigate('/')} aria-label="Terug naar het dashboard">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M14.5 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-        <span className="back-label">Dashboard</span>
-      </button>
       {!wide && (
         <button className="history-button" type="button" onClick={() => setHistoryOpen(true)} aria-haspopup="dialog">
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
@@ -448,7 +440,6 @@ export function TodoPage({ onLock, onSetPin, onLogout }: PageProps) {
           </DragOverlay>
         </DndContext>
 
-        <MoreFooter onLock={onLock} onSetPin={onSetPin} onLogout={onLogout} />
       </div>
 
       {!wide && (

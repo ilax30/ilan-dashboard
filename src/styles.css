@@ -3655,3 +3655,300 @@ button {
     border-radius: 0;
   }
 }
+
+/* ---------- App-schil met zijbalk ---------- */
+
+:root {
+  --sidebar-w: 0px;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --sidebar-w: 72px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --sidebar-w: 240px;
+  }
+}
+
+.shell-main {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  margin-left: var(--sidebar-w);
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: var(--sidebar-w);
+  padding: 22px 14px 16px;
+  overflow-y: auto;
+  border-right: 1px solid var(--card-edge);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.side-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 8px 14px;
+}
+
+.side-logo {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: var(--card-hi);
+}
+
+.side-title {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  line-height: 1.05;
+}
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.side-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 1rem;
+  text-align: left;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.side-link svg {
+  flex-shrink: 0;
+}
+
+@media (hover: hover) {
+  .side-link:hover {
+    background: color-mix(in srgb, var(--card-hi) 70%, transparent);
+    color: var(--ink);
+  }
+}
+
+.side-link[data-active] {
+  background: var(--card-hi);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.side-link[data-active] svg {
+  color: var(--accent);
+}
+
+.side-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.side-quick {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.side-quick-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.side-quick-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  font-size: 0.95rem;
+}
+
+.side-quick-input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.side-quick-note {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.side-theme {
+  padding: 2px 4px;
+}
+
+/* In de zijbalk staat het schuifje gewoon in de lijst, niet vast linksboven. */
+.side-theme .theme-toggle {
+  position: relative;
+  top: auto;
+  left: auto;
+}
+
+.side-more .footer {
+  margin: 0;
+  justify-content: flex-start;
+}
+
+.side-more .footer-more-items {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.side-menu-button,
+.side-backdrop {
+  display: none;
+}
+
+/* iPad: alleen icoontjes. */
+@media (min-width: 900px) and (max-width: 1279.98px) {
+  .sidebar {
+    align-items: center;
+    padding: 18px 10px;
+  }
+
+  .side-label,
+  .side-quick,
+  .side-more {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .side-brand {
+    padding: 2px 0 12px;
+  }
+
+  .side-link {
+    justify-content: center;
+    width: 48px;
+    padding: 12px;
+  }
+
+  .side-bottom {
+    align-items: center;
+  }
+
+  /* Schuifje past niet in 72 px: kleiner in de icoonbalk. */
+  .side-theme {
+    display: grid;
+    place-items: center start;
+    width: 52px;
+    height: 32px;
+    padding: 0;
+  }
+
+  .side-theme .theme-toggle {
+    flex-shrink: 0;
+    transform: scale(0.6);
+    transform-origin: left center;
+  }
+}
+
+/* Telefoon / iPad staand: menuknop + zijbalk als laag. */
+@media (max-width: 899.98px) {
+  .side-menu-button {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 7;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
+  .side-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: block;
+    background: rgb(30 20 15 / 0.35);
+  }
+
+  .sidebar {
+    z-index: 9;
+    width: min(280px, 86vw);
+    transform: translateX(-105%);
+    transition: transform 260ms var(--ease-out);
+  }
+
+  .sidebar[data-open] {
+    transform: none;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .history-button {
+    left: 70px;
+  }
+}
+
+@media (min-width: 900px) {
+  .history-button {
+    left: calc(var(--sidebar-w) + 24px);
+  }
+}
+
+/* Zonder vast schuifje linksboven kan de bovenmarge van het dashboard kleiner. */
+@media (min-width: 1280px) {
+  .dash {
+    padding-top: 36px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1279.98px) {
+  .dash {
+    padding-top: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
+  }
+}

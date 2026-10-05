@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Landscape } from '../components/Landscape'
-import { MoreFooter } from '../components/MoreFooter'
-import { SettingsDialog } from '../dashboard/SettingsDialog'
 import { Timeline } from '../dashboard/Timeline'
 import { TodayHeader } from '../dashboard/TodayHeader'
 import { TodoSummaryCard } from '../dashboard/TodoSummaryCard'
+import { emit, useAppEvent } from '../lib/appEvents'
 import { useCalendar } from '../lib/calendar'
 import { getSettings, rememberedPlace, type DashboardSettings } from '../lib/settings'
 import { supabase } from '../lib/supabase'
@@ -15,8 +13,7 @@ import type { PageProps } from './TodoPage'
  * Dashboard (#/), desktop eerst: 12-koloms raster.
  * Rij 1 de live kop, rij 2 tijdlijn + to-do, rij 3 (later) de onderwerp-tegels (Doelen, Financiën, …).
  */
-export function DashboardPage({ onLock, onSetPin, onLogout }: PageProps) {
-  const [settingsOpen, setSettingsOpen] = useState(false)
+export function DashboardPage(_props: PageProps) {
   // Start met de onthouden woonplaats: het weer staat er dan meteen, ook offline.
   const [settings, setSettings] = useState<DashboardSettings | null>(() => {
     const place = rememberedPlace()
@@ -42,10 +39,13 @@ export function DashboardPage({ onLock, onSetPin, onLogout }: PageProps) {
       document.removeEventListener('visibilitychange', onVisible)
     }
   }, [loadSettings])
+  useAppEvent('settings-saved', () => {
+    loadSettings()
+    calendar.refresh()
+  })
 
   return (
     <>
-      <Landscape />
       <main className="dash">
         <TodayHeader
           events={calendar.events}
@@ -53,29 +53,18 @@ export function DashboardPage({ onLock, onSetPin, onLogout }: PageProps) {
           weather={weather}
           weatherStale={stale}
           hasCity={settings === null || settings.latitude !== null}
-          onOpenSettings={() => setSettingsOpen(true)}
+          onOpenSettings={() => emit('open-settings')}
         />
         <Timeline
           events={calendar.events}
           status={calendar.status}
-          onConnect={() => setSettingsOpen(true)}
+          onConnect={() => emit('open-settings')}
           onRetry={calendar.refresh}
         />
         <div className="dash-side">
           <TodoSummaryCard />
         </div>
-        <div className="dash-footer">
-          <MoreFooter onLock={onLock} onSetPin={onSetPin} onLogout={onLogout} />
-        </div>
       </main>
-      <SettingsDialog
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        onSaved={() => {
-          loadSettings()
-          calendar.refresh()
-        }}
-      />
     </>
   )
 }
