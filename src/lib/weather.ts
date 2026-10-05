@@ -10,7 +10,7 @@ export type Weather = {
   /** Lokale tijd van zonsopkomst/-ondergang vandaag, bijv. "2026-10-05T07:58". */
   sunrise: string | null
   sunset: string | null
-  hourly: { time: string; temp: number; rainChance: number }[]
+  hourly: { time: string; temp: number; rainChance: number; code: number }[]
 }
 
 export type WeatherIcon = 'sun' | 'partly' | 'cloud' | 'fog' | 'rain' | 'snow' | 'storm'
@@ -36,7 +36,7 @@ export function describeWeather(code: number): { text: string; icon: WeatherIcon
 
 type Forecast = {
   current?: { temperature_2m?: number; weather_code?: number }
-  hourly?: { time?: string[]; temperature_2m?: number[]; precipitation_probability?: (number | null)[] }
+  hourly?: { time?: string[]; temperature_2m?: number[]; precipitation_probability?: (number | null)[]; weather_code?: number[] }
   daily?: { temperature_2m_max?: number[]; temperature_2m_min?: number[]; sunrise?: string[]; sunset?: string[] }
 }
 
@@ -62,6 +62,7 @@ export function parseForecast(raw: Forecast): Weather {
       time,
       temp: hourly?.temperature_2m?.[i] ?? temp,
       rainChance: hourly?.precipitation_probability?.[i] ?? 0,
+      code: hourly?.weather_code?.[i] ?? code,
     })),
   }
 }
@@ -70,7 +71,7 @@ function forecastUrl(lat: number, lon: number) {
   // forecast_days=2: ook 's avonds laat nog een paar uur vooruit kunnen tonen.
   return (
     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-    '&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability' +
+    '&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,weather_code' +
     '&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&timezone=Europe%2FAmsterdam&forecast_days=2'
   )
 }

@@ -1,4 +1,4 @@
-import { ICONS } from '../../components/icons'
+import { Icon } from '../../components/icons'
 import type { CalendarStatus } from '../../lib/calendar'
 import type { CalEvent } from '../../lib/calendarTypes'
 import { formatCountdown, headline, upcoming } from '../../lib/dayMath'
@@ -80,7 +80,7 @@ export function AgendaWidget({ size, onOpen, events, status, onConnect, onRetry 
   // Geen hooks in StatusMessage, dus als functie aanroepen om te weten of er een melding is.
   const message = StatusMessage({ status, hasEvents: events.length > 0, onConnect, onRetry })
   return (
-    <WidgetCard title="Agenda" icon={ICONS.agenda} size={size} onOpen={onOpen} openLabel="Openen" className="widget-agenda">
+    <WidgetCard title="Agenda" icon={<Icon name="agenda" size={24} />} size={size} onOpen={onOpen} openLabel="Openen" className="widget-agenda">
       {size === 'groot' ? (
         <Timeline events={events} status={status} onConnect={onConnect} onRetry={onRetry} embedded />
       ) : (

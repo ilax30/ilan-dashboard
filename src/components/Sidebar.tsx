@@ -4,7 +4,7 @@ import { emit } from '../lib/appEvents'
 import { navigate, type Route } from '../lib/router'
 import { store } from '../lib/store'
 import type { Todo } from '../lib/types'
-import { ICONS, icon } from './icons'
+import { Icon, type IconName } from './icons'
 import { MoreFooter } from './MoreFooter'
 import type { PageControls } from './PinGate'
 import { ThemeToggle } from './ThemeToggle'
@@ -59,10 +59,10 @@ export function Sidebar({ route, controls }: Props) {
     }
   }
 
-  const item = (key: keyof typeof ICONS, label: string, active: boolean, onClick: () => void) => (
+  const item = (key: IconName, label: string, active: boolean, onClick: () => void) => (
     <li key={label}>
       <button className="side-link" type="button" data-active={active || undefined} aria-current={active ? 'page' : undefined} onClick={onClick} title={label}>
-        {ICONS[key]}
+        <Icon name={key} weight={active ? 'fill' : 'regular'} />
         <span className="side-label">{label}</span>
       </button>
     </li>
@@ -71,13 +71,13 @@ export function Sidebar({ route, controls }: Props) {
   return (
     <>
       <button className="side-menu-button" type="button" aria-label="Menu openen" aria-expanded={open} onClick={() => setOpen(true)}>
-        {ICONS.menu}
+        <Icon name="menu" />
       </button>
       {open && <div className="side-backdrop" onClick={() => setOpen(false)} aria-hidden="true" />}
       <nav className="sidebar" data-open={open || undefined} aria-label="Hoofdmenu">
         <div className="side-brand">
           <span className="side-logo" aria-hidden="true">
-            {icon(<path d="M3 18l5.5-8 4 5 3-4 5.5 7" />)}
+            <Icon name="logo" size={20} weight="bold" />
           </span>
           <span className="side-label side-title">Ilan's dashboard</span>
         </div>
@@ -92,6 +92,7 @@ export function Sidebar({ route, controls }: Props) {
         <div className="side-bottom">
           <form className="side-quick" onSubmit={add}>
             <label className="side-quick-label" htmlFor="side-quick-input">
+              <Icon name="quick" size={18} weight="fill" className="side-quick-icon" />
               Snel toevoegen
             </label>
             <input
@@ -120,7 +121,7 @@ export function Sidebar({ route, controls }: Props) {
           {/* Icoonbalk (iPad): uitklappen voor snel toevoegen en Meer…. */}
           {!open && (
             <button className="side-expand" type="button" aria-label="Menu uitklappen" title="Meer" onClick={() => setOpen(true)}>
-              {icon(<path d="M6 12h.01M12 12h.01M18 12h.01" strokeWidth="3" />)}
+              <Icon name="more" weight="bold" />
             </button>
           )}
         </div>

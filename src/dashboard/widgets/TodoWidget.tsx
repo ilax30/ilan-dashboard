@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
-import { ICONS } from '../../components/icons'
+import { Icon } from '../../components/icons'
 import { emit, useAppEvent } from '../../lib/appEvents'
 import { store } from '../../lib/store'
 import { supabase } from '../../lib/supabase'
@@ -144,7 +144,7 @@ export function TodoWidget({ size, onOpen }: WidgetProps) {
   const shown = list.slice(0, SHOWN[size])
 
   return (
-    <WidgetCard title="To-do" icon={ICONS.todo} size={size} onOpen={onOpen} className="widget-todo">
+    <WidgetCard title="To-do" icon={<Icon name="todo" size={24} weight="fill" />} size={size} onOpen={onOpen} className="widget-todo">
       {todos === null ? (
         <p className="widget-muted">{failed ? 'Taken konden niet laden' : 'Laden…'}</p>
       ) : size === 'klein' ? (

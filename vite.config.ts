@@ -32,8 +32,18 @@ const pwa = VitePWA({
     skipWaiting: true,
     clientsClaim: true,
     navigateFallback: 'index.html',
-    globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+    globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
     runtimeCaching: [
+      {
+        // Natuurfoto's (achtergrond en weerkaart): na de eerste keer offline beschikbaar
+        urlPattern: /\/(landschap|weer)\/[a-z]+\.webp$/i,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'fotos',
+          expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
       {
         // Lettertypes ook offline beschikbaar
         urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/i,

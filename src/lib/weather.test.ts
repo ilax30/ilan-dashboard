@@ -26,6 +26,7 @@ describe('parseForecast', () => {
       time: ['2026-10-05T10:00', '2026-10-05T11:00'],
       temperature_2m: [14.1, 15.4],
       precipitation_probability: [10, 40],
+      weather_code: [3, 61],
     },
     daily: { temperature_2m_max: [17.2], temperature_2m_min: [9.8] },
   }
@@ -39,8 +40,8 @@ describe('parseForecast', () => {
       sunrise: null,
       sunset: null,
       hourly: [
-        { time: '2026-10-05T10:00', temp: 14.1, rainChance: 10 },
-        { time: '2026-10-05T11:00', temp: 15.4, rainChance: 40 },
+        { time: '2026-10-05T10:00', temp: 14.1, rainChance: 10, code: 3 },
+        { time: '2026-10-05T11:00', temp: 15.4, rainChance: 40, code: 61 },
       ],
     })
   })

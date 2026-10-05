@@ -26,8 +26,8 @@
   --holo: linear-gradient(125deg, #f0c47a, #e5977b, #e9a9c6, #a9cdc4, #f0c47a);
   --holo-tint: rgb(233 169 198 / 0.14);
 
-  --font-display: 'Chewy', 'Fredoka', system-ui, sans-serif;
-  --font-body: 'Fredoka', ui-rounded, system-ui, sans-serif;
+  --font-display: 'Inter Variable', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter Variable', 'Inter', system-ui, sans-serif;
 
   --radius: 18px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -1914,9 +1914,9 @@ button {
   }
 }
 
-/* ---------- Breed scherm: drie kolommen ---------- */
+/* ---------- Breed scherm: drie kolommen (vanaf 1600 px, want de zijbalk neemt 240 px in) ---------- */
 
-@media (min-width: 1280px) {
+@media (min-width: 1600px) {
   .app {
     max-width: 1880px;
     padding: 40px 48px 64px;
@@ -3465,163 +3465,49 @@ button {
   }
 }
 
-/* ---------- Landschap (achtergrond, per dagdeel) ---------- */
+/* ---------- Achtergrond: natuurfoto per dagdeel ---------- */
 
 .landscape {
-  --sky-top: #b9cdd6;
-  --sky-bottom: #e4d8c4;
-  --sun: #f0c060;
-  --hill-1: #c6b79d;
-  --hill-2: #b4a385;
-  --hill-3: #a08f72;
-  --tree: #7f8a62;
-  --trunk: #7a6450;
-  --sun-x: 1150px;
-  --sun-y: 190px;
-  --star-opacity: 0;
-  --sun-opacity: 1;
-  --moon-opacity: 0;
   position: fixed;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+  background: var(--bg);
 }
 
-.landscape svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+.ls-photo {
+  position: absolute;
+  inset: 0;
+  background: var(--photo) center 35% / cover no-repeat;
 }
 
-.landscape[data-dagdeel='ochtend'] {
-  --sky-top: #e6c3b3;
-  --sky-bottom: #f1dcc5;
-  --sun: #f2b36d;
-  --hill-1: #cdb9a2;
-  --hill-2: #bea78d;
-  --hill-3: #ad977c;
-  --tree: #8b8a66;
-  --sun-x: 330px;
-  --sun-y: 520px;
+.ls-photo[data-entering] {
+  animation: ls-fade 4s ease forwards;
 }
 
-.landscape[data-dagdeel='avond'] {
-  --sky-top: #cf8f7c;
-  --sky-bottom: #ebbf96;
-  --sun: #e8855a;
-  --hill-1: #b99a86;
-  --hill-2: #a3836f;
-  --hill-3: #8c6e5c;
-  --tree: #6e5d48;
-  --trunk: #5e4838;
-  --sun-x: 1290px;
-  --sun-y: 540px;
+@keyframes ls-fade {
+  from {
+    opacity: 0;
+  }
 }
 
-.landscape[data-dagdeel='nacht'] {
-  --sky-top: #232c44;
-  --sky-bottom: #444a64;
-  --hill-1: #3d4258;
-  --hill-2: #33374b;
-  --hill-3: #2a2d3f;
-  --tree: #262a3b;
-  --trunk: #20232f;
-  --sun-y: 900px;
-  --star-opacity: 0.9;
-  --sun-opacity: 0;
-  --moon-opacity: 1;
-}
-
-.ls-sky-top,
-.ls-sky-bottom {
-  transition: stop-color 60s linear;
-}
-
-.ls-sky-top {
-  stop-color: var(--sky-top);
-}
-
-.ls-sky-bottom {
-  stop-color: var(--sky-bottom);
-}
-
-.ls-stars {
-  fill: #f4ecd8;
-  opacity: var(--star-opacity);
-  transition: opacity 60s linear;
-}
-
-.ls-sun {
-  fill: var(--sun);
-  opacity: var(--sun-opacity);
-  transform: translate(var(--sun-x), var(--sun-y));
-  transition: transform 60s ease-in-out, opacity 60s linear, fill 60s linear;
-}
-
-.ls-moon {
-  fill: #f2e6c9;
-  opacity: var(--moon-opacity);
-  transform: translate(1260px, 170px);
-  transition: opacity 60s linear;
-}
-
-.ls-crater {
-  fill: #ddd0b2;
-}
-
-.ls-hill-1,
-.ls-hill-2,
-.ls-hill-3,
-.ls-canopy,
-.ls-trunk {
-  transition: fill 60s linear;
-}
-
-.ls-hill-1 {
-  fill: var(--hill-1);
-}
-
-.ls-hill-2 {
-  fill: var(--hill-2);
-}
-
-.ls-hill-3 {
-  fill: var(--hill-3);
-}
-
-.ls-canopy {
-  fill: var(--tree);
-}
-
-.ls-trunk {
-  fill: var(--trunk);
-}
-
-/* Donker thema: landschap gedimd zodat het rustig blijft. */
+/* Foto bovenaan zichtbaar, naar beneden toe in de ondergrond; zo blijven kaarten en tekst rustig. */
 .landscape::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--bg);
-  opacity: 0;
-  transition: opacity 400ms ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .landscape::after {
-    opacity: 0.55;
-  }
-}
-
-:root[data-theme='dark'] .landscape::after {
-  opacity: 0.55;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--bg) 52%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 80%, transparent) 38%,
+    var(--bg) 78%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .landscape *,
-  .landscape::after {
-    transition: none !important;
+  .ls-photo[data-entering] {
+    animation: none;
   }
 }
 
@@ -4904,4 +4790,309 @@ button {
   .edit-bar {
     border-radius: 20px;
   }
+}
+
+/* ---------- Typografie: strak (Inter), koppen halfvet met iets krappere letterafstand ---------- */
+
+.title, .col-title, .done-plus, .done-title, .empty-title, .pin-title, .drawer-title, .insight-big,
+.calendar-title, .calendar-month-name, .calendar-day-title, .settings-heading, .today-greeting, .today-temp,
+.tl-title, .side-title, .widget-title, .agenda-title {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+body {
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+/* ==========================================================================
+   Look zoals Ilans voorbeeld: strak, compact, dunne randjes, gekleurde iconen
+   ========================================================================== */
+
+:root {
+  --tile-radius: 18px;
+  --gap: 14px;
+}
+
+.dash {
+  gap: var(--gap);
+}
+
+@media (min-width: 1280px) {
+  .dash {
+    gap: var(--gap);
+    padding: 22px 26px;
+  }
+}
+
+@media (min-width: 2200px) {
+  .dash {
+    gap: 16px;
+    padding: 30px 36px;
+  }
+}
+
+/* Kaarten: iets doorschijnend boven de foto, dun randje, minder ronding. */
+.dash-card {
+  border: 1px solid color-mix(in srgb, var(--card-edge) 80%, transparent);
+  border-radius: var(--tile-radius);
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 8px 24px -14px rgb(0 0 0 / 0.35);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+.slot-handle {
+  border-radius: var(--tile-radius);
+}
+
+/* Kop: begroeting direct op de achtergrond, geen kaart. */
+.today {
+  padding: 10px 6px 6px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.today-date {
+  font-size: 1.05rem;
+}
+
+.today-greeting {
+  margin: 2px 0 6px;
+  font-size: 2.5rem;
+}
+
+.today-agenda {
+  font-size: 1.1rem;
+}
+
+.today-progress-bar {
+  height: 8px;
+  background: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
+.today-progress-bar span {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 85%, #ff8a6a), var(--accent));
+}
+
+.layout-edit {
+  background: color-mix(in srgb, var(--card) 70%, transparent);
+}
+
+/* Weerkaart met foto. */
+.weather-card[data-photo] {
+  position: relative;
+  gap: 10px;
+  padding: 18px 20px;
+  overflow: hidden;
+  border-color: rgb(255 255 255 / 0.12);
+  background:
+    linear-gradient(100deg, rgb(18 14 12 / 0.78) 0%, rgb(18 14 12 / 0.5) 55%, rgb(18 14 12 / 0.25) 100%),
+    var(--weather-photo) center / cover no-repeat;
+  color: #fff;
+}
+
+.weather-now {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weather-card[data-photo] .today-temp {
+  font-size: 2.4rem;
+  font-weight: 600;
+}
+
+.weather-text {
+  font-size: 1.15rem;
+  font-weight: 500;
+}
+
+.weather-details {
+  margin: 0;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 0.92rem;
+}
+
+.weather-hours {
+  display: flex;
+  gap: 18px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weather-hours li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-hour {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.weather-hour-label {
+  color: rgb(255 255 255 / 0.75);
+  font-size: 0.8rem;
+}
+
+.weather-hour-temp {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-card[data-photo] .stale-label {
+  background: rgb(255 255 255 / 0.18);
+  color: #fff;
+}
+
+/* Tegels: compacter, koppen zoals het voorbeeld. */
+.widget {
+  gap: 10px;
+  padding: 16px 18px;
+}
+
+.widget[data-size='klein'] {
+  padding: 14px 16px;
+}
+
+.widget-title,
+.widget[data-size='klein'] .widget-title {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.widget-icon {
+  color: var(--ink);
+}
+
+.widget-open {
+  font-size: 0.8rem;
+}
+
+/* Kleur per onderwerp (iconen en vlakken). */
+.widget-financien {
+  --topic: #e0675a;
+}
+
+.widget-doelen {
+  --topic: #47a86a;
+}
+
+.widget-notities {
+  --topic: #d99a2b;
+}
+
+.widget-projecten {
+  --topic: #8a78e6;
+}
+
+.widget-topic .widget-icon,
+.topic-art {
+  color: var(--topic);
+}
+
+.widget-art,
+.topic-art {
+  background: color-mix(in srgb, var(--topic) 15%, transparent);
+}
+
+.widget-art svg,
+.topic-art svg {
+  width: auto;
+  height: auto;
+}
+
+.widget-todo .widget-icon {
+  color: var(--ink);
+}
+
+.widget-check {
+  border-radius: 6px;
+  border-width: 1.5px;
+}
+
+/* Zijbalk zoals het voorbeeld: iets donkerder vlak, geen blur. */
+.sidebar {
+  border-right: 1px solid color-mix(in srgb, var(--card-edge) 70%, transparent);
+  background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.side-logo {
+  background: none;
+  color: var(--accent);
+}
+
+.side-title {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.side-link {
+  font-size: 0.98rem;
+}
+
+.side-link[data-active] {
+  font-weight: 600;
+}
+
+.side-quick-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.side-quick-icon {
+  color: var(--accent);
+}
+
+/* Agendavenster en vensters: zelfde ronding. */
+.agenda-dialog,
+.calendar {
+  border-radius: 22px;
+}
+
+.agenda-body {
+  border-radius: var(--tile-radius);
+}
+
+/* Donker: foto bovenaan iets meer gedimd, zodat datum en begroeting leesbaar blijven bij een felle lucht. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .landscape::after {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg) 68%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 86%, transparent) 38%,
+      var(--bg) 78%
+    );
+  }
+}
+
+:root[data-theme='dark'] .landscape::after {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--bg) 68%, transparent) 0%,
+    color-mix(in srgb, var(--bg) 86%, transparent) 38%,
+    var(--bg) 78%
+  );
+}
+
+.today-date,
+.today-greeting,
+.today-agenda,
+.today-progress-label {
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--bg) 70%, transparent);
 }

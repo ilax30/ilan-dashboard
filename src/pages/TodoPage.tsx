@@ -40,7 +40,8 @@ const DONE = 'done'
 const LEAVE_MS = 320
 const HISTORY_MS = 72 * 3600 * 1000
 const WEEK_MS = 7 * 24 * 3600 * 1000
-const WIDE = '(min-width: 1280px)'
+// Drie kolommen pas vanaf 1600 px: de zijbalk neemt 240 px in.
+const WIDE = '(min-width: 1600px)'
 
 const insertSorted = (list: Todo[], todo: Todo) => [...list.filter((t) => t.id !== todo.id), todo].sort(compareTodos)
 
