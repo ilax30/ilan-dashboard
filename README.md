@@ -6,13 +6,27 @@ Gebouwd met Vite, React en TypeScript, `@dnd-kit` voor het slepen en (optioneel)
 
 ## Dashboard
 
-Na het inloggen kom je op het **dashboard** (`#/`); de to-do lijst staat op `#/todo` (knop **‹ Dashboard** om terug te gaan).
+Na het inloggen kom je op het **dashboard** (`#/`). Links staat op elke pagina een **zijbalk** met Home, Agenda,
+Taken (`#/todo`), Doelen, Financiën, Notities en Projecten, plus snel een taak toevoegen, het dag/nacht-schuifje,
+Instellingen en Meer… (vergrendelen, pincode, uitloggen). Op de iPad is de zijbalk een icoonbalk (⋯ klapt hem uit),
+op de telefoon een menuknop.
 
-- **Kop**: datum en klok, begroeting, je volgende afspraak met aftellen ("over 1u 14m") en het weer voor je woonplaats.
-- **Tijdlijn**: je agenda van vandaag (of de hele week) met een meelopende **NU**-lijn. Elke afspraaktitel heeft een vaste kleur.
-- **To-do**: aantal open taken en je bovenste (favoriete) taak; klik om naar de lijst te gaan. Daaronder snel een taak toevoegen.
+- **Kop**: datum en klok, begroeting, je volgende afspraak met aftellen ("over 1u 14m") en hoeveel van je dag
+  (07:00–23:00) voorbij is. Rechts het **weer** voor je woonplaats.
+- **Tegels** op vaste plekken: 1 groot, 1 middel en 4 klein. Standaard Agenda groot, To-do middel en Financiën,
+  Doelen, Notities en Projecten klein. Elke tegel past zich aan de maat aan (Agenda klein = volgende afspraak +
+  dagbalk, groot = uurrooster; To-do middel = 5 taken met vinkje, groot = 10 + toevoegen).
+- **Indeling aanpassen** (knop in de kop): sleep een tegel op een andere plek en ze ruilen. "Standaardindeling"
+  zet alles terug. Je indeling wordt in je account bewaard (zelfde op pc en iPad) én op het apparaat.
+- **Agendavenster** (Agenda-tegel of Agenda in de zijbalk): Dag, Week en Maand, 5 weken vooruit vanaf deze
+  maandag. Klik in de maand op een dag om die dag te openen.
+- Doelen, Financiën, Notities en Projecten zijn er nog als lege pagina; de inhoud volgt later.
 
-**Instellingen** (tandwiel rechtsboven):
+**Look**: licht thema "Zandsteen", donker thema warm espresso. Op de achtergrond een getekend landschap dat
+meekleurt met ochtend, dag, avond en nacht (op basis van zonsopkomst en -ondergang in je woonplaats). Tijdens het
+ontwikkelen kun je een dagdeel bekijken met `?dagdeel=ochtend|dag|avond|nacht` in de adresbalk.
+
+**Instellingen** (zijbalk):
 
 - **Agenda**: plak het geheime iCal-adres van Google Agenda. Je vindt het op de computer via Google Agenda →
   Instellingen (tandwiel) → links je agenda onder "Instellingen voor mijn agenda's" → "Agenda integreren" →
@@ -21,9 +35,10 @@ Na het inloggen kom je op het **dashboard** (`#/`); de to-do lijst staat op `#/t
   [`dashboard-calendar`](supabase/functions/dashboard-calendar/index.ts). Deel deze link met niemand.
 - **Woonplaats**: zoek en kies je plaats; het weer komt van [Open-Meteo](https://open-meteo.com) (gratis, geen sleutel).
 
-Agenda en weer worden onthouden op het apparaat, dus het dashboard werkt ook offline (met "niet bijgewerkt").
+Agenda, weer, woonplaats en indeling worden onthouden op het apparaat, dus het dashboard werkt ook offline
+(met "niet bijgewerkt").
 
-Tests: `npm test` (Vitest: dag-logica, weer, iCal-uitvouwing incl. zomer-/wintertijd).
+Tests: `npm test` (Vitest, altijd in Amsterdamse tijd: dag-logica, dagdelen, indeling, agenda-bladeren, weer, iCal-uitvouwing incl. zomer-/wintertijd).
 
 ## Lokaal draaien
 
@@ -61,7 +76,7 @@ Losse HTML (om te delen/testen): `npm run build:single` → `dist-single/index.h
 | Bewerken | Het potlood ✎ (Enter = opslaan, Esc = annuleren) |
 | Verwijderen | Het × (de kaart scheurt; je kunt het nog ongedaan maken) |
 | Touch | Veeg → om af te ronden, ← om te verwijderen; houd vast om te slepen |
-| Dag/nacht | Schuifje linksboven |
+| Dag/nacht | Schuifje in de zijbalk |
 | Afgerond (72 uur) | Vaste kolom links op brede schermen, anders de knop **Afgerond** |
 | Overzicht per maand | Kalender-knopje bij **Deze week** (of in de Afgerond-lade) |
 | Links | `https://…` of `www.…` wordt vanzelf een klikbare link |

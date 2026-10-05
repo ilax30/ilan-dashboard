@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { SlotGrid } from '../dashboard/SlotGrid'
 import { TodayHeader } from '../dashboard/TodayHeader'
 import { TOPICS } from '../dashboard/topics'
 import { WeatherCard } from '../dashboard/WeatherCard'
@@ -7,20 +8,11 @@ import { TodoWidget } from '../dashboard/widgets/TodoWidget'
 import { TopicWidget } from '../dashboard/widgets/TopicWidget'
 import { emit, useAppEvent } from '../lib/appEvents'
 import { useSharedCalendar } from '../lib/calendar'
-import { useLayout, type SlotRef, type SlotSize, type WidgetId } from '../lib/layout'
+import { DEFAULT_LAYOUT, useLayout, type SlotSize, type WidgetId } from '../lib/layout'
 import { navigate } from '../lib/router'
 import { getSettings, rememberedPlace, type DashboardSettings } from '../lib/settings'
 import { useWeather } from '../lib/weather'
 import type { PageProps } from './TodoPage'
-
-const SLOTS: { ref: SlotRef; size: SlotSize }[] = [
-  { ref: 'groot', size: 'groot' },
-  { ref: 'middel', size: 'middel' },
-  { ref: 0, size: 'klein' },
-  { ref: 1, size: 'klein' },
-  { ref: 2, size: 'klein' },
-  { ref: 3, size: 'klein' },
-]
 
 /**
  * Dashboard (#/), desktop eerst: 12-koloms raster.
@@ -34,7 +26,7 @@ export function DashboardPage(_props: PageProps) {
   })
   const calendar = useSharedCalendar()
   const [editing, setEditing] = useState(false)
-  const { layout } = useLayout()
+  const { layout, setLayout } = useLayout()
   const { weather, stale } = useWeather(settings?.latitude ?? null, settings?.longitude ?? null)
 
   const loadSettings = useCallback(() => {
@@ -88,14 +80,18 @@ export function DashboardPage(_props: PageProps) {
         hasCity={settings === null || settings.latitude !== null}
         onOpenSettings={() => emit('open-settings')}
       />
-      {SLOTS.map(({ ref, size }) => {
-        const id = typeof ref === 'number' ? layout.klein[ref] : layout[ref]
-        return (
-          <div key={String(ref)} className="slot" data-slot={size}>
-            {widget(id, size)}
-          </div>
-        )
-      })}
+      <SlotGrid layout={layout} editing={editing} onChange={setLayout} render={widget} />
+      {editing && (
+        <div className="edit-bar" role="region" aria-label="Indeling aanpassen">
+          <span className="edit-bar-text">Sleep een tegel naar een andere plek om te ruilen</span>
+          <button className="settings-button" data-variant="ghost" type="button" onClick={() => setLayout(DEFAULT_LAYOUT)}>
+            Standaardindeling
+          </button>
+          <button className="settings-button" type="button" onClick={() => setEditing(false)}>
+            Klaar
+          </button>
+        </div>
+      )}
     </main>
   )
 }
