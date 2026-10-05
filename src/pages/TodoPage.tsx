@@ -26,6 +26,7 @@ import { ImportBanner } from '../components/ImportBanner'
 import { OldestTask, WeekChart } from '../components/Insights'
 import { TodoCard, TodoCardView } from '../components/TodoCard'
 import { Toast, type ToastData } from '../components/Toast'
+import { MoreFooter } from '../components/MoreFooter'
 import { burst } from '../lib/effects'
 import { SteadyMouseSensor, SteadyTouchSensor } from '../lib/sensors'
 import { startOfToday, useNow } from '../lib/relativeTime'
@@ -85,7 +86,6 @@ export type PageProps = { onLock?: () => void; onSetPin?: () => void; onLogout?:
 
 /** De to-do pagina (#/todo). */
 export function TodoPage({ onLock, onSetPin, onLogout }: PageProps) {
-  const [confirmLogout, setConfirmLogout] = useState(false)
   const now = useNow()
   const [todos, setTodos] = useState<Todo[]>([])
   const [loaded, setLoaded] = useState(false)
@@ -447,35 +447,7 @@ export function TodoPage({ onLock, onSetPin, onLogout }: PageProps) {
           </DragOverlay>
         </DndContext>
 
-        {onLogout && (
-          <footer className="footer">
-            {/* Uitloggen is zelden nodig: weggestopt, zodat je er niet per ongeluk op drukt. */}
-            <details className="footer-more">
-              <summary>Meer…</summary>
-              <div className="footer-more-items">
-                {onLock && (
-                  <button className="link" type="button" onClick={onLock}>
-                    Vergrendelen
-                  </button>
-                )}
-                <button className="link" type="button" onClick={onSetPin}>
-                  Pincode wijzigen
-                </button>
-                <button
-                  className="link"
-                  type="button"
-                  onClick={() => {
-                    if (confirmLogout) return onLogout()
-                    setConfirmLogout(true)
-                    setTimeout(() => setConfirmLogout(false), 4000)
-                  }}
-                >
-                  {confirmLogout ? 'Zeker? Daarna moet je weer via e-mail inloggen. Klik nogmaals' : 'Uitloggen'}
-                </button>
-              </div>
-            </details>
-          </footer>
-        )}
+        <MoreFooter onLock={onLock} onSetPin={onSetPin} onLogout={onLogout} />
       </div>
 
       {!wide && (

@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Blobs } from '../components/Decor'
+import { MoreFooter } from '../components/MoreFooter'
 import { SettingsDialog } from '../dashboard/SettingsDialog'
 import { Timeline } from '../dashboard/Timeline'
 import { TodayHeader } from '../dashboard/TodayHeader'
+import { TodoSummaryCard } from '../dashboard/TodoSummaryCard'
 import { useCalendar } from '../lib/calendar'
-import { navigate } from '../lib/router'
 import { getSettings, type DashboardSettings } from '../lib/settings'
 import { supabase } from '../lib/supabase'
 import { useWeather } from '../lib/weather'
 import type { PageProps } from './TodoPage'
 
-/** Dashboard (#/): live kop, tijdlijn en to-do. To-do-kaart volgt in taak 8. */
-export function DashboardPage(_props: PageProps) {
+/**
+ * Dashboard (#/), desktop eerst: 12-koloms raster.
+ * Rij 1 de live kop, rij 2 tijdlijn + to-do, rij 3 (later) de onderwerp-tegels (Doelen, Financiën, …).
+ */
+export function DashboardPage({ onLock, onSetPin, onLogout }: PageProps) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settings, setSettings] = useState<DashboardSettings | null>(null)
   const calendar = useCalendar(Boolean(supabase))
@@ -43,9 +47,10 @@ export function DashboardPage(_props: PageProps) {
           onRetry={calendar.refresh}
         />
         <div className="dash-side">
-          <button className="complete" type="button" onClick={() => navigate('/todo')}>
-            To-do →
-          </button>
+          <TodoSummaryCard />
+        </div>
+        <div className="dash-footer">
+          <MoreFooter onLock={onLock} onSetPin={onSetPin} onLogout={onLogout} />
         </div>
       </main>
       <SettingsDialog
