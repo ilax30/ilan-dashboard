@@ -6100,10 +6100,29 @@ body {
   }
 }
 
-/* Notities-tegel klein: vijf titels onder elkaar. */
-.widget-notities[data-size='klein'] .widget-list {
-  gap: 1px;
+/* Notities-tegel: titels vet met een bolletje ervoor, met wat lucht ertussen. */
+.widget-notities .widget-list {
+  /* Grote kolomafstand: titels die niet passen schuiven ver buiten beeld. */
+  gap: 10px 200px;
   line-height: 1.35;
+}
+
+.widget-notities .widget-list li {
+  align-items: center;
+}
+
+.widget-notities .widget-list li::before {
+  content: '';
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.widget-notities .widget-list .widget-clip {
+  flex: 1;
+  font-weight: 600;
 }
 
 /* Notities-tegel: wat niet past valt helemaal weg (loopt door naar een onzichtbare tweede kolom) i.p.v. half afgekapt. */
