@@ -84,8 +84,7 @@ export function Sidebar({ route, controls }: Props) {
 
         <ul className="side-nav">
           {item('home', 'Home', route === '/', () => navigate('/'))}
-          {/* Het agendavenster komt in taak 10; tot dan naar het dashboard (daar staat de agenda). */}
-          {item('agenda', 'Agenda', false, () => navigate('/'))}
+          {item('agenda', 'Agenda', false, () => emit('open-agenda'))}
           {item('todo', 'Taken', route === '/todo', () => navigate('/todo'))}
           {TOPICS.map((t) => item(t.id, t.title, route === t.route, () => navigate(t.route)))}
         </ul>

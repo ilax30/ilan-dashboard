@@ -5,9 +5,11 @@ import { PinGate, type PageControls } from './components/PinGate'
 import { PinLogin } from './components/PinLogin'
 import { Sidebar } from './components/Sidebar'
 import { ThemeToggle } from './components/ThemeToggle'
+import { AgendaDialog } from './dashboard/AgendaDialog'
 import { SettingsDialog } from './dashboard/SettingsDialog'
 import { topicFor } from './dashboard/topics'
 import { emit, useAppEvent } from './lib/appEvents'
+import { CalendarContext, useCalendar } from './lib/calendar'
 import { useHashRoute, type Route } from './lib/router'
 import { supabase } from './lib/supabase'
 import { DashboardPage } from './pages/DashboardPage'
@@ -27,9 +29,13 @@ function Page({ route, controls }: { route: Route; controls?: PageControls }) {
 /** Alles na het inloggen: landschap, zijbalk, de pagina en de app-brede vensters. */
 function Shell({ route, controls }: { route: Route; controls?: PageControls }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [agendaOpen, setAgendaOpen] = useState(false)
+  const calendar = useCalendar(Boolean(supabase))
   useAppEvent('open-settings', () => setSettingsOpen(true))
+  useAppEvent('open-agenda', () => setAgendaOpen(true))
+  useAppEvent('settings-saved', calendar.refresh)
   return (
-    <>
+    <CalendarContext.Provider value={calendar}>
       <Landscape />
       <div className="shell">
         <Sidebar route={route} controls={controls} />
@@ -38,7 +44,18 @@ function Shell({ route, controls }: { route: Route; controls?: PageControls }) {
         </div>
       </div>
       <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onSaved={() => emit('settings-saved')} />
-    </>
+      <AgendaDialog
+        open={agendaOpen}
+        onClose={() => setAgendaOpen(false)}
+        events={calendar.events}
+        status={calendar.status}
+        onConnect={() => {
+          setAgendaOpen(false)
+          emit('open-settings')
+        }}
+        onRetry={calendar.refresh}
+      />
+    </CalendarContext.Provider>
   )
 }
 

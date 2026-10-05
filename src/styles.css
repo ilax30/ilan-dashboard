@@ -4583,3 +4583,220 @@ button {
   line-clamp: 2;
   overflow: hidden;
 }
+
+/* ---------- Agendavenster (Dag / Week / Maand) ---------- */
+
+.agenda-dialog {
+  width: min(1600px, calc(100vw - 48px));
+  height: calc(100dvh - 48px);
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  border-radius: 28px;
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--shadow-lift);
+}
+
+.agenda-dialog[open] {
+  display: flex;
+  animation: dialog-in 260ms var(--ease-out);
+}
+
+.agenda-dialog::backdrop {
+  background: rgb(30 20 15 / 0.4);
+  backdrop-filter: blur(3px);
+}
+
+.agenda-inner {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  min-height: 0;
+  padding: 22px 26px 24px;
+}
+
+.agenda-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.agenda-title {
+  flex: 1 1 auto;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: 1.1;
+}
+
+.agenda-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.agenda-nav .icon-button {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.agenda-nav .icon-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.agenda-head .tl-switch {
+  margin-left: 0;
+}
+
+.agenda-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+
+.agenda-body .timeline[data-embedded] {
+  --ppm: 0.85px;
+}
+
+.month-view {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: auto repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  min-height: 0;
+}
+
+.mv-weekday {
+  padding-bottom: 4px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.mv-day {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  min-height: 0;
+  padding: 7px 8px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--card-hi) 60%, transparent);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+@media (hover: hover) {
+  .mv-day:hover {
+    border-color: var(--accent);
+  }
+}
+
+.mv-day[data-past] {
+  opacity: 0.55;
+}
+
+.mv-day[data-today] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+}
+
+.mv-num {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.mv-month {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.mv-allday,
+.mv-event,
+.mv-more {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mv-allday {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--tint);
+}
+
+.mv-event {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mv-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tint) 70%, var(--ink));
+}
+
+.mv-time {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mv-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mv-more {
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .agenda-dialog {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .agenda-inner {
+    padding: 14px 12px 14px;
+  }
+
+  .agenda-title {
+    flex-basis: 100%;
+    font-size: 1.5rem;
+  }
+
+  .mv-event .mv-time,
+  .mv-event .mv-title {
+    display: none;
+  }
+
+  .mv-event {
+    display: inline-flex;
+  }
+}

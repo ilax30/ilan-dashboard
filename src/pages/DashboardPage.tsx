@@ -6,11 +6,10 @@ import { AgendaWidget } from '../dashboard/widgets/AgendaWidget'
 import { TodoWidget } from '../dashboard/widgets/TodoWidget'
 import { TopicWidget } from '../dashboard/widgets/TopicWidget'
 import { emit, useAppEvent } from '../lib/appEvents'
-import { useCalendar } from '../lib/calendar'
+import { useSharedCalendar } from '../lib/calendar'
 import { useLayout, type SlotRef, type SlotSize, type WidgetId } from '../lib/layout'
 import { navigate } from '../lib/router'
 import { getSettings, rememberedPlace, type DashboardSettings } from '../lib/settings'
-import { supabase } from '../lib/supabase'
 import { useWeather } from '../lib/weather'
 import type { PageProps } from './TodoPage'
 
@@ -33,7 +32,7 @@ export function DashboardPage(_props: PageProps) {
     const place = rememberedPlace()
     return place ? { icalUrl: null, layout: null, ...place } : null
   })
-  const calendar = useCalendar(Boolean(supabase))
+  const calendar = useSharedCalendar()
   const [editing, setEditing] = useState(false)
   const { layout } = useLayout()
   const { weather, stale } = useWeather(settings?.latitude ?? null, settings?.longitude ?? null)
@@ -55,10 +54,7 @@ export function DashboardPage(_props: PageProps) {
       document.removeEventListener('visibilitychange', onVisible)
     }
   }, [loadSettings])
-  useAppEvent('settings-saved', () => {
-    loadSettings()
-    calendar.refresh()
-  })
+  useAppEvent('settings-saved', loadSettings)
 
   function widget(id: WidgetId, size: SlotSize) {
     if (id === 'agenda')

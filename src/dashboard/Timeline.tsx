@@ -12,6 +12,10 @@ type Props = {
   onRetry: () => void
   /** In een tegel: zonder eigen kaartrand. */
   embedded?: boolean
+  /** Gestuurd vanuit het agendavenster: weergave en gekozen dag (anders eigen schakelaar en vandaag). */
+  view?: View
+  anchor?: Date
+  hideHeader?: boolean
 }
 
 const VIEW_KEY = 'dashboard.view'
@@ -76,14 +80,16 @@ function NowLine({ now, windowStart, windowEnd, label }: { now: Date; windowStar
 }
 
 /** Agenda-tijdlijn: dag (uurraster) of week (7 kolommen), met meelopende NU-lijn. */
-export function Timeline({ events, status, onConnect, onRetry, embedded }: Props) {
-  const [view, setView] = useState<View>(readView)
+export function Timeline({ events, status, onConnect, onRetry, embedded, view: viewProp, anchor, hideHeader }: Props) {
+  const [ownView, setView] = useState<View>(readView)
+  const view = viewProp ?? ownView
   const nowMs = useNow(30_000)
   const now = new Date(nowMs)
   const today = startOfDay(now)
+  const anchorDay = anchor ? startOfDay(anchor) : today
   const scrollRef = useRef<HTMLDivElement>(null)
 
-  const days = useMemo(() => (view === 'week' ? weekDays(new Date(today)) : [today]), [view, today.getTime()])
+  const days = useMemo(() => (view === 'week' ? weekDays(anchorDay) : [anchorDay]), [view, anchorDay.getTime()])
   const window_ = useMemo(() => {
     let startMin = 24 * 60
     let endMin = 0
@@ -108,14 +114,17 @@ export function Timeline({ events, status, onConnect, onRetry, embedded }: Props
     }
   }
 
-  // Bij openen en bij wisselen van weergave: "nu" in beeld, op een derde van de hoogte.
+  // Bij openen en bij wisselen van weergave of dag: "nu" in beeld (of 08:00 op andere dagen), op een derde
+  // van de hoogte. Niet bij elke verversing, zodat de tijdlijn niet verspringt terwijl je scrollt.
+  const showsToday = days.some((d) => sameDay(d, now))
   useLayoutEffect(() => {
     const el = scrollRef.current
     if (!el) return
     const ppm = parseFloat(getComputedStyle(el).getPropertyValue('--ppm')) || 0.6
-    const y = (minutesOf(new Date()) - window_.startMin) * ppm
+    const target = showsToday ? minutesOf(new Date()) : 8 * 60
+    const y = (target - window_.startMin) * ppm
     el.scrollTop = Math.max(0, y - el.clientHeight / 3)
-  }, [view, window_.startMin])
+  }, [view, anchorDay.getTime()])
 
   // Scrollbalk-ruimte meenemen zodat de dagkoppen in de week boven hun kolom staan.
   const [gutter, setGutter] = useState(0)
@@ -153,7 +162,7 @@ export function Timeline({ events, status, onConnect, onRetry, embedded }: Props
   } else if (status === 'loading' && !hasAny) {
     message = 'Agenda laden…'
   } else if (!hasTimed) {
-    message = view === 'week' ? 'Niks in je agenda deze week' : 'Niks in je agenda vandaag'
+    message = view === 'week' ? 'Niks in je agenda deze week' : showsToday ? 'Niks in je agenda vandaag' : 'Niks in je agenda op deze dag'
   }
 
   const week = view === 'week'
@@ -161,6 +170,7 @@ export function Timeline({ events, status, onConnect, onRetry, embedded }: Props
 
   return (
     <section className={embedded ? "timeline" : "timeline dash-card"} data-embedded={embedded || undefined} data-view={view} aria-label="Agenda" style={{ '--cols': days.length } as CSSProperties}>
+      {!hideHeader && (
       <header className="tl-head">
         <h2 className="tl-title">{week ? 'Deze week' : 'Vandaag'}</h2>
         {status === 'stale' && <span className="stale-label">niet bijgewerkt</span>}
@@ -173,6 +183,7 @@ export function Timeline({ events, status, onConnect, onRetry, embedded }: Props
           </button>
         </div>
       </header>
+      )}
 
       {(week || showAllDayRow) && (
         <div className="tl-top" style={{ paddingRight: gutter }}>

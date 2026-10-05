@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { CalEvent } from './calendarTypes'
 import { functionErrorCode } from './settings'
 import { supabase } from './supabase'
@@ -83,3 +83,9 @@ export function useCalendar(enabled: boolean): { events: CalEvent[]; status: Cal
 
   return { ...state, refresh: () => void refresh() }
 }
+
+export type CalendarState = { events: CalEvent[]; status: CalendarStatus; refresh: () => void }
+
+/** Eén agenda voor de hele app (dashboard en agendavenster), opgehaald in de app-schil. */
+export const CalendarContext = createContext<CalendarState>({ events: [], status: 'none', refresh: () => {} })
+export const useSharedCalendar = () => useContext(CalendarContext)
