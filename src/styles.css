@@ -5140,13 +5140,14 @@ body {
 /* Donker: kaarten iets lichter dan de ondergrond, zoals het voorbeeld. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) .dash-card {
-    background: var(--card);
+    /* Alleen de kleur: de foto in de weerkaart moet blijven. */
+    background-color: var(--card);
     box-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 30px -14px rgb(0 0 0 / 0.7);
   }
 }
 
 :root[data-theme='dark'] .dash-card {
-  background: var(--card);
+  background-color: var(--card);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 30px -14px rgb(0 0 0 / 0.7);
 }
 
