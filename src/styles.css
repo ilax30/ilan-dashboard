@@ -2788,3 +2788,365 @@ button {
     font-size: 1.05rem;
   }
 }
+
+/* ---------- Dashboard: tijdlijn ---------- */
+
+:root {
+  --tint-0: #f2d3c0;
+  --tint-1: #d6e3c9;
+  --tint-2: #cfe0ea;
+  --tint-3: #e2d5ec;
+  --tint-4: #f3e2b4;
+  --tint-5: #efcfd4;
+  --now: #e5674f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --tint-0: #6b4536;
+    --tint-1: #46573e;
+    --tint-2: #3d5260;
+    --tint-3: #54465f;
+    --tint-4: #66562f;
+    --tint-5: #67434a;
+    --now: #f08a72;
+  }
+}
+
+:root[data-theme='dark'] {
+  --tint-0: #6b4536;
+  --tint-1: #46573e;
+  --tint-2: #3d5260;
+  --tint-3: #54465f;
+  --tint-4: #66562f;
+  --tint-5: #67434a;
+  --now: #f08a72;
+}
+
+[data-tint='0'] { --tint: var(--tint-0); }
+[data-tint='1'] { --tint: var(--tint-1); }
+[data-tint='2'] { --tint: var(--tint-2); }
+[data-tint='3'] { --tint: var(--tint-3); }
+[data-tint='4'] { --tint: var(--tint-4); }
+[data-tint='5'] { --tint: var(--tint-5); }
+
+.timeline {
+  --ppm: 0.6px;
+  --gutter-w: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 24px 26px 22px;
+}
+
+.tl-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tl-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.tl-head .stale-label {
+  margin-left: 0;
+}
+
+.tl-switch {
+  display: flex;
+  margin-left: auto;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--bg);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+.tl-switch button {
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+.tl-switch button[aria-pressed='true'] {
+  background: var(--card-hi);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.tl-top,
+.tl-grid {
+  display: grid;
+  grid-template-columns: var(--gutter-w) repeat(var(--cols), minmax(0, 1fr));
+}
+
+.tl-top-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.tl-dayname {
+  padding: 4px 0 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.tl-dayname strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tl-top-col[data-today] .tl-dayname {
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.tl-top-col[data-today] .tl-dayname strong {
+  color: var(--accent-ink);
+}
+
+.tl-allday {
+  overflow: hidden;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: var(--tint);
+  font-size: 0.86rem;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline[data-view='day'] .tl-top-col {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.tl-body {
+  position: relative;
+  min-height: 0;
+}
+
+.tl-scroll {
+  max-height: calc(960 * var(--ppm) + 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.tl-grid {
+  position: relative;
+  margin: 8px 0;
+}
+
+.tl-gutter {
+  position: relative;
+}
+
+.tl-hour {
+  position: absolute;
+  right: 12px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  transform: translateY(-50%);
+}
+
+.tl-line {
+  position: absolute;
+  left: var(--gutter-w);
+  right: 0;
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.tl-col {
+  position: relative;
+  min-width: 0;
+}
+
+.timeline[data-view='week'] .tl-col + .tl-col {
+  border-left: 1px dashed color-mix(in srgb, var(--line) 60%, transparent);
+}
+
+.tl-col[data-today] {
+  background: color-mix(in srgb, var(--accent-soft) 35%, transparent);
+}
+
+.tl-block {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 5px 10px;
+  border-left: 4px solid color-mix(in srgb, var(--tint) 55%, var(--ink));
+  border-radius: 10px;
+  background: var(--tint);
+  box-shadow: 0 1px 2px rgb(80 50 40 / 0.08);
+  font-size: 0.92rem;
+  line-height: 1.25;
+  transition: opacity 200ms ease;
+}
+
+.tl-block[data-short] {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding-block: 0;
+  font-size: 0.8rem;
+  line-height: 1.1;
+}
+
+.tl-block[data-past] {
+  opacity: 0.55;
+}
+
+.tl-block-time {
+  color: color-mix(in srgb, var(--ink) 65%, var(--tint));
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tl-block-title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tl-block-place {
+  overflow: hidden;
+  color: color-mix(in srgb, var(--ink) 65%, var(--tint));
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline[data-view='week'] .tl-block {
+  padding: 3px 6px;
+  border-left-width: 3px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+}
+
+.timeline[data-view='week'] .tl-block-title {
+  white-space: normal;
+}
+
+.tl-now {
+  position: absolute;
+  left: -6px;
+  right: 0;
+  z-index: 2;
+  border-top: 2px solid var(--now);
+  pointer-events: none;
+}
+
+.tl-now::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--now);
+}
+
+.tl-now-label {
+  position: absolute;
+  top: -11px;
+  left: calc(-1 * var(--gutter-w) + 2px);
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--now);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.tl-message {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + var(--gutter-w) / 2);
+  z-index: 3;
+  margin: 0;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: var(--card-hi);
+  box-shadow: var(--shadow);
+  color: var(--muted);
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 2200px) {
+  .timeline {
+    --ppm: 0.66px;
+    --gutter-w: 76px;
+    padding: 30px 32px 26px;
+  }
+}
+
+@media (max-width: 900px) {
+  .timeline {
+    --gutter-w: 54px;
+    padding: 20px 16px 18px;
+  }
+
+  .tl-message {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* ---------- Dashboard: rij 2 (tijdlijn + rechterkolom) ---------- */
+
+.dash > .timeline {
+  grid-column: span 7;
+}
+
+.dash-side {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  grid-column: span 5;
+  min-width: 0;
+}
+
+@media (min-width: 1800px) {
+  .dash > .timeline {
+    grid-column: span 8;
+  }
+
+  .dash-side {
+    grid-column: span 4;
+  }
+}
+
+@media (max-width: 900px) {
+  .dash > .timeline,
+  .dash-side {
+    grid-column: 1 / -1;
+  }
+
+  .dash-side {
+    gap: 20px;
+  }
+}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Blobs } from '../components/Decor'
 import { SettingsDialog } from '../dashboard/SettingsDialog'
+import { Timeline } from '../dashboard/Timeline'
 import { TodayHeader } from '../dashboard/TodayHeader'
 import { useCalendar } from '../lib/calendar'
 import { navigate } from '../lib/router'
@@ -9,7 +10,7 @@ import { supabase } from '../lib/supabase'
 import { useWeather } from '../lib/weather'
 import type { PageProps } from './TodoPage'
 
-/** Dashboard (#/): live kop, tijdlijn en to-do. Tijdlijn en to-do volgen in taak 7–8. */
+/** Dashboard (#/): live kop, tijdlijn en to-do. To-do-kaart volgt in taak 8. */
 export function DashboardPage(_props: PageProps) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settings, setSettings] = useState<DashboardSettings | null>(null)
@@ -35,9 +36,17 @@ export function DashboardPage(_props: PageProps) {
           hasCity={settings === null || settings.latitude !== null}
           onOpenSettings={() => setSettingsOpen(true)}
         />
-        <button className="complete" type="button" onClick={() => navigate('/todo')}>
-          To-do →
-        </button>
+        <Timeline
+          events={calendar.events}
+          status={calendar.status}
+          onConnect={() => setSettingsOpen(true)}
+          onRetry={calendar.refresh}
+        />
+        <div className="dash-side">
+          <button className="complete" type="button" onClick={() => navigate('/todo')}>
+            To-do →
+          </button>
+        </div>
       </main>
       <SettingsDialog
         open={settingsOpen}
