@@ -349,6 +349,8 @@ export function TodoPage(_props: PageProps) {
         </button>
       )}
       <div className="app">
+        {/* Breed scherm: Afgerond als eigen kolom vanaf de bovenkant, naast kop en lijst. */}
+        {wide && <HistoryPanel items={recent72} now={now} onRestore={restoreFromHistory} />}
         <header className="header">
           <h1 className="title">
             <Sparks className="spark spark-l" />
@@ -386,8 +388,6 @@ export function TodoPage(_props: PageProps) {
           }}
         >
           <main className="board">
-            {wide && <HistoryPanel items={recent72} now={now} onRestore={restoreFromHistory} />}
-
             <section className="todo-col" aria-labelledby="todo-heading">
               <h2 className="col-title" id="todo-heading">
                 To do {todos.length > 0 && <span className="badge">{todos.length}</span>}

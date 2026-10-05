@@ -6270,3 +6270,39 @@ a.wish-title:hover {
   text-decoration: line-through;
   text-decoration-thickness: 2px;
 }
+
+/* Takenpagina, breed scherm: Afgerond als eigen kolom vanaf de bovenkant (niet pas onder de kop). */
+@media (min-width: 1600px) {
+  .app {
+    display: grid;
+    grid-template-columns: 340px minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+    column-gap: 40px;
+    align-items: start;
+  }
+
+  .app > * {
+    grid-column: 2;
+  }
+
+  .app > .history-panel {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    margin-top: 0;
+  }
+
+  .board {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+@media (min-width: 1800px) {
+  .app {
+    grid-template-columns: 400px minmax(0, 1fr);
+    column-gap: 48px;
+  }
+
+  .board {
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+}
