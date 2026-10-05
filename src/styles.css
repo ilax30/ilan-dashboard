@@ -426,6 +426,27 @@ button {
   white-space: nowrap;
 }
 
+/* Desktop: ruimte genoeg, dus de hele beschrijving (max. 6 regels) i.p.v. één afgekapte regel. */
+@media (min-width: 900px) {
+  .card-preview {
+    align-items: flex-start;
+  }
+
+  .card-preview svg {
+    margin-top: 0.3em;
+  }
+
+  .card-preview-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+    line-clamp: 6;
+    line-height: 1.45;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+}
+
 .card-edit {
   min-width: 0;
   padding: 4px 8px;

@@ -89,7 +89,8 @@ export function TodoCardView({
     if (e.key === 'Escape') onStopEdit?.(null)
   }
 
-  const firstLine = todo.notes.split('\n').find((l) => l.trim()) ?? ''
+  // Op desktop toont de CSS de hele beschrijving (max. 6 regels), op de telefoon één regel.
+  const preview = todo.notes.trim()
   const still = overlay || ghost
 
   return (
@@ -140,13 +141,13 @@ export function TodoCardView({
               <LinkifiedText text={todo.title} interactive={!still} />
             </span>
           )}
-          {!expanded && !overlay && firstLine && (
+          {!expanded && !overlay && preview && (
             <span className="card-preview">
               <svg viewBox="0 0 24 24" width="13" height="13" aria-hidden="true">
                 <path d="M5 7h14M5 12h14M5 17h9" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
               </svg>
               <span className="card-preview-text">
-                <LinkifiedText text={firstLine} />
+                <LinkifiedText text={preview} />
               </span>
             </span>
           )}
@@ -259,6 +260,11 @@ function Notes({ notes, onSave, onDone, onEditTitle }: NotesProps) {
           onBlur={(e) => save(e.currentTarget.value)}
           onKeyDown={(e) => {
             if (e.key === 'Escape') e.currentTarget.blur()
+            // Enter = opslaan en inklappen (een beschrijving heeft geen alinea's nodig).
+            if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
+              e.preventDefault()
+              done()
+            }
           }}
         />
       ) : (
