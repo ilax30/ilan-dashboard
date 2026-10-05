@@ -67,6 +67,23 @@ voor weer het is. Primair gebruik: **iPad en pc** (de telefoon moet blijven werk
 - **Snelle actie** onder de to-do-kaart: invoerveld "Nieuwe taak…" + toevoegen, zonder van pagina te wisselen.
 - **iPad staand / smalle schermen** (< 900 px): tijdlijn en rechterkolom onder elkaar. Telefoon: idem, één kolom.
 
+### Desktop eerst (32" breedbeeld, ± 2560×1440)
+
+Het ontwerp wordt primair gemaakt en getest op een breed desktopscherm; iPad volgt daarna, telefoon blijft werken.
+
+- **12-koloms grid**, maximale breedte ± 2300 px, ruime marges (64–72 px). Basisletter op dit formaat ± 20 px
+  (zoals de to-do pagina nu al op ≥ 2200 px doet).
+- **Rij 1 — kop** (volle breedte, 12 kolommen): links datum/tijd + begroeting + volgende afspraak (groot, de klok
+  ± 3rem), rechts het weer met icoon, temperatuur, omschrijving en een paar uren vooruit.
+- **Rij 2 — vandaag** (hoogte ± 560 px): tijdlijn 8 kolommen, rechterkolom 4 kolommen met To-do-kaart en Snelle actie.
+- **Rij 3 — onderwerpen**: gereserveerd voor de tegels **Doelen, Financiën, Notities, Projecten**: 4 tegels naast
+  elkaar (elk 3 kolommen), elk ± 260 px hoog, met een grote illustratie (± 96 px), titel en één kerngetal + korte
+  regel ("€ 47,50 openstaand", "3/5 doelen deze week"). Hele tegel klikbaar naar de eigen pagina.
+  In ronde 1 is deze rij **nog niet zichtbaar** (alleen wat werkt), maar de grid en tegelstijl worden zo gebouwd dat
+  een nieuw onderwerp alleen een tegel-definitie toevoegt. De To-do-kaart gebruikt dezelfde tegelstijl (illustratie
+  + kerngetal), zodat alles één familie vormt.
+- Tussen 1280 en 1800 px: zelfde indeling, compacter (tijdlijn 7 / rechts 5 kolommen; tegels 2 × 2).
+
 ## Navigatie
 
 - Hash-routes: `#/` = dashboard, `#/todo` = to-do pagina. Werkt op GitHub Pages zonder rewrites en binnen de PWA.
@@ -160,7 +177,8 @@ Opsplitsing van het huidige `App.tsx` (±700 regels) zodat elk deel één taak h
   (kolommen), weekdagen ma–zo.
 - **Deno-tests** voor de agenda-parse/expand-logica met vaste ICS-voorbeelden: losse afspraak, wekelijks herhalend
   met EXDATE, gewijzigde instantie (RECURRENCE-ID), hele-dag, afspraak over middernacht, zomer→wintertijd-overgang.
-- **In de browser** (iPad-formaat 1024×768/768×1024 en desktop 1280+): indeling, NU-lijn, dag/week-schakelaar,
+- **In de browser**, eerst op **2560×1440** (Ilans 32"-scherm), daarna 1920×1080, 1280×800 en iPad
+  (1024×768/768×1024): indeling, NU-lijn, dag/week-schakelaar,
   to-do-kaart naar `#/todo` en terug, snelle actie, lege staten, offline (cache).
 - Bestaande to-do pagina: snelle regressiecheck (slepen naar Gedaan, vegen, pincode) na de opsplitsing.
 
