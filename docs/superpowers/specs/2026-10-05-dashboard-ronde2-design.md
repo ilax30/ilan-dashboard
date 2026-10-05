@@ -1,146 +1,178 @@
-# Dashboard — ronde 2: compacte agenda, agendavenster (dag/week/maand) en onderwerp-tegels
+# Dashboard — ronde 2: nieuwe look, zijbalk, verplaatsbare tegels en agendavenster
 
-Datum: 2026-10-05 · Status: ontwerp, wacht op review · Bouwt voort op
+Datum: 2026-10-05 · Status: ontwerp (herzien), wacht op review · Bouwt voort op
 [ronde 1](2026-10-05-dashboard-ronde1-design.md) (live sinds `b2d321a`).
 
 ## Doel
 
-De homepagina besteedt haar ruimte aan wat Ilan het meest gebruikt. Ilan heeft geen drukke agenda: een
-groot, vrijwel leeg tijdlijn-blok is zonde van de ruimte. De agenda wordt daarom **compact** in de bovenste
-kaart getoond en opent bij een klik **groot**. De vrijgekomen ruimte gaat naar de **tegels** voor de andere
-onderwerpen. Daarnaast wil Ilan **verder vooruit** kunnen kijken (afspraken over 2–3 weken).
+Het dashboard krijgt de look van Ilans voorbeeld (zijbalk, kop met dag-voortgang, kaarten) in eigen kleuren,
+rustig voor de ogen overdag én 's avonds. Ilan bepaalt zelf wat belangrijk is: tegels zijn **verplaatsbaar** en
+passen zich aan de plek aan. De agenda kan **5 weken vooruit** (Dag/Week/Maand) in een groot venster.
 
 ### Wat Ilan zei
 
-- "agenda in het midden [van de bovenste kaart] … een hele lege plek … als ik erop druk dan vergroot die
-  naar (haast) volledig scherm. Anders neemt een vrijwel lege agenda zoveel plek."
-- "Daarnaast maand optie zou ook fijn zijn, kan ik afspraken van over 2-3 weken ook zien."
-- Tegels voor de andere onderwerpen nu toevoegen, **zonder** de details/inhoud ("Binnenkort" + lege pagina).
-- Licht thema iets donkerder — al gedaan en live (`b2d321a`).
-
-### Besluiten (met Ilan afgestemd)
-
-- Maandweergave = **5 weken vanaf de maandag van deze week** (altijd vooruit), **zonder** bladeren naar
-  latere maanden.
-- Klik op een dag in de maand → **Dag**-weergave van die dag, met ‹ › en "Vandaag".
-- Onderwerp-tegels: Doelen, Financiën, Notities, Projecten, elk met eigen illustratie, kerngetal
-  "Binnenkort" en een eigen (lege) pagina.
+- Voorbeeld-dashboard (donker, zijbalk, kop met "38% van je dag", Agenda/To-do/Snelle actie, vier
+  onderwerp-kaarten): "I really like the look of this, keep it in our colors".
+- Donker was overdag te donker, licht "flashbangde": **licht = Zandsteen (zandcrème)**, **donker = de blauwe
+  schemer, iets donkerder blauw, maar wel mooi**.
+- "Achtergrond natuur wat past bij de tijd" → **getekend landschap** dat meekleurt met het dagdeel.
+- "Maak het zodat ik de tegels kan slepen waar ik wil … als ik een kleiner tegel daar sleep wordt die zo groot
+  als de agenda" → **vaste plekken, ruilen**.
+- Maandoptie: afspraken van over 2–3 weken zien → 5 weken vanaf deze maandag, zonder verder bladeren.
+- Onderwerpen (Doelen, Financiën, Notities, Projecten) nu als tegel + lege pagina, inhoud later.
 
 ### Buiten scope (ronde 2)
 
-- Inhoud van Doelen/Financiën/Notities/Projecten (eigen rondes).
-- Bladeren voorbij de 5 weken; afspraken maken of wijzigen (de iCal-link is alleen-lezen).
-- De uitgestelde kleine punten uit ronde 1, behalve de twee die dit ontwerp vanzelf raakt (zie onderaan).
+- Inhoud van Doelen/Financiën/Notities/Projecten; snel toevoegen van afspraak/notitie/uitgave.
+- Vrij formaat trekken van tegels; per apparaat een andere indeling.
+- Datums/deadlines bij taken (dus geen "Vandaag/Morgen"-labels).
+- Bladeren in de agenda voorbij 5 weken; afspraken maken/wijzigen.
 
-## Indeling (desktop eerst, 32" ± 2560×1440)
+## Kleuren
+
+Twee thema's via het bestaande dag/nacht-schuifje (standaard volgt het systeem, zoals nu). De oude crème- en
+cacao-thema's vervallen. Startwaarden (fijnafstemming in de browser mag, de sfeer niet):
+
+| Token | Licht — Zandsteen | Donker — diep schemerblauw |
+|---|---|---|
+| `--bg` | `#cbbfae` | `#1c2430` |
+| `--card` / `--card-hi` | `#d9cfc1` / `#e2d9cc` | `#283241` / `#313d4e` |
+| `--card-edge` / `--line` | `#c9bba8` / `#b8aa97` | `#3a4657` / `#3a4657` |
+| `--ink` / `--muted` | `#2f2725` / `#5f5149` | `#e9edf2` / `#a3aebb` |
+| `--accent` (terracotta) | `#b9714f` | `#e3a586` |
+| `--tint-0..5` | `#e7b8a0 #b8c9a8 #a9c3d1 #cdb9d6 #e5cf9a #e6b9bf` | `#6b4a3a #3f6f5c #3a5684 #6a5088 #7a6436 #7a4a52` |
+
+Tekstcontrast minimaal WCAG AA op kaarten. `theme-color`-meta volgt `--bg`.
+
+## Achtergrond: landschap per dagdeel
+
+- Vlak getekend landschap (inline SVG, geen foto's): lucht, zon/maan, 2–3 lagen glooiende heuvels, enkele
+  bomen. Vult het hele scherm achter alles; kaarten liggen erop, het landschap is zichtbaar rond en tussen
+  de kaarten.
+- **Dagdelen** (uit zonsopkomst `op` en zonsondergang `onder` van vandaag):
+  ochtend `op − 45 min … op + 90 min` (perzik/roze lucht, lage zon) · dag (lichte lucht, zon) ·
+  avond `onder − 90 min … onder + 45 min` (oranje/roze, lage zon) · nacht (donkerblauw, maan + sterren,
+  heuvels als silhouet).
+- Zonsopkomst/-ondergang komen van Open-Meteo (`daily=sunrise,sunset` bij de bestaande weer-aanvraag, mee
+  in de weer-cache). Zonder woonplaats of gegevens: 07:00 / 19:00.
+- Elke minuut opnieuw bepaald; kleuren lopen vloeiend over (± 60 s overgang); `prefers-reduced-motion` → direct.
+- In het donkere thema wordt het landschap gedimd zodat het rustig blijft.
+- **Ontwikkel-testknop**: alleen in dev-builds (`import.meta.env.DEV`) een `?dagdeel=ochtend|dag|avond|nacht`
+  in de URL om een dagdeel te forceren.
+
+## Indeling
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────────┐
-│ Maandag 5 okt · 11:27   │  VANDAAG  07 ──▮▮──── 12 ────│NU── 18 ──▮── 23  │ ☀ 18°  ⚙ │
-│ Goedemorgen!            │  🎂 Verjaardag Sanne                             │ Zonnig   │
-│ Volgende: 14:30 Sport…  │  14:30 Sportschool · 19:00 Etentje          ⤢    │ 12u 13u… │
-├───────────────────────┬──────────────────────────┬───────────────────────────────────┤
-│ TO-DO                 │ 🎯 Doelen    Binnenkort  │ 🐷 Financiën   Binnenkort         │
-│ 4 open · ★ Belasting  ├──────────────────────────┼───────────────────────────────────┤
-│ + Nieuwe taak…        │ 📓 Notities  Binnenkort  │ 🗂 Projecten   Binnenkort         │
-└───────────────────────┴──────────────────────────┴───────────────────────────────────┘
+┌──────────┬──────────────────────────────────────────────┬───────────────┐
+│ Ilan's   │ Maandag 5 oktober · 10:16                    │ ☀ 14° Bewolkt │
+│ dashboard│ Goedemorgen!                                 │ 17° / 12°     │
+│ ⌂ Home   │ Volgende: 11:30 Projectoverleg · over 1u 14m │ 12u 15u 18u   │
+│ ▦ Agenda │ ▬▬▬▬▬▬▬░░░░░░░░░░░  38% van je dag             │               │
+│ ☑ Taken  ├──────────────────────────────┬───────────────┴───────────────┤
+│ ◎ Doelen │ GROTE PLEK (8 kol.)          │ MIDDELGROTE PLEK (4 kol.)     │
+│ € Financ.│ standaard: Agenda            │ standaard: To-do              │
+│ ✎ Notit. │                              │                               │
+│ ▤ Proj.  ├───────┬───────┬───────┬──────┴───────────────────────────────┤
+│ ⚡ Snel   │ KLEIN │ KLEIN │ KLEIN │ KLEIN  (elk 3 kol.)                 │
+│ ⚙ Inst.  │ Fin.  │ Doelen│ Notit.│ Projecten                           │
+└──────────┴───────┴───────┴───────┴─────────────────────────────────────┘
 ```
 
-- 12-koloms raster blijft (max ± 2300 px).
-- **Rij 1 — kop** (12 kolommen): links datum/klok/begroeting/volgende afspraak (zoals nu), **midden de
-  compacte agenda** (vult de lege ruimte, max ± 960 px breed), rechts het weer + tandwiel.
-- **Rij 2 — tegels**: To-do-kaart + snel toevoegen (4 kolommen) en de vier onderwerp-tegels in een 2 × 2-blok
-  (8 kolommen).
-- Doel: op 2560×1440 én 1920×1080 past alles **zonder scrollen**.
-- 1280–1800 px: zelfde indeling, compacter.
-- 900–1280 px (iPad liggend): kop in twee regels (compacte agenda over de volle breedte onder links/weer);
-  To-do over de volle breedte, tegels 2 × 2 eronder.
-- < 900 px (iPad staand, telefoon): alles onder elkaar; tegels één kolom (telefoon) of 2 × 2 (≥ 600 px).
-- Het grote tijdlijn-blok van ronde 1 verdwijnt van de homepagina.
+- **Zijbalk** (vast, 240 px op ≥ 1280 px; alleen icoontjes, 72 px, op 900–1280; < 900: menuknop linksboven
+  die de zijbalk als laag opent): titel "Ilan's dashboard"; Home, Agenda, Taken, Doelen, Financiën,
+  Notities, Projecten (huidige pagina uitgelicht; **Agenda** opent het agendavenster); onderin
+  **Snel toevoegen** (taak, Enter = toevoegen, "Toegevoegd ✓"), het dag/nacht-schuifje, **Instellingen**
+  (bestaande dialoog) en **Meer…** (vergrendelen, pincode wijzigen, uitloggen).
+- De zijbalk staat op **alle pagina's** (dashboard, to-do, onderwerpen) en vervangt de "‹ Dashboard"-knop en
+  het losse schuifje linksboven. De to-do pagina zelf blijft verder gelijk (alleen naar rechts geschoven; de
+  vaste knoppen die nu linksboven staan verhuizen mee).
+- **Kop** (rij 1): datum · klok, begroeting, volgende afspraak / nu bezig (zoals ronde 1), **dag-voortgangsbalk**
+  07:00–23:00 met "N% van je dag" (vóór 07:00 0 %, na 23:00 100 %). Rechts een **weerkaart** (icoon, temperatuur,
+  omschrijving, max/min, 4 uur vooruit). Rechtsboven de knop **"Indeling aanpassen"**.
+- **Plekken** (rij 2–3): 1 groot, 1 middel, 4 klein. Op 2560×1440 en 1920×1080 past alles **zonder scrollen**.
+  900–1280: groot en middel onder elkaar, klein 2 × 2. < 900: alles onder elkaar, klein 2 × 2 (≥ 600 px) of
+  één kolom. Nooit horizontale scroll.
 
-## Compacte agenda (midden van de kop)
+## Tegels en hun maten
 
-- **Dagbalk**: liggende balk 07:00–23:00 (uitgebreid zoals `dayWindow`), uurlabels om de 3 uur
-  (09, 12, 15, 18, 21), afspraken als gekleurde blokjes (zelfde 6 tinten via `colorIndex`); overlappende
-  afspraken in rijtjes boven elkaar (max. 3, uit `layoutDay`). Koraal **NU-streepje** schuift mee (elke 30 s).
-  Afgelopen deel van de dag iets vager.
-- **Hele-dag-afspraken**: max. 2 labeltjes boven de balk, daarna "+N".
-- **Lijstje** onder de balk: de eerstvolgende **max. 3** afspraken van vandaag die nog niet voorbij zijn
-  ("14:30 Sportschool"; een lopende afspraak met "nu"). Niets meer vandaag → "Niets meer vandaag · Morgen
-  09:00 Tandarts" (eerste afspraak van morgen); helemaal niets vandaag én morgen → "Vrije dag 🌿".
-- **Hele blok is één knop** (met ⤢-icoontje, `aria-label` "Agenda openen") → opent het agendavenster.
-  Uitzondering: bij "geen agenda" en "mislukt zonder cache" is het blok géén knop (dan staan er eigen
-  knoppen in, zie hieronder).
-- Statussen: geen agenda → "Koppel je agenda →" (opent Instellingen, niet het venster); laden zonder cache →
-  "Agenda laden…"; mislukt zonder cache → "Agenda niet bereikbaar · Opnieuw proberen"; verouderd →
-  "niet bijgewerkt"-label (zoals nu).
-- De regel "Volgende afspraak / Nu bezig" links in de kop blijft zoals in ronde 1.
+Zes tegels; elke tegel heeft een weergave per maat. De hele tegel is klikbaar (behalve in aanpas-stand).
 
-## Agendavenster
+| Tegel | Klein | Middel | Groot | Klik |
+|---|---|---|---|---|
+| **Agenda** | volgende afspraak + dagbalk (07–23, blokjes, NU-streepje) | dagbalk + lijstje resterende afspraken van vandaag (max. 6), anders "Niets meer vandaag · Morgen 09:00 …" / "Vrije dag 🌿" | uurrooster met **Vandaag / Week** (tijdlijn uit ronde 1, NU-lijn) | agendavenster |
+| **To-do** | "N open" + bovenste (favoriete) taak | bovenste 5 taken met vinkje en ster | bovenste 10 taken met vinkje + invoerveld "Nieuwe taak…" | to-do pagina |
+| **Doelen, Financiën, Notities, Projecten** | plaatje + titel + "Binnenkort" | idem + korte regel | groot plaatje + regel + "Hier komen straks …" | eigen pagina |
 
-- Native `<dialog>` zoals het Overzicht-venster: (bijna) volledig scherm — `min(1600px, 100vw − 48px)` ×
-  `100dvh − 48px`. Sluiten met ×, Esc of klik naast het venster.
-- Bovenaan: titel (bijv. "Maandag 5 oktober", "Week 41", "5 okt – 8 nov"), schakelaar **Dag | Week | Maand**
-  (onthouden in `localStorage['dashboard.view']`), "niet bijgewerkt"-label indien van toepassing.
-- **Dag**: het uurraster uit ronde 1 (blokken, overlap naast elkaar, NU-lijn alleen op vandaag), voor een
-  **gekozen dag**. ‹ › bladert per dag, "Vandaag" springt terug; bladeren blijft binnen het opgehaalde bereik
-  (knoppen uitgeschakeld aan de randen). Bij openen staat de dag op vandaag.
-- **Week**: 7 kolommen ma–zo zoals ronde 1, met ‹ › per week binnen het bereik (5 weken) en "Vandaag".
-- **Maand**: raster van 5 × 7 dagen vanaf de maandag van deze week. Per dag: dagnummer (op de 1e van een maand
-  met maandnaam, "1 nov"), daaronder max. 3 regels — eerst hele-dag-afspraken als gekleurd labeltje, dan
-  afspraken als "● 09:00 Titel" — en "+N meer". Vandaag uitgelicht, afgelopen dagen vager.
-  **Klik op een dag** → Dag-weergave van die dag.
-- Scrollen naar "nu" gebeurt alleen bij openen en bij wisselen van weergave/dag (niet meer na elke verversing —
-  lost uitgesteld punt "tijdlijn springt terug" op).
-- Lege staten zoals ronde 1 ("Niks in je agenda vandaag/deze week"; in maand: geen melding, gewoon lege dagen).
+- **Vinkje** bij een taak = afronden (zelfde als naar "Gedaan" slepen: `done_at`), met 5 s "Ongedaan maken" in
+  de tegel. Ster tonen, niet wijzigen.
+- Statussen van de agenda zoals ronde 1 ("Koppel je agenda →", "Agenda laden…", "Agenda niet bereikbaar ·
+  Opnieuw proberen", "niet bijgewerkt").
 
-## Agenda-functie (server)
+## Verplaatsen (aanpas-stand)
 
-- Bereik wordt **maandag 00:00 van deze week t/m 35 dagen later** (Amsterdamse middernachten), via
-  `calendarRange`. Al het andere blijft (auth-check, 15 MB-grens, 8 s timeout, foutcodes).
-- Melding na koppelen: "Gekoppeld: N afspraken in de komende 5 weken" (lost uitgesteld punt "telt niet deze
-  week" op).
-- Rekentijd blijft ruim binnen de grens (nu ± 0,6 s inclusief ophalen); de bestaande test met een reeks sinds
-  1990 bewaakt het uitvouwen.
+- **"Indeling aanpassen"** zet de aanpas-stand aan: tegels krijgen een stippelrand en een sleepgreep, klikken
+  opent niets. Sleep een tegel op een andere plek → de twee **ruilen** (elk neemt de maat van zijn nieuwe plek
+  aan). Muis, touch (even vasthouden) en toetsenbord (dnd-kit, zoals de to-do lijst).
+- In de aanpas-stand ook **"Standaardindeling"** (Agenda groot, To-do middel, Financiën/Doelen/Notities/
+  Projecten klein) en **"Klaar"**.
+- **Opslaan**: `{ groot, middel, klein: [4] }` met tegel-ids in `dashboard_settings.layout` (nieuwe kolom,
+  `jsonb`, RLS zoals de rest van de rij) én in `localStorage['dashboard.layout']` voor direct/offline openen.
+  Lukt opslaan op de server niet, dan blijft een "nog op te slaan"-markering staan en wordt bij `online` /
+  terugkomen opnieuw geprobeerd.
+- **Normaliseren**: een opgeslagen indeling met onbekende of dubbele ids of ontbrekende tegels wordt aangevuld
+  in de standaardvolgorde; nooit een lege of dubbele plek.
 
-## Onderwerp-tegels en pagina's
+## Agendavenster (zoals afgesproken)
 
-- Eén lijst met tegel-definities (`src/dashboard/topics.tsx`): `{ id, title, route, line, art }`:
-  - Doelen — `#/doelen` — "Je doelen voor deze week" — vlaggetje op een heuvel
-  - Financiën — `#/financien` — "Overzicht van je geld" — spaarvarken met muntjes
-  - Notities — `#/notities` — "Losse gedachten en lijstjes" — opengeslagen schriftje met potlood
-  - Projecten — `#/projecten` — "Waar je aan werkt" — stapeltje mapjes
-- Tegel = bestaande `Tile` (illustratie, titel, kerngetal, regel, "Bekijk alles →"); kerngetal
-  "Binnenkort" in rustige (muted) stijl.
-- Router: routes `/doelen`, `/financien`, `/notities`, `/projecten` erbij; onbekend → dashboard.
-- **Onderwerp-pagina** (één herbruikbaar component): "‹ Dashboard"-knop, grote illustratie, titel en
-  "Hier komen straks je doelen." (per onderwerp), zelfde achtergrond/dag-nacht als de rest.
+- Native `<dialog>`, (bijna) volledig scherm; sluiten met ×, Esc of naast klikken. Openen via de Agenda-tegel
+  of "Agenda" in de zijbalk.
+- **Dag**: uurrooster voor een gekozen dag, ‹ › per dag, "Vandaag". **Week**: ma–zo, ‹ › per week.
+  **Maand**: 5 × 7 dagen vanaf maandag van deze week; per dag max. 3 regels (hele-dag-label, "● 09:00 Titel")
+  + "+N meer"; klik op een dag → Dag van die dag. Bladeren alleen binnen de 5 weken (knoppen uit aan de randen).
+- Weergave onthouden in `localStorage['dashboard.view']`; scrollen naar "nu" alleen bij openen en bij wisselen.
+
+## Agenda-functie (server) — al gebouwd
+
+- Bereik: maandag 00:00 van deze week t/m 35 dagen later (Amsterdam). Live als versie 4. Melding na koppelen:
+  "Gekoppeld: N afspraken in de komende 5 weken".
+
+## Onderwerp-pagina's — deels gebouwd
+
+- Routes `#/doelen`, `#/financien`, `#/notities`, `#/projecten`; één `TopicPage` (plaatje, titel,
+  "Hier komen straks …"); tegel-definities in `src/dashboard/topics.tsx`. Krijgt de zijbalk.
+
+## Foutafhandeling
+
+| Situatie | Gedrag |
+|---|---|
+| Indeling opslaan mislukt / offline | Lokaal bewaard, later opnieuw geprobeerd; geen melding nodig |
+| Opgeslagen indeling kapot/verouderd | Normaliseren naar geldige indeling |
+| Geen woonplaats / geen zonnetijden | Landschap met 07:00 / 19:00 |
+| Afronden via vinkje mislukt | Taak komt terug, melding "Opslaan mislukt" |
+| Agenda/weer | Zoals ronde 1 (cache + "niet bijgewerkt") |
 
 ## Testen
 
-- **Vitest (pure functies)**:
-  - `upcoming(events, now, limit)` → resterende afspraken van vandaag / eerste van morgen / leeg (incl.
-    lopende afspraak, afspraak van gisteren die nog loopt, hele-dag genegeerd).
-  - `stripPosition(min, window)` → percentage op de dagbalk (begin, eind, NU, buiten venster).
-  - `monthGrid(now)` → 35 datums vanaf maandag van deze week (ook over maand- en wintertijdgrens).
-  - `eventsOnDay(events, day)` → hele-dag + meerdaagse + gewone afspraken van een dag, gesorteerd.
-  - `calendarRange(now)` → maandag t/m +35 dagen (rond de wintertijd).
-  - `parseRoute` → nieuwe routes.
-- **Browser**: 2560×1440 en 1920×1080 zonder scrollen; 1280, iPad liggend/staand, telefoon zonder horizontale
-  scroll. Venster opent/sluit (Esc, ×, buiten klikken); Maand → klik dag → Dag van die dag; ‹ › begrensd;
-  tegels openen hun pagina en "‹ Dashboard" terug; licht en donker.
+- **Vitest**: `swapSlots` en `normalizeLayout` (ruilen groot↔klein, dubbele/onbekende/ontbrekende ids);
+  `dayPart(now, sunrise, sunset)` (grenzen, december en juni, geen zonnetijden); `dayProgress(now)` (06:00 → 0,
+  15:00 → 50, 23:30 → 100); bestaande en al gebouwde agenda-functies (`upcoming`, `stripPosition`,
+  `monthGrid`, `eventsOnDay`, `canStep/step`, `calendarRange`), `parseRoute`.
+- **Browser**: 2560×1440 en 1920×1080 zonder scrollen; 1280, iPad 1024×768 / 768×1024, telefoon zonder
+  horizontale scroll; aanpas-stand: slepen ruilt, na herladen dezelfde indeling, "Standaardindeling" werkt;
+  elke tegel in alle drie de maten leesbaar; licht en donker; vier dagdelen via `?dagdeel=`; zijbalk op alle
+  pagina's; to-do pagina ongewijzigd in gedrag (slepen, vegen, pincode).
 
 ## Bestanden (globaal)
 
 | Bestand | Wat |
 |---|---|
-| `src/dashboard/AgendaStrip.tsx` | compacte agenda in de kop |
-| `src/dashboard/AgendaDialog.tsx` | groot venster met Dag/Week/Maand |
-| `src/dashboard/Timeline.tsx` | aangepast: gekozen dag, ‹ ›, scroll alleen bij openen/wisselen |
-| `src/dashboard/MonthView.tsx` | maandraster |
-| `src/dashboard/topics.tsx` | tegel-definities + illustraties |
-| `src/pages/TopicPage.tsx` | lege onderwerp-pagina |
-| `src/lib/dayMath.ts` | `upcoming`, `stripPosition`, `monthGrid`, `eventsOnDay` |
-| `src/lib/router.ts` | nieuwe routes |
-| `supabase/functions/dashboard-calendar/expand.ts` | `calendarRange` → 35 dagen |
-| `src/pages/DashboardPage.tsx`, `src/dashboard/TodayHeader.tsx`, `src/styles.css` | nieuwe indeling |
+| `src/styles.css` | Zandsteen + blauw thema, zijbalk, plekken, tegelmaten, landschap |
+| `src/components/Sidebar.tsx` | zijbalk (nav, snel toevoegen, schuifje, instellingen, meer) |
+| `src/components/Landscape.tsx` + `src/lib/dayPart.ts` | landschap + dagdeel/dagvoortgang |
+| `src/lib/layout.ts` | indeling: types, standaard, `swapSlots`, `normalizeLayout`, laden/opslaan |
+| `src/dashboard/widgets/*.tsx` | Agenda-, To-do- en onderwerp-tegel per maat |
+| `src/dashboard/AgendaDialog.tsx`, `MonthView.tsx`, `agendaNav.ts` | agendavenster |
+| `src/dashboard/TodayHeader.tsx`, `WeatherCard.tsx` | kop + weerkaart |
+| `src/pages/DashboardPage.tsx`, `TodoPage.tsx`, `TopicPage.tsx`, `App.tsx` | zijbalk-indeling |
+| `src/lib/weather.ts` | + zonsopkomst/-ondergang |
+| `supabase/migrations/005_dashboard_layout.sql` | kolom `layout jsonb` |
