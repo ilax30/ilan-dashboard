@@ -83,6 +83,8 @@ export function AgendaDialog({ open, onClose, events, status, onConnect, onRetry
       className="agenda-dialog"
       aria-label="Agenda"
       onClose={onClose}
+      // Esc: meteen bijwerken via "cancel" (het "close"-event kan later of niet komen).
+      onCancel={onClose}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}

@@ -137,6 +137,8 @@ export function SettingsDialog({ open, onClose, onSaved }: Props) {
       className="calendar settings"
       aria-labelledby="settings-title"
       onClose={onClose}
+      // Esc: meteen bijwerken via "cancel" (het "close"-event kan later of niet komen).
+      onCancel={onClose}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}

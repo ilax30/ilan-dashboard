@@ -92,6 +92,8 @@ export function CalendarDialog({ open, now, onClose }: Props) {
       className="calendar"
       aria-labelledby="calendar-title"
       onClose={onClose}
+      // Esc: meteen bijwerken via "cancel" (het "close"-event kan later of niet komen).
+      onCancel={onClose}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
