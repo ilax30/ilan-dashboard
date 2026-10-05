@@ -10,9 +10,11 @@ export type DashboardSettings = {
   cityName: string | null
   latitude: number | null
   longitude: number | null
+  /** Indeling van het dashboard (zie layout.ts); null = standaard. */
+  layout: unknown
 }
 
-const EMPTY: DashboardSettings = { icalUrl: null, cityName: null, latitude: null, longitude: null }
+const EMPTY: DashboardSettings = { icalUrl: null, cityName: null, latitude: null, longitude: null, layout: null }
 const LOCAL_KEY = 'dashboard.settings'
 
 function readLocal(): DashboardSettings {
@@ -49,11 +51,11 @@ export async function getSettings(): Promise<DashboardSettings> {
   if (!supabase) return readLocal()
   const { data, error } = await supabase
     .from('dashboard_settings')
-    .select('ical_url, city_name, latitude, longitude')
+    .select('ical_url, city_name, latitude, longitude, layout')
     .maybeSingle()
   if (error) throw error
   const settings = data
-    ? { icalUrl: data.ical_url, cityName: data.city_name, latitude: data.latitude, longitude: data.longitude }
+    ? { icalUrl: data.ical_url, cityName: data.city_name, latitude: data.latitude, longitude: data.longitude, layout: data.layout }
     : EMPTY
   rememberPlace(settings)
   return settings
@@ -72,6 +74,7 @@ export async function saveSettings(patch: Partial<DashboardSettings>): Promise<v
   if ('cityName' in patch) row.city_name = patch.cityName
   if ('latitude' in patch) row.latitude = patch.latitude
   if ('longitude' in patch) row.longitude = patch.longitude
+  if ('layout' in patch) row.layout = patch.layout
   const { error } = await supabase.from('dashboard_settings').upsert(row, { onConflict: 'user_id' })
   if (error) throw error
 }

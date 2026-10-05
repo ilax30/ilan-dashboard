@@ -9,13 +9,13 @@ const memory = () => {
 describe('rememberPlace / rememberedPlace', () => {
   it('onthoudt woonplaats en coördinaten, zodat het weer offline direct kan tonen', () => {
     const storage = memory()
-    rememberPlace({ icalUrl: 'https://calendar.google.com/geheim/basic.ics', cityName: 'Utrecht', latitude: 52.09, longitude: 5.12 }, storage)
+    rememberPlace({ icalUrl: 'https://calendar.google.com/geheim/basic.ics', cityName: 'Utrecht', latitude: 52.09, longitude: 5.12, layout: null }, storage)
     expect(rememberedPlace(storage)).toEqual({ cityName: 'Utrecht', latitude: 52.09, longitude: 5.12 })
   })
 
   it('slaat de geheime agenda-link nooit op', () => {
     const storage = memory()
-    rememberPlace({ icalUrl: 'https://calendar.google.com/geheim/basic.ics', cityName: 'Utrecht', latitude: 52.09, longitude: 5.12 }, storage)
+    rememberPlace({ icalUrl: 'https://calendar.google.com/geheim/basic.ics', cityName: 'Utrecht', latitude: 52.09, longitude: 5.12, layout: null }, storage)
     expect([...storage.map.values()].join()).not.toContain('geheim')
   })
 

@@ -20,7 +20,7 @@ export function DashboardPage({ onLock, onSetPin, onLogout }: PageProps) {
   // Start met de onthouden woonplaats: het weer staat er dan meteen, ook offline.
   const [settings, setSettings] = useState<DashboardSettings | null>(() => {
     const place = rememberedPlace()
-    return place ? { icalUrl: null, ...place } : null
+    return place ? { icalUrl: null, layout: null, ...place } : null
   })
   const calendar = useCalendar(Boolean(supabase))
   const { weather, stale } = useWeather(settings?.latitude ?? null, settings?.longitude ?? null)
