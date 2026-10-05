@@ -7,3 +7,4 @@ dist-single
 .claude/
 Reference image.avif
 .env.localtest
+.superpowers/
