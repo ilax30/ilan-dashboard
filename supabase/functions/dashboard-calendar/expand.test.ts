@@ -73,11 +73,11 @@ describe('expandEvents', () => {
 })
 
 describe('calendarRange', () => {
-  it('loopt 5 weken vanaf maandag van deze week', () => {
+  it('loopt 13 weken vanaf maandag van deze week', () => {
     // woensdag 7 okt 2026
     expect(calendarRange(new Date('2026-10-07T10:00:00Z'))).toEqual({
       start: new Date('2026-10-04T22:00:00Z'),
-      end: new Date('2026-11-08T23:00:00Z'),
+      end: new Date('2027-01-03T23:00:00Z'),
     })
   })
   it('begint op maandag zelf als het maandag is, en zondag hoort bij dezelfde week', () => {
@@ -90,7 +90,7 @@ describe('calendarRange', () => {
     // zondag 25 okt: week begon op ma 19 okt (nog zomertijd)
     expect(calendarRange(new Date('2026-10-25T10:00:00Z'))).toEqual({
       start: new Date('2026-10-18T22:00:00Z'),
-      end: new Date('2026-11-22T23:00:00Z'),
+      end: new Date('2027-01-17T23:00:00Z'),
     })
   })
 })
