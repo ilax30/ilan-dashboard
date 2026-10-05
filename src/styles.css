@@ -1312,10 +1312,37 @@ button {
 
 /* ---------- Afgerond-knop + lade ---------- */
 
-.history-button {
+/* Terug naar het dashboard (to-do pagina), naast het dag/nacht-schuifje. */
+.back-button {
   position: fixed;
   top: 20px;
   left: 116px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px 10px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  font-weight: 500;
+  transition: transform 160ms var(--ease-out), box-shadow 160ms ease;
+}
+
+.back-button svg {
+  color: var(--accent);
+}
+
+.back-button:active {
+  transform: scale(0.97);
+}
+
+.history-button {
+  position: fixed;
+  top: 20px;
+  left: 262px;
   z-index: 5;
   display: flex;
   align-items: center;
@@ -1983,6 +2010,11 @@ button {
 
   .history-button {
     top: 28px;
+    left: 270px;
+  }
+
+  .back-button {
+    top: 28px;
     left: 124px;
   }
 
@@ -2065,7 +2097,17 @@ button {
   }
 
   .history-button {
+    left: 162px;
+  }
+
+  .back-button {
+    top: 14px;
     left: 108px;
+    padding: 10px;
+  }
+
+  .back-label {
+    display: none;
   }
 
   .history-label {
@@ -2301,7 +2343,8 @@ button {
 /* Telefoons met inkeping / thuisbalk */
 @supports (padding: env(safe-area-inset-bottom)) {
   .theme-toggle,
-  .history-button {
+  .history-button,
+  .back-button {
     margin-top: env(safe-area-inset-top);
   }
 
