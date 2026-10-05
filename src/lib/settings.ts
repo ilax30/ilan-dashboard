@@ -23,6 +23,28 @@ function readLocal(): DashboardSettings {
   }
 }
 
+export type Place = Pick<DashboardSettings, 'cityName' | 'latitude' | 'longitude'>
+const PLACE_KEY = 'dashboard.place'
+
+/** Woonplaats (niet geheim) op het apparaat onthouden, zodat het weer ook offline meteen kan tonen. */
+export function rememberPlace(s: DashboardSettings, storage: Pick<Storage, 'setItem'> = localStorage) {
+  try {
+    const place: Place = { cityName: s.cityName, latitude: s.latitude, longitude: s.longitude }
+    storage.setItem(PLACE_KEY, JSON.stringify(place))
+  } catch {
+    // alleen een gemak
+  }
+}
+
+export function rememberedPlace(storage: Pick<Storage, 'getItem'> = localStorage): Place | null {
+  try {
+    const place = JSON.parse(storage.getItem(PLACE_KEY) ?? 'null') as Place | null
+    return place && typeof place.latitude === 'number' && typeof place.longitude === 'number' ? place : null
+  } catch {
+    return null
+  }
+}
+
 export async function getSettings(): Promise<DashboardSettings> {
   if (!supabase) return readLocal()
   const { data, error } = await supabase
@@ -30,8 +52,11 @@ export async function getSettings(): Promise<DashboardSettings> {
     .select('ical_url, city_name, latitude, longitude')
     .maybeSingle()
   if (error) throw error
-  if (!data) return EMPTY
-  return { icalUrl: data.ical_url, cityName: data.city_name, latitude: data.latitude, longitude: data.longitude }
+  const settings = data
+    ? { icalUrl: data.ical_url, cityName: data.city_name, latitude: data.latitude, longitude: data.longitude }
+    : EMPTY
+  rememberPlace(settings)
+  return settings
 }
 
 export async function saveSettings(patch: Partial<DashboardSettings>): Promise<void> {
