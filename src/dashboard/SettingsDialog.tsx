@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
+import type { PageControls } from '../components/PinGate'
 import { getSettings, saveSettings, testCalendarUrl, type DashboardSettings } from '../lib/settings'
 import { supabase } from '../lib/supabase'
 import { searchCity, type CityResult } from '../lib/weather'
 
-type Props = { open: boolean; onClose: () => void; onSaved: () => void }
+type Props = { open: boolean; onClose: () => void; onSaved: () => void; /** Vergrendelen, pincode, uitloggen (alleen met inloggen). */ account?: PageControls }
 
 const LINK_ERROR = 'Deze link werkt niet. Controleer of je het geheime iCal-adres hebt gekopieerd.'
 
@@ -18,8 +19,9 @@ function maskUrl(url: string): string {
   }
 }
 
-/** Instellingen van het dashboard: geheime agenda-link en woonplaats voor het weer. */
-export function SettingsDialog({ open, onClose, onSaved }: Props) {
+/** Instellingen: geheime agenda-link, woonplaats voor het weer en je account (vergrendelen, pincode, uitloggen). */
+export function SettingsDialog({ open, onClose, onSaved, account }: Props) {
+  const [confirmLogout, setConfirmLogout] = useState(false)
   const dialogRef = useRef<HTMLDialogElement>(null)
   const [settings, setSettings] = useState<DashboardSettings | null>(null)
   const [loadError, setLoadError] = useState(false)
@@ -270,6 +272,53 @@ export function SettingsDialog({ open, onClose, onSaved }: Props) {
               )}
             </section>
           </div>
+        )}
+
+        {account && (
+          <section className="settings-section" aria-labelledby="settings-account">
+            <h3 className="settings-heading" id="settings-account">
+              Account
+            </h3>
+            <div className="settings-row">
+              {account.onLock && (
+                <button
+                  className="settings-button"
+                  data-variant="ghost"
+                  type="button"
+                  onClick={() => {
+                    onClose()
+                    account.onLock?.()
+                  }}
+                >
+                  Vergrendelen
+                </button>
+              )}
+              <button
+                className="settings-button"
+                data-variant="ghost"
+                type="button"
+                onClick={() => {
+                  onClose()
+                  account.onSetPin()
+                }}
+              >
+                Pincode wijzigen
+              </button>
+              {/* Uitloggen is zelden nodig: twee keer klikken, zodat het niet per ongeluk gebeurt. */}
+              <button
+                className="settings-button"
+                data-variant="ghost"
+                type="button"
+                onClick={() => {
+                  if (confirmLogout) return account.onLogout()
+                  setConfirmLogout(true)
+                  window.setTimeout(() => setConfirmLogout(false), 4000)
+                }}
+              >
+                {confirmLogout ? 'Zeker? Klik nogmaals' : 'Uitloggen'}
+              </button>
+            </div>
+          </section>
         )}
       </div>
     </dialog>

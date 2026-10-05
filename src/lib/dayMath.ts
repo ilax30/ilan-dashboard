@@ -171,3 +171,8 @@ export function eventsOnDay(events: CalEvent[], day: Date): CalEvent[] {
     })
     .sort((a, b) => Number(b.allDay) - Number(a.allDay) || byStart(a, b))
 }
+
+/** De eerstvolgende afspraak die nog moet beginnen (ook over dagen); hele-dag-afspraken van vandaag tellen niet. */
+export function nextEvent(events: CalEvent[], now: Date): CalEvent | null {
+  return [...events].sort(byStart).find((e) => new Date(e.start) > now) ?? null
+}

@@ -6005,3 +6005,115 @@ body {
     min-width: 0;
   }
 }
+
+/* Maandweergave: dagen buiten het opgehaalde bereik (vóór deze week of na 13 weken). */
+.month-view .mv-day[data-unloaded] {
+  opacity: 0.3;
+  cursor: default;
+  background-image: repeating-linear-gradient(135deg, transparent 0 8px, color-mix(in srgb, var(--line) 45%, transparent) 8px 9px);
+}
+
+/* Kop: eerstvolgende afspraak en betaling rechts (vult de lege ruimte). */
+.today-next {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 360px));
+  gap: 12px;
+  align-self: center;
+}
+
+.today-next-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--card) 72%, transparent);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+@media (hover: hover) {
+  .today-next-item:hover {
+    border-color: var(--accent);
+  }
+}
+
+.today-next-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+
+.today-next-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.today-next-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.today-next-title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.today-next-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 1400px) {
+  .today-next {
+    grid-template-columns: minmax(200px, 260px);
+  }
+}
+
+@media (max-width: 900px) {
+  .today {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .today-next {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+/* Notities-tegel klein: vijf titels onder elkaar. */
+.widget-notities[data-size='klein'] .widget-list {
+  gap: 1px;
+  line-height: 1.35;
+}
+
+/* Notities-tegel: wat niet past valt helemaal weg (loopt door naar een onzichtbare tweede kolom) i.p.v. half afgekapt. */
+.widget-notities .widget-list {
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  min-height: 0;
+}
+
+.widget-notities .widget-list li {
+  width: 100%;
+}

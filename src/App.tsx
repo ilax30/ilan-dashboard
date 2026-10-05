@@ -41,12 +41,12 @@ function Shell({ route, controls }: { route: Route; controls?: PageControls }) {
     <CalendarContext.Provider value={calendar}>
       <Landscape />
       <div className="shell">
-        <Sidebar route={route} controls={controls} />
+        <Sidebar route={route} />
         <div className="shell-main">
           <Page route={route} controls={controls} />
         </div>
       </div>
-      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onSaved={() => emit('settings-saved')} />
+      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} onSaved={() => emit('settings-saved')} account={controls} />
     </CalendarContext.Provider>
   )
 }

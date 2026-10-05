@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CalEvent } from './calendarTypes'
-import { colorIndex, dayWindow, eventsOnDay, formatCountdown, greeting, headline, layoutDay, monthGrid, stripPosition, upcoming, weekDays } from './dayMath'
+import { colorIndex, dayWindow, eventsOnDay, formatCountdown, greeting, headline, layoutDay, monthGrid, nextEvent, stripPosition, upcoming, weekDays } from './dayMath'
 
 // Tests draaien in de lokale tijdzone (Nederland); datums zonder 'Z' zijn lokale tijd.
 const at = (s: string) => new Date(s)
@@ -190,5 +190,22 @@ describe('eventsOnDay', () => {
   })
   it('telt een afspraak van 0 minuten op die dag mee', () => {
     expect(eventsOnDay([ev('Herinnering', '2026-10-07T00:00', '2026-10-07T00:00')], at('2026-10-07T00:00'))).toHaveLength(1)
+  })
+})
+
+describe('nextEvent', () => {
+  const now = new Date('2026-10-05T20:52')
+  it('geeft de eerstvolgende afspraak die nog moet beginnen, ook als die over dagen is', () => {
+    const list = [
+      ev('Voorbij', '2026-10-05T09:00', '2026-10-05T10:00'),
+      ev('Bezig', '2026-10-05T20:00', '2026-10-05T22:00'),
+      ev('Later', '2026-10-09T14:00', '2026-10-09T15:00'),
+      ev('Tandarts', '2026-10-08T09:00', '2026-10-08T09:30'),
+    ]
+    expect(nextEvent(list, now)?.title).toBe('Tandarts')
+  })
+  it('telt hele-dag-afspraken mee vanaf de dag erna, en geeft null als er niets komt', () => {
+    expect(nextEvent([ev('Vandaag', '2026-10-05T00:00', '2026-10-06T00:00', true), ev('Verjaardag', '2026-10-07T00:00', '2026-10-08T00:00', true)], now)?.title).toBe('Verjaardag')
+    expect(nextEvent([ev('Voorbij', '2026-10-05T09:00', '2026-10-05T10:00')], now)).toBeNull()
   })
 })

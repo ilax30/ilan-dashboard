@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { EDIT_LAYOUT_FLAG } from '../components/Sidebar'
 import { SlotGrid } from '../dashboard/SlotGrid'
 import { TodayHeader } from '../dashboard/TodayHeader'
 import { TOPICS } from '../dashboard/topics'
@@ -16,6 +17,17 @@ import { getSettings, rememberedPlace, type DashboardSettings } from '../lib/set
 import { useWeather } from '../lib/weather'
 import type { PageProps } from './TodoPage'
 
+/** Via 'Indeling aanpassen' in de zijbalk vanaf een andere pagina: meteen in de aanpas-stand. */
+function takeEditFlag(): boolean {
+  try {
+    const on = sessionStorage.getItem(EDIT_LAYOUT_FLAG) === '1'
+    sessionStorage.removeItem(EDIT_LAYOUT_FLAG)
+    return on
+  } catch {
+    return false
+  }
+}
+
 /**
  * Dashboard (#/), desktop eerst: 12-koloms raster.
  * Rij 1 kop + weer, daarna 6 plekken (1 groot, 1 middel, 4 klein); welke tegel waar staat bepaalt de indeling.
@@ -27,7 +39,7 @@ export function DashboardPage(_props: PageProps) {
     return place ? { icalUrl: null, layout: null, ...place } : null
   })
   const calendar = useSharedCalendar()
-  const [editing, setEditing] = useState(false)
+  const [editing, setEditing] = useState(takeEditFlag)
   const { layout, setLayout } = useLayout()
   const { weather, stale } = useWeather(settings?.latitude ?? null, settings?.longitude ?? null)
 
@@ -49,6 +61,7 @@ export function DashboardPage(_props: PageProps) {
     }
   }, [loadSettings])
   useAppEvent('settings-saved', loadSettings)
+  useAppEvent('edit-layout', () => setEditing((e) => !e))
 
   function widget(id: WidgetId, size: SlotSize) {
     if (id === 'agenda')
@@ -75,8 +88,6 @@ export function DashboardPage(_props: PageProps) {
         events={calendar.events}
         calendarStatus={calendar.status}
         onOpenSettings={() => emit('open-settings')}
-        editing={editing}
-        onToggleEditing={() => setEditing((e) => !e)}
       />
       <WeatherCard
         weather={weather}

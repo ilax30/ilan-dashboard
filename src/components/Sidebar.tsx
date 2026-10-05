@@ -5,14 +5,15 @@ import { navigate, type Route } from '../lib/router'
 import { store } from '../lib/store'
 import type { Todo } from '../lib/types'
 import { Icon, type IconName } from './icons'
-import { MoreFooter } from './MoreFooter'
-import type { PageControls } from './PinGate'
 import { ThemeToggle } from './ThemeToggle'
 
-type Props = { route: Route; controls?: PageControls }
+/** Vlag: na het openen van Home meteen de aanpas-stand van de tegels. */
+export const EDIT_LAYOUT_FLAG = 'dashboard.edit'
 
-/** Zijbalk op elke pagina: navigatie, snel een taak toevoegen, dag/nacht, instellingen en meer. */
-export function Sidebar({ route, controls }: Props) {
+type Props = { route: Route }
+
+/** Zijbalk op elke pagina: navigatie, snel een taak toevoegen, dag/nacht, instellingen en indeling. */
+export function Sidebar({ route }: Props) {
   const [open, setOpen] = useState(false) // alleen op smalle schermen (laag over de pagina)
   const [title, setTitle] = useState('')
   const [note, setNote] = useState<string | null>(null)
@@ -57,6 +58,17 @@ export function Sidebar({ route, controls }: Props) {
       setTitle(text)
       flash('Opslaan mislukt. Probeer het nog eens.')
     }
+  }
+
+  /** Tegels verplaatsen kan alleen op Home: vanaf een andere pagina eerst daarheen. */
+  function editLayout() {
+    if (route === '/') return emit('edit-layout')
+    try {
+      sessionStorage.setItem(EDIT_LAYOUT_FLAG, '1')
+    } catch {
+      // geen sessie-opslag: dan alleen naar Home
+    }
+    navigate('/')
   }
 
   const item = (key: IconName, label: string, active: boolean, onClick: () => void, later = false) => (
@@ -114,11 +126,11 @@ export function Sidebar({ route, controls }: Props) {
           <div className="side-theme">
             <ThemeToggle />
           </div>
-          <ul className="side-nav">{item('settings', 'Instellingen', false, () => emit('open-settings'))}</ul>
-          <div className="side-more">
-            <MoreFooter onLock={controls?.onLock} onSetPin={controls?.onSetPin ?? (() => {})} onLogout={controls?.onLogout} />
-          </div>
-          {/* Icoonbalk (iPad): uitklappen voor snel toevoegen en Meer…. */}
+          <ul className="side-nav">
+            {item('settings', 'Instellingen', false, () => emit('open-settings'))}
+            {item('layout', 'Indeling aanpassen', false, editLayout)}
+          </ul>
+          {/* Icoonbalk (iPad): uitklappen voor snel toevoegen. */}
           {!open && (
             <button className="side-expand" type="button" aria-label="Menu uitklappen" title="Meer" onClick={() => setOpen(true)}>
               <Icon name="more" weight="bold" />

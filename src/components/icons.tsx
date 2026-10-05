@@ -8,6 +8,7 @@ import {
   Lightning,
   List,
   Mountains,
+  SquaresFour,
   NotePencil,
   Target,
   Wallet,
@@ -29,6 +30,7 @@ const MAP = {
   more: DotsThree,
   quick: Lightning,
   logo: Mountains,
+  layout: SquaresFour,
 } as const
 
 export type IconName = keyof typeof MAP

@@ -6,10 +6,10 @@ import { useNotes } from '../../lib/useNotes'
 import { NEW_NOTE_FLAG } from '../../pages/NotesPage'
 import { WidgetCard, type WidgetProps } from './WidgetCard'
 
-const SHOWN = { klein: 1, middel: 4, groot: 6 } as const
+const SHOWN = { klein: 5, middel: 5, groot: 6 } as const
 const dateFmt = new Intl.DateTimeFormat('nl-NL', { day: 'numeric', month: 'short' })
 
-/** Notities-tegel: klein = aantal + laatste, middel = 4 laatste, groot = 6 + "Nieuwe notitie". */
+/** Notities-tegel: titels van de laatste notities (klein/middel 5, groot 6 + "Nieuwe notitie"); klik = lezen. */
 export function NotesWidget({ size, onOpen }: WidgetProps) {
   const { notes, failed } = useNotes()
   const list = notes ?? []
@@ -27,19 +27,12 @@ export function NotesWidget({ size, onOpen }: WidgetProps) {
         <p className="widget-muted">{failed ? 'Notities konden niet laden' : 'Laden…'}</p>
       ) : list.length === 0 ? (
         <p className="widget-muted">Nog geen notities</p>
-      ) : size === 'klein' ? (
-        <div className="widget-todo-small">
-          <span className="widget-big">{list.length}</span>
-          <span className="widget-line">
-            <span className="widget-clip">{noteTitle(list[0])}</span>
-          </span>
-        </div>
       ) : (
         <ul className="widget-list widget-notes">
           {list.slice(0, SHOWN[size]).map((n) => (
             <li key={n.id}>
               <span className="widget-clip">{noteTitle(n)}</span>
-              <span className="widget-time">{dateFmt.format(new Date(n.updated_at)).replace('.', '')}</span>
+              {size !== 'klein' && <span className="widget-time">{dateFmt.format(new Date(n.updated_at)).replace('.', '')}</span>}
             </li>
           ))}
         </ul>

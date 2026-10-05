@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import type { CalendarStatus } from '../lib/calendar'
 import type { CalEvent } from '../lib/calendarTypes'
-import { formatCountdown, greeting, headline } from '../lib/dayMath'
+import { formatCountdown, greeting, headline, nextEvent } from '../lib/dayMath'
 import { dayProgress } from '../lib/dayPart'
+import { daysUntil, dueLabel, dueSoon, formatEuro } from '../lib/bills'
+import { navigate } from '../lib/router'
+import { useBills } from '../lib/useBills'
+import { Icon } from '../components/icons'
 
 type Props = {
   events: CalEvent[]
   calendarStatus: CalendarStatus
   onOpenSettings: () => void
-  /** Aanpas-stand van de tegels. */
-  editing: boolean
-  onToggleEditing: () => void
 }
 
 const dateFmt = new Intl.DateTimeFormat('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -64,8 +65,77 @@ function AgendaLine({ events, status, now, onOpenSettings }: { events: CalEvent[
   return <span className="today-muted">Geen afspraken meer vandaag</span>
 }
 
+const shortDayFmt = new Intl.DateTimeFormat('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' })
+
+/** 'Vandaag', 'Morgen' of 'do 8 okt'. */
+function dayLabel(d: Date, now: Date): string {
+  const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  const days = daysUntil(iso, now)
+  if (days === 0) return 'Vandaag'
+  if (days === 1) return 'Morgen'
+  return capitalize(shortDayFmt.format(d).replace(/\./g, ''))
+}
+
+/** Rechts in de kop: de eerstvolgende afspraak en betaling, ook als die pas over een paar dagen zijn. */
+function NextUp({ events, status, now }: { events: CalEvent[]; status: CalendarStatus; now: Date }) {
+  const { bills } = useBills()
+  const event = status === 'none' ? null : nextEvent(events, now)
+  const bill = bills ? dueSoon(bills, now, 3650)[0] : undefined
+  const due = bill ? dueLabel(bill.next_due, now) : null
+  const [y, m, d] = bill ? bill.next_due.split('-').map(Number) : [0, 0, 0]
+  return (
+    <div className="today-next">
+      <button className="today-next-item" type="button" onClick={() => navigate('/agenda')}>
+        <span className="today-next-icon" aria-hidden="true">
+          <Icon name="agenda" size={20} weight="duotone" />
+        </span>
+        <span className="today-next-text">
+          <span className="today-next-label">Volgende afspraak</span>
+          {event ? (
+            <>
+              <span className="today-next-title">{event.title}</span>
+              <span className="today-next-meta">
+                {dayLabel(new Date(event.start), now)} · {event.allDay ? 'hele dag' : hhmm(event.start)}
+              </span>
+            </>
+          ) : (
+            <span className="today-next-meta">
+              {status === 'none' ? 'Agenda niet gekoppeld' : status === 'loading' ? 'Laden…' : status === 'error' ? 'Agenda niet bereikbaar' : 'Niets gepland'}
+            </span>
+          )}
+        </span>
+      </button>
+      <button className="today-next-item" type="button" onClick={() => navigate('/financien')}>
+        <span className="today-next-icon" aria-hidden="true">
+          <Icon name="financien" size={20} weight="duotone" />
+        </span>
+        <span className="today-next-text">
+          <span className="today-next-label">Volgende betaling</span>
+          {bill ? (
+            <>
+              <span className="today-next-title">
+                {bill.name} · {formatEuro(bill.amount)}
+              </span>
+              <span className="today-next-meta">
+                {dayLabel(new Date(y, m - 1, d), now)}
+                {due && due.tone !== 'soon' && (
+                  <span className="fin-badge" data-tone={due.tone}>
+                    {due.text}
+                  </span>
+                )}
+              </span>
+            </>
+          ) : (
+            <span className="today-next-meta">{bills === null ? 'Laden…' : 'Nog geen vaste lasten'}</span>
+          )}
+        </span>
+      </button>
+    </div>
+  )
+}
+
 /** Bovenste kaart van het dashboard: klok, begroeting, volgende afspraak en hoeveel van de dag voorbij is. */
-export function TodayHeader({ events, calendarStatus, onOpenSettings, editing, onToggleEditing }: Props) {
+export function TodayHeader({ events, calendarStatus, onOpenSettings }: Props) {
   const now = useClock()
   const progress = dayProgress(now)
   return (
@@ -93,9 +163,7 @@ export function TodayHeader({ events, calendarStatus, onOpenSettings, editing, o
           <span className="today-progress-label">{progress}% van je dag</span>
         </div>
       </div>
-      <button className="layout-edit" type="button" aria-pressed={editing} onClick={onToggleEditing}>
-        {editing ? 'Klaar' : 'Indeling aanpassen'}
-      </button>
+      <NextUp events={events} status={calendarStatus} now={now} />
     </section>
   )
 }
