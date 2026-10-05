@@ -127,3 +127,47 @@ export function colorIndex(title: string): number {
   for (const ch of title) h = (h * 31 + ch.charCodeAt(0)) >>> 0
   return h % 6
 }
+
+const byStart = (a: CalEvent, b: CalEvent) => a.start.localeCompare(b.start)
+
+/**
+ * Lijstje onder de dagbalk: afspraken van vandaag die nog niet voorbij zijn (ook als ze gisteren begonnen),
+ * en alleen als dat leeg is de eerste afspraak van morgen. Hele-dag-afspraken tellen niet mee.
+ */
+export function upcoming(events: CalEvent[], now: Date, limit = 3): { today: CalEvent[]; tomorrow: CalEvent | null } {
+  const todayStart = startOfDay(now)
+  const tomorrowStart = nextDayStart(now)
+  const dayAfter = nextDayStart(tomorrowStart)
+  const timed = events.filter((e) => !e.allDay).sort(byStart)
+  const today = timed
+    .filter((e) => new Date(e.end) > now && new Date(e.start) < tomorrowStart && new Date(e.end) > todayStart)
+    .slice(0, limit)
+  if (today.length) return { today, tomorrow: null }
+  const tomorrow = timed.find((e) => new Date(e.start) >= tomorrowStart && new Date(e.start) < dayAfter) ?? null
+  return { today, tomorrow }
+}
+
+/** Minuut van de dag → percentage op de dagbalk; null buiten het venster. */
+export function stripPosition(min: number, window: { startMin: number; endMin: number }): number | null {
+  if (min < window.startMin || min > window.endMin) return null
+  return ((min - window.startMin) / (window.endMin - window.startMin)) * 100
+}
+
+/** Maandweergave: 35 dagen (5 weken) vanaf maandag van deze week, elk om lokale middernacht. */
+export function monthGrid(now: Date): Date[] {
+  const monday = weekDays(now)[0]
+  return Array.from({ length: 35 }, (_, i) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i))
+}
+
+/** Alle afspraken die (een deel van) deze dag beslaan; hele-dag eerst, daarna op begintijd. */
+export function eventsOnDay(events: CalEvent[], day: Date): CalEvent[] {
+  const start = startOfDay(day)
+  const end = nextDayStart(day)
+  return events
+    .filter((e) => {
+      const s = new Date(e.start)
+      const en = new Date(e.end)
+      return s < end && (en > start || (en.getTime() === s.getTime() && s >= start))
+    })
+    .sort((a, b) => Number(b.allDay) - Number(a.allDay) || byStart(a, b))
+}

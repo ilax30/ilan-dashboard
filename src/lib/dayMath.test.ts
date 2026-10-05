@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CalEvent } from './calendarTypes'
-import { colorIndex, dayWindow, formatCountdown, greeting, headline, layoutDay, weekDays } from './dayMath'
+import { colorIndex, dayWindow, eventsOnDay, formatCountdown, greeting, headline, layoutDay, monthGrid, stripPosition, upcoming, weekDays } from './dayMath'
 
 // Tests draaien in de lokale tijdzone (Nederland); datums zonder 'Z' zijn lokale tijd.
 const at = (s: string) => new Date(s)
@@ -120,5 +120,75 @@ describe('colorIndex', () => {
       expect(i).toBeGreaterThanOrEqual(0)
       expect(i).toBeLessThanOrEqual(5)
     }
+  })
+})
+
+describe('upcoming', () => {
+  const now = at('2026-10-05T11:00')
+  const day = [
+    ev('Ochtend', '2026-10-05T07:00', '2026-10-05T08:00'),
+    ev('Werk', '2026-10-05T09:00', '2026-10-05T12:00'),
+    ev('Lunch', '2026-10-05T12:30', '2026-10-05T13:00'),
+    ev('Sport', '2026-10-05T17:30', '2026-10-05T18:30'),
+    ev('Eten', '2026-10-05T19:00', '2026-10-05T21:00'),
+  ]
+  it('geeft de eerstvolgende drie afspraken van vandaag die nog niet voorbij zijn', () => {
+    const r = upcoming(day, now)
+    expect(r.today.map((e) => e.title)).toEqual(['Werk', 'Lunch', 'Sport'])
+    expect(r.tomorrow).toBeNull()
+  })
+  it('telt een afspraak die gisteren begon en nog loopt mee', () => {
+    const r = upcoming([ev('Nachtdienst', '2026-10-04T22:00', '2026-10-05T12:00')], now)
+    expect(r.today.map((e) => e.title)).toEqual(['Nachtdienst'])
+  })
+  it('geeft de eerste afspraak van morgen als er vandaag niets meer is', () => {
+    const r = upcoming([day[0], ev('Tandarts', '2026-10-06T09:00', '2026-10-06T09:30'), ev('Later', '2026-10-06T14:00', '2026-10-06T15:00')], now)
+    expect(r.today).toEqual([])
+    expect(r.tomorrow?.title).toBe('Tandarts')
+  })
+  it('negeert hele-dag-afspraken', () => {
+    const r = upcoming([ev('Verjaardag', '2026-10-05T00:00', '2026-10-06T00:00', true)], now)
+    expect(r).toEqual({ today: [], tomorrow: null })
+  })
+})
+
+describe('stripPosition', () => {
+  const w = { startMin: 420, endMin: 1380 }
+  it('zet minuten om naar een percentage van de dagbalk', () => {
+    expect(stripPosition(420, w)).toBe(0)
+    expect(stripPosition(1380, w)).toBe(100)
+    expect(stripPosition(900, w)).toBe(50)
+  })
+  it('geeft null buiten het venster (bijv. 01:00 snachts)', () => {
+    expect(stripPosition(60, w)).toBeNull()
+  })
+})
+
+describe('monthGrid', () => {
+  it('geeft 35 dagen vanaf maandag van deze week, ook over de wintertijd heen', () => {
+    const grid = monthGrid(at('2026-10-07T12:00'))
+    expect(grid).toHaveLength(35)
+    expect(grid[0]).toEqual(at('2026-10-05T00:00'))
+    expect(grid[34]).toEqual(at('2026-11-08T00:00'))
+    expect(grid.every((d) => d.getHours() === 0 && d.getMinutes() === 0)).toBe(true)
+    expect(new Set(grid.map((d) => `${d.getMonth()}-${d.getDate()}`)).size).toBe(35)
+  })
+})
+
+describe('eventsOnDay', () => {
+  const vakantie = ev('Vakantie', '2026-10-06T00:00', '2026-10-09T00:00', true)
+  const tandarts = ev('Tandarts', '2026-10-07T09:00', '2026-10-07T09:30')
+  it('zet een meerdaagse hele-dag-afspraak op elke dag die hij beslaat', () => {
+    const titles = (d: string) => eventsOnDay([vakantie], at(d)).map((e) => e.title)
+    expect(titles('2026-10-06T00:00')).toEqual(['Vakantie'])
+    expect(titles('2026-10-07T00:00')).toEqual(['Vakantie'])
+    expect(titles('2026-10-08T00:00')).toEqual(['Vakantie'])
+    expect(titles('2026-10-09T00:00')).toEqual([])
+  })
+  it('zet hele-dag-afspraken voor gewone afspraken', () => {
+    expect(eventsOnDay([tandarts, vakantie], at('2026-10-07T00:00')).map((e) => e.title)).toEqual(['Vakantie', 'Tandarts'])
+  })
+  it('telt een afspraak van 0 minuten op die dag mee', () => {
+    expect(eventsOnDay([ev('Herinnering', '2026-10-07T00:00', '2026-10-07T00:00')], at('2026-10-07T00:00'))).toHaveLength(1)
   })
 })
