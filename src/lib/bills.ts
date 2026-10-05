@@ -90,6 +90,18 @@ export function daysUntil(date: string, now: Date): number {
   return Math.round((parse(date).getTime() - today.getTime()) / 86_400_000)
 }
 
+export type DueTone = 'late' | 'today' | 'soon'
+
+/** Label voor betalingen die te laat zijn of binnen 7 dagen vallen; anders null. */
+export function dueLabel(date: string, now: Date): { text: string; tone: DueTone } | null {
+  const days = daysUntil(date, now)
+  if (days < 0) return { text: 'Te laat', tone: 'late' }
+  if (days === 0) return { text: 'Vandaag', tone: 'today' }
+  if (days === 1) return { text: 'Morgen', tone: 'soon' }
+  if (days <= 7) return { text: `Over ${days} dagen`, tone: 'soon' }
+  return null
+}
+
 // ---------- Opslag: Supabase (met login) of localStorage (lokale testmodus) ----------
 
 export type BillInput = Omit<Bill, 'created_at'>

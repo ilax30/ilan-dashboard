@@ -5696,3 +5696,312 @@ body {
     min-height: 60vh;
   }
 }
+
+/* ---------- Financiën (#/financien) ---------- */
+
+.fin-page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  max-width: 1400px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 22px 26px 80px;
+}
+
+.fin-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fin-heading {
+  flex: 1;
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.fin-new,
+.fin-paid {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fin-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+.fin-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 18px 20px;
+}
+
+.fin-stat-label {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.fin-stat-value {
+  font-size: 2.1rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fin-stat-sub {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.fin-badge {
+  display: inline-block;
+  flex-shrink: 0;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fin-badge[data-tone='today'] {
+  background: var(--accent);
+  color: #fff;
+}
+
+.fin-badge[data-tone='late'] {
+  background: var(--now);
+  color: #fff;
+}
+
+.fin-list {
+  padding: 8px 10px;
+}
+
+.fin-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fin-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 220px 110px auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.fin-row:last-child {
+  border-bottom: 0;
+}
+
+.fin-row[data-inactive] {
+  opacity: 0.55;
+}
+
+.fin-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-weight: 650;
+}
+
+.fin-row-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fin-row-name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fin-row-meta {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.fin-row-due {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+.fin-row-amount {
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.fin-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 150px;
+}
+
+.fin-paid {
+  padding: 7px 12px;
+}
+
+.fin-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 48px 16px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.fin-empty p {
+  margin: 0;
+}
+
+.fin-dialog {
+  width: min(560px, calc(100vw - 32px));
+}
+
+.fin-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.fin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.fin-field .settings-input {
+  flex: none;
+  width: 100%;
+  color: var(--ink);
+}
+
+.fin-field-wide {
+  grid-column: 1 / -1;
+}
+
+.fin-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.fin-dialog-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fin-spacer {
+  flex: 1;
+}
+
+/* Tegel */
+.fin-w-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 10px;
+  row-gap: 2px;
+}
+
+.fin-w-label {
+  flex-basis: 100%;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.fin-w-list {
+  margin-top: 12px;
+  gap: 8px;
+}
+
+.fin-w-list li {
+  align-items: center;
+}
+
+.fin-w-list .fin-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+}
+
+.fin-w-name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.fin-w-name .widget-time {
+  font-size: 0.82rem;
+}
+
+.fin-w-amount {
+  flex-shrink: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .fin-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fin-row {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .fin-row-due {
+    grid-column: 2;
+  }
+
+  .fin-row-amount {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .fin-row-actions {
+    grid-column: 3;
+    min-width: 0;
+  }
+}

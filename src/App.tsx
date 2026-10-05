@@ -13,6 +13,7 @@ import { useHashRoute, type Route } from './lib/router'
 import { supabase } from './lib/supabase'
 import { AgendaPage } from './pages/AgendaPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { FinancePage } from './pages/FinancePage'
 import { NotesPage } from './pages/NotesPage'
 import { TodoPage } from './pages/TodoPage'
 import { TopicPage } from './pages/TopicPage'
@@ -25,6 +26,7 @@ function Page({ route, controls }: { route: Route; controls?: PageControls }) {
   if (route === '/todo') return <TodoPage {...controls} />
   if (route === '/agenda') return <AgendaPage />
   if (route === '/notities') return <NotesPage />
+  if (route === '/financien') return <FinancePage />
   const topic = topicFor(route)
   return topic ? <TopicPage topic={topic} /> : <DashboardPage {...controls} />
 }

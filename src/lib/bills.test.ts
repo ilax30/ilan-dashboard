@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { dueSoon, formatEuro, monthlyTotal, nextDueAfter, openThisMonth, parseAmount, type Bill } from './bills'
+import { dueLabel, dueSoon, formatEuro, monthlyTotal, nextDueAfter, openThisMonth, parseAmount, type Bill } from './bills'
 
 const bill = (id: string, over: Partial<Bill> = {}): Bill => ({
   id,
@@ -63,5 +63,16 @@ describe('overzicht', () => {
   })
   it('geeft wat binnen 7 dagen vervalt, eerst wat te laat is', () => {
     expect(dueSoon(bills, now, 7).map((b) => b.name)).toEqual(['Te laat', 'Netflix'])
+  })
+})
+
+describe('dueLabel', () => {
+  const now = new Date('2026-10-05T12:00')
+  it('zegt hoe dringend een betaling is', () => {
+    expect(dueLabel('2026-10-03', now)).toEqual({ text: 'Te laat', tone: 'late' })
+    expect(dueLabel('2026-10-05', now)).toEqual({ text: 'Vandaag', tone: 'today' })
+    expect(dueLabel('2026-10-06', now)).toEqual({ text: 'Morgen', tone: 'soon' })
+    expect(dueLabel('2026-10-12', now)).toEqual({ text: 'Over 7 dagen', tone: 'soon' })
+    expect(dueLabel('2026-10-13', now)).toBeNull()
   })
 })

@@ -4,6 +4,7 @@ import { TodayHeader } from '../dashboard/TodayHeader'
 import { TOPICS } from '../dashboard/topics'
 import { WeatherCard } from '../dashboard/WeatherCard'
 import { AgendaWidget } from '../dashboard/widgets/AgendaWidget'
+import { FinanceWidget } from '../dashboard/widgets/FinanceWidget'
 import { NotesWidget } from '../dashboard/widgets/NotesWidget'
 import { TodoWidget } from '../dashboard/widgets/TodoWidget'
 import { TopicWidget } from '../dashboard/widgets/TopicWidget'
@@ -63,6 +64,7 @@ export function DashboardPage(_props: PageProps) {
       )
     if (id === 'todo') return <TodoWidget size={size} onOpen={() => navigate('/todo')} />
     if (id === 'notities') return <NotesWidget size={size} onOpen={() => navigate('/notities')} />
+    if (id === 'financien') return <FinanceWidget size={size} onOpen={() => navigate('/financien')} />
     const topic = TOPICS.find((t) => t.id === id)!
     return <TopicWidget size={size} topic={topic} onOpen={() => navigate(topic.route)} />
   }
