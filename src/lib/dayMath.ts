@@ -2,7 +2,7 @@ import type { CalEvent } from './calendarTypes'
 
 const MIN = 60_000
 const DAY_MIN = 24 * 60
-const MIN_BLOCK = 20 // kortste blok in de tijdlijn (minuten)
+const MIN_BLOCK = 30 // kortste blok in de tijdlijn (minuten): één regel tekst moet passen
 const WINDOW = { startMin: 7 * 60, endMin: 23 * 60 }
 
 export function greeting(date: Date): 'Goedemorgen' | 'Goedemiddag' | 'Goedenavond' | 'Goedenacht' {
@@ -41,15 +41,24 @@ export function headline(events: CalEvent[], now: Date): { kind: 'next' | 'ongoi
   return { kind: 'none' }
 }
 
-/** Afspraak in minuten vanaf middernacht van `day`, afgekapt tot de dag, minimaal MIN_BLOCK lang. */
+/** Lokale middernacht van de dag na `day` (op zomer-/wintertijddagen 23 of 25 uur later). */
+export const nextDayStart = (day: Date) => new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1)
+const clockMin = (d: Date) => d.getHours() * 60 + d.getMinutes()
+
+/**
+ * Afspraak als wandkloktijd in minuten (09:00 = 540) op `day`, afgekapt tot de dag, minimaal MIN_BLOCK lang.
+ * Wandklok in plaats van verstreken tijd, zodat het raster ook op zomer-/wintertijddagen klopt.
+ */
 function minutesOnDay(e: CalEvent, day: Date): { startMin: number; endMin: number } | null {
-  const dayStart = startOfDay(day).getTime()
-  const s = (new Date(e.start).getTime() - dayStart) / MIN
-  const en = (new Date(e.end).getTime() - dayStart) / MIN
-  if (en <= 0 && s < 0) return null
-  if (s >= DAY_MIN) return null
-  const startMin = Math.max(0, s)
-  const endMin = Math.min(DAY_MIN, Math.max(en, startMin + MIN_BLOCK))
+  const dayStart = startOfDay(day)
+  const dayEnd = nextDayStart(day)
+  const s = new Date(e.start)
+  const en = new Date(e.end)
+  if (en <= dayStart && s < dayStart) return null
+  if (s >= dayEnd) return null
+  const startMin = s < dayStart ? 0 : clockMin(s)
+  const rawEnd = en >= dayEnd ? DAY_MIN : clockMin(en)
+  const endMin = Math.min(DAY_MIN, Math.max(rawEnd, startMin + MIN_BLOCK))
   return { startMin, endMin }
 }
 

@@ -70,9 +70,23 @@ describe('layoutDay', () => {
     expect(b.startMin).toBe(22 * 60 + 30)
     expect(b.endMin).toBe(1440)
   })
-  it('geeft een afspraak van 0 minuten minimaal 20 minuten', () => {
+  it('geeft een afspraak van 0 minuten minimaal 30 minuten (leesbaar blok)', () => {
     const [b] = layoutDay([ev('kort', '2026-10-05T12:00', '2026-10-05T12:00')], day)
-    expect(b.endMin - b.startMin).toBe(20)
+    expect(b.endMin - b.startMin).toBe(30)
+  })
+  it('houdt wandkloktijd aan op de dag van de wintertijd (25 okt 2026)', () => {
+    const dst = at('2026-10-25T00:00')
+    const blocks = layoutDay([ev('loop', '2026-10-25T09:00', '2026-10-25T10:00'), ev('laat', '2026-10-25T23:30', '2026-10-25T23:50')], dst)
+    expect(blocks.map((b) => b.startMin)).toEqual([540, 1410])
+  })
+  it('houdt wandkloktijd aan op de dag van de zomertijd (28 mrt 2027)', () => {
+    const [b] = layoutDay([ev('loop', '2027-03-28T09:00', '2027-03-28T10:00')], at('2027-03-28T00:00'))
+    expect([b.startMin, b.endMin]).toEqual([540, 600])
+  })
+  it('kapt op een wintertijd-dag af op de echte middernacht', () => {
+    const [b] = layoutDay([ev('nacht', '2026-10-25T22:30', '2026-10-26T01:00')], at('2026-10-25T00:00'))
+    expect(b.endMin).toBe(1440)
+    expect(layoutDay([ev('morgen', '2026-10-26T00:30', '2026-10-26T01:00')], at('2026-10-25T00:00'))).toEqual([])
   })
   it('slaat hele-dag-afspraken over', () => {
     expect(layoutDay([ev('hele dag', '2026-10-05T00:00', '2026-10-06T00:00', true)], day)).toEqual([])

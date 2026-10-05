@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { CalendarStatus } from '../lib/calendar'
 import type { CalEvent } from '../lib/calendarTypes'
-import { colorIndex, dayWindow, layoutDay, weekDays, type DayBlock } from '../lib/dayMath'
+import { colorIndex, dayWindow, layoutDay, nextDayStart, weekDays, type DayBlock } from '../lib/dayMath'
 import { useNow } from '../lib/relativeTime'
 
 type View = 'day' | 'week'
@@ -29,7 +29,7 @@ function readView(): View {
 /** Hele-dag-afspraken die (een deel van) deze dag beslaan. */
 function allDayOn(events: CalEvent[], day: Date) {
   const start = startOfDay(day).getTime()
-  const end = start + 24 * 60 * 60 * 1000
+  const end = nextDayStart(day).getTime()
   return events.filter((e) => e.allDay && new Date(e.start).getTime() < end && new Date(e.end).getTime() > start)
 }
 
