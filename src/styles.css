@@ -1,19 +1,19 @@
 :root {
-  --bg: #ece2d4;
-  --blob: #e2d4c2;
+  --bg: #e3d6c4;
+  --blob: #d8c7b1;
   --ink: #2f2725;
-  --muted: #73635b;
+  --muted: #6c5c54;
   --accent: #d9967a;
   --accent-ink: #a95f42;
-  --accent-soft: #f0d5c3;
-  --card: #f6eee2;
-  --line: #d9c8b4;
+  --accent-soft: #ebcbb6;
+  --card: #efe4d4;
+  --line: #cfbca5;
   --shadow: 0 1px 2px rgb(110 70 50 / 0.06), 0 6px 18px -8px rgb(110 70 50 / 0.18);
   --shadow-lift: 0 2px 4px rgb(110 70 50 / 0.08), 0 18px 36px -12px rgb(110 70 50 / 0.32);
 
   /* Trading card: rand, folie, glans */
-  --card-hi: #faf4ea;
-  --card-edge: #e3d3bf;
+  --card-hi: #f5ecdf;
+  --card-edge: #d9c6ae;
   --card-gloss: rgb(255 250 240 / 0.7);
   --gloss: rgb(255 250 240 / 0.45);
   --glare: rgb(255 248 235 / 0.5);
@@ -1200,7 +1200,7 @@ button {
 /* ---------- Dag/nacht-schuifje ---------- */
 
 .theme-toggle {
-  --track: #f6eee2;
+  --track: #efe4d4;
   --edge: #2f2725;
   --knob: #2f2725;
   position: fixed;
