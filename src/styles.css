@@ -37,19 +37,19 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #221d1b;
-    --blob: #2a2421;
-    --ink: #f1e9e2;
-    --muted: #b4a79d;
+    --bg: #1b1a19;
+    --blob: #222020;
+    --ink: #f2eee9;
+    --muted: #aaa49e;
     --accent: #f2b79a;
     --accent-ink: #f6c7ae;
-    --accent-soft: #4a3a33;
-    --card: #2e2825;
-    --line: #443b36;
+    --accent-soft: #45382f;
+    --card: #262423;
+    --line: #3a3633;
     --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 8px 20px -10px rgb(0 0 0 / 0.5);
     --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 20px 40px -12px rgb(0 0 0 / 0.6);
-    --card-hi: #37302c;
-    --card-edge: #463c37;
+    --card-hi: #2f2c2a;
+    --card-edge: #3b3734;
     --card-gloss: rgb(255 245 235 / 0.06);
     --gloss: rgb(255 245 235 / 0.05);
     --glare: rgb(255 236 220 / 0.08);
@@ -66,19 +66,19 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: #221d1b;
-  --blob: #2a2421;
-  --ink: #f1e9e2;
-  --muted: #b4a79d;
+  --bg: #1b1a19;
+  --blob: #222020;
+  --ink: #f2eee9;
+  --muted: #aaa49e;
   --accent: #f2b79a;
   --accent-ink: #f6c7ae;
-  --accent-soft: #4a3a33;
-  --card: #2e2825;
-  --line: #443b36;
+  --accent-soft: #45382f;
+  --card: #262423;
+  --line: #3a3633;
   --shadow: 0 1px 2px rgb(0 0 0 / 0.25), 0 8px 20px -10px rgb(0 0 0 / 0.5);
   --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.3), 0 20px 40px -12px rgb(0 0 0 / 0.6);
-  --card-hi: #37302c;
-  --card-edge: #463c37;
+  --card-hi: #2f2c2a;
+  --card-edge: #3b3734;
   --card-gloss: rgb(255 245 235 / 0.06);
   --gloss: rgb(255 245 235 / 0.05);
   --glare: rgb(255 236 220 / 0.08);
@@ -5123,4 +5123,38 @@ body {
 .today-agenda,
 .today-progress-label {
   color: color-mix(in srgb, var(--ink) 78%, var(--muted));
+}
+
+/* ---------- Tegels duidelijker, latere onderwerpen grijs ---------- */
+
+.dash-card {
+  border-color: var(--card-edge);
+  background: var(--card-hi);
+  box-shadow: 0 1px 2px rgb(40 25 15 / 0.08), 0 12px 30px -14px rgb(40 25 15 / 0.45);
+}
+
+.today {
+  background: color-mix(in srgb, var(--card-hi) 72%, transparent);
+}
+
+/* Donker: kaarten iets lichter dan de ondergrond, zoals het voorbeeld. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .dash-card {
+    background: var(--card);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 30px -14px rgb(0 0 0 / 0.7);
+  }
+}
+
+:root[data-theme='dark'] .dash-card {
+  background: var(--card);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 30px -14px rgb(0 0 0 / 0.7);
+}
+
+.widget-later {
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+.side-link[data-later] {
+  opacity: 0.5;
 }

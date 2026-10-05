@@ -13,7 +13,7 @@ export type SlotRef = 'groot' | 'middel' | 0 | 1 | 2 | 3
 export const DEFAULT_LAYOUT: Layout = {
   groot: 'agenda',
   middel: 'todo',
-  klein: ['financien', 'doelen', 'notities', 'projecten'],
+  klein: ['notities', 'financien', 'doelen', 'projecten'],
 }
 
 const ORDER: WidgetId[] = [DEFAULT_LAYOUT.groot, DEFAULT_LAYOUT.middel, ...DEFAULT_LAYOUT.klein]

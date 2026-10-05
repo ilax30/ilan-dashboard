@@ -10,13 +10,15 @@ export type Topic = {
   line: string
   /** Tekst op de (nog) lege pagina. */
   empty: string
+  /** Nog niet aan begonnen: grijs in zijbalk en op het dashboard. */
+  later?: boolean
 }
 
 export const TOPICS: Topic[] = [
-  { id: 'doelen', title: 'Doelen', route: '/doelen', line: 'Je doelen voor deze week', empty: 'Hier komen straks je doelen.' },
-  { id: 'financien', title: 'Financiën', route: '/financien', line: 'Overzicht van je geld', empty: 'Hier komt straks je geldoverzicht.' },
   { id: 'notities', title: 'Notities', route: '/notities', line: 'Losse gedachten en lijstjes', empty: 'Hier komen straks je notities.' },
-  { id: 'projecten', title: 'Projecten', route: '/projecten', line: 'Waar je aan werkt', empty: 'Hier komen straks je projecten.' },
+  { id: 'financien', title: 'Financiën', route: '/financien', line: 'Overzicht van je geld', empty: 'Hier komt straks je geldoverzicht.' },
+  { id: 'doelen', title: 'Doelen', route: '/doelen', line: 'Je doelen voor deze week', empty: 'Hier komen straks je doelen.', later: true },
+  { id: 'projecten', title: 'Projecten', route: '/projecten', line: 'Waar je aan werkt', empty: 'Hier komen straks je projecten.', later: true },
 ]
 
 export const topicFor = (route: Route) => TOPICS.find((t) => t.route === route)

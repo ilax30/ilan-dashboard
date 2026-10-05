@@ -59,9 +59,9 @@ export function Sidebar({ route, controls }: Props) {
     }
   }
 
-  const item = (key: IconName, label: string, active: boolean, onClick: () => void) => (
+  const item = (key: IconName, label: string, active: boolean, onClick: () => void, later = false) => (
     <li key={label}>
-      <button className="side-link" type="button" data-active={active || undefined} aria-current={active ? 'page' : undefined} onClick={onClick} title={label}>
+      <button className="side-link" type="button" data-active={active || undefined} data-later={later || undefined} aria-current={active ? 'page' : undefined} onClick={onClick} title={label}>
         <Icon name={key} weight={active ? 'fill' : 'regular'} />
         <span className="side-label">{label}</span>
       </button>
@@ -84,9 +84,9 @@ export function Sidebar({ route, controls }: Props) {
 
         <ul className="side-nav">
           {item('home', 'Home', route === '/', () => navigate('/'))}
-          {item('agenda', 'Agenda', false, () => emit('open-agenda'))}
           {item('todo', 'Taken', route === '/todo', () => navigate('/todo'))}
-          {TOPICS.map((t) => item(t.id, t.title, route === t.route, () => navigate(t.route)))}
+          {item('agenda', 'Agenda', false, () => emit('open-agenda'))}
+          {TOPICS.map((t) => item(t.id, t.title, route === t.route, () => navigate(t.route), t.later))}
         </ul>
 
         <div className="side-bottom">

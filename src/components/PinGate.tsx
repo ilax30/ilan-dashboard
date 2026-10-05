@@ -15,12 +15,15 @@ import {
   syncPinFromAccount,
   touchActive,
 } from '../lib/pin'
+import { isDesktop, lockPolicy } from '../lib/lockPolicy'
 
-const AUTO_LOCK_MS = 10 * 60 * 1000
+// Desktop: niet op slot zolang de app openstaat (pas na 2 uur weg); telefoon/tablet: na 10 minuten.
+const { lockAfterMs: AUTO_LOCK_MS, lockWhileOpen: LOCK_WHILE_OPEN } = lockPolicy(isDesktop())
 
 /**
  * Pincode-slot rond het bord. Ingelogd blijf je via Supabase; de pincode is een snel slot
- * per apparaat. Hij komt pas na 10 minuten niet gebruiken (ook bij openen/refresh), of via "Vergrendelen".
+ * per apparaat. Hij komt na een tijd niet gebruiken (desktop 2 uur, alleen bij opnieuw openen; telefoon 10 minuten),
+ * of via "Vergrendelen".
  */
 export type PageControls = { onLock?: () => void; onSetPin: () => void; onLogout: () => void }
 
@@ -50,7 +53,7 @@ export function PinGate({
   const [first, setFirst] = useState('')
   const [error, setError] = useState('')
 
-  // Bijhouden wanneer je de app gebruikt; na 10 minuten niets doen gaat hij op slot.
+  // Bijhouden wanneer je de app gebruikt (voor het slot, zie lockPolicy).
   useEffect(() => {
     if (mode !== 'open') return
     let last = 0
@@ -61,11 +64,11 @@ export function PinGate({
     }
     const onVis = () => {
       if (document.hidden) return touchActive()
-      if (hasPin(uid) && !recentlyActive(AUTO_LOCK_MS)) setMode('locked')
+      if (LOCK_WHILE_OPEN && hasPin(uid) && !recentlyActive(AUTO_LOCK_MS)) setMode('locked')
       else active()
     }
     const check = setInterval(() => {
-      if (!document.hidden && hasPin(uid) && !recentlyActive(AUTO_LOCK_MS)) setMode('locked')
+      if (LOCK_WHILE_OPEN && !document.hidden && hasPin(uid) && !recentlyActive(AUTO_LOCK_MS)) setMode('locked')
     }, 30_000)
     window.addEventListener('pointerdown', active, { passive: true })
     window.addEventListener('keydown', active)

@@ -7,7 +7,7 @@ const ids = (l: Layout) => [l.groot, l.middel, ...l.klein]
 describe('swapSlots', () => {
   it('ruilt een kleine tegel met de grote plek', () => {
     const l = swapSlots(DEFAULT_LAYOUT, 'groot', 1)
-    expect(l.groot).toBe('doelen')
+    expect(l.groot).toBe('financien')
     expect(l.klein[1]).toBe('agenda')
     expect(DEFAULT_LAYOUT.groot).toBe('agenda') // origineel blijft ongewijzigd
   })
@@ -32,6 +32,9 @@ describe('normalizeLayout', () => {
     expect(l.groot).toBe('todo')
     expect(l.klein).toHaveLength(4)
     expect([...ids(l)].sort()).toEqual([...ALL].sort())
+  })
+  it('zet Notities en Financiën voor de (nog grijze) Doelen en Projecten', () => {
+    expect(DEFAULT_LAYOUT.klein).toEqual(['notities', 'financien', 'doelen', 'projecten'])
   })
   it('laat een geldige indeling ongemoeid', () => {
     const custom: Layout = { groot: 'notities', middel: 'agenda', klein: ['todo', 'doelen', 'financien', 'projecten'] }

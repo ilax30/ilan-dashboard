@@ -47,7 +47,7 @@ export function ThemeToggle() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
     // Venster-/statusbalk van de app laten meekleuren met het thema.
-    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', theme === 'dark' ? '#221D1B' : '#CBBFAE'))
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', theme === 'dark' ? '#1B1A19' : '#CBBFAE'))
   }, [theme])
 
   async function toggle(e: MouseEvent<HTMLButtonElement>) {
