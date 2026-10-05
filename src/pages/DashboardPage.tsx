@@ -1,18 +1,31 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Timeline } from '../dashboard/Timeline'
 import { TodayHeader } from '../dashboard/TodayHeader'
-import { TodoSummaryCard } from '../dashboard/TodoSummaryCard'
+import { TOPICS } from '../dashboard/topics'
 import { WeatherCard } from '../dashboard/WeatherCard'
+import { AgendaWidget } from '../dashboard/widgets/AgendaWidget'
+import { TodoWidget } from '../dashboard/widgets/TodoWidget'
+import { TopicWidget } from '../dashboard/widgets/TopicWidget'
 import { emit, useAppEvent } from '../lib/appEvents'
 import { useCalendar } from '../lib/calendar'
+import { useLayout, type SlotRef, type SlotSize, type WidgetId } from '../lib/layout'
+import { navigate } from '../lib/router'
 import { getSettings, rememberedPlace, type DashboardSettings } from '../lib/settings'
 import { supabase } from '../lib/supabase'
 import { useWeather } from '../lib/weather'
 import type { PageProps } from './TodoPage'
 
+const SLOTS: { ref: SlotRef; size: SlotSize }[] = [
+  { ref: 'groot', size: 'groot' },
+  { ref: 'middel', size: 'middel' },
+  { ref: 0, size: 'klein' },
+  { ref: 1, size: 'klein' },
+  { ref: 2, size: 'klein' },
+  { ref: 3, size: 'klein' },
+]
+
 /**
  * Dashboard (#/), desktop eerst: 12-koloms raster.
- * Rij 1 de live kop, rij 2 tijdlijn + to-do, rij 3 (later) de onderwerp-tegels (Doelen, Financiën, …).
+ * Rij 1 kop + weer, daarna 6 plekken (1 groot, 1 middel, 4 klein); welke tegel waar staat bepaalt de indeling.
  */
 export function DashboardPage(_props: PageProps) {
   // Start met de onthouden woonplaats: het weer staat er dan meteen, ook offline.
@@ -22,6 +35,7 @@ export function DashboardPage(_props: PageProps) {
   })
   const calendar = useCalendar(Boolean(supabase))
   const [editing, setEditing] = useState(false)
+  const { layout } = useLayout()
   const { weather, stale } = useWeather(settings?.latitude ?? null, settings?.longitude ?? null)
 
   const loadSettings = useCallback(() => {
@@ -46,32 +60,46 @@ export function DashboardPage(_props: PageProps) {
     calendar.refresh()
   })
 
-  return (
-    <>
-      <main className="dash">
-        <TodayHeader
-          events={calendar.events}
-          calendarStatus={calendar.status}
-          onOpenSettings={() => emit('open-settings')}
-          editing={editing}
-          onToggleEditing={() => setEditing((e) => !e)}
-        />
-        <WeatherCard
-          weather={weather}
-          stale={stale}
-          hasCity={settings === null || settings.latitude !== null}
-          onOpenSettings={() => emit('open-settings')}
-        />
-        <Timeline
+  function widget(id: WidgetId, size: SlotSize) {
+    if (id === 'agenda')
+      return (
+        <AgendaWidget
+          size={size}
+          onOpen={() => emit('open-agenda')}
           events={calendar.events}
           status={calendar.status}
           onConnect={() => emit('open-settings')}
           onRetry={calendar.refresh}
         />
-        <div className="dash-side">
-          <TodoSummaryCard />
-        </div>
-      </main>
-    </>
+      )
+    if (id === 'todo') return <TodoWidget size={size} onOpen={() => navigate('/todo')} />
+    const topic = TOPICS.find((t) => t.id === id)!
+    return <TopicWidget size={size} topic={topic} onOpen={() => navigate(topic.route)} />
+  }
+
+  return (
+    <main className="dash" data-editing={editing || undefined}>
+      <TodayHeader
+        events={calendar.events}
+        calendarStatus={calendar.status}
+        onOpenSettings={() => emit('open-settings')}
+        editing={editing}
+        onToggleEditing={() => setEditing((e) => !e)}
+      />
+      <WeatherCard
+        weather={weather}
+        stale={stale}
+        hasCity={settings === null || settings.latitude !== null}
+        onOpenSettings={() => emit('open-settings')}
+      />
+      {SLOTS.map(({ ref, size }) => {
+        const id = typeof ref === 'number' ? layout.klein[ref] : layout[ref]
+        return (
+          <div key={String(ref)} className="slot" data-slot={size}>
+            {widget(id, size)}
+          </div>
+        )
+      })}
+    </main>
   )
 }

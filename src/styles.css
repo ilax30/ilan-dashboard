@@ -4102,3 +4102,484 @@ button {
     flex-direction: column;
   }
 }
+
+/* ---------- Dashboard: plekken (1 groot, 1 middel, 4 klein) ---------- */
+
+.slot {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.slot > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.slot[data-slot='groot'] {
+  grid-column: span 8;
+}
+
+.slot[data-slot='middel'] {
+  grid-column: span 4;
+}
+
+.slot[data-slot='klein'] {
+  grid-column: span 3;
+}
+
+/* Desktop: alles past op één scherm; de rijen delen de hoogte. */
+@media (min-width: 1280px) {
+  .dash {
+    height: 100dvh;
+    min-height: 760px;
+    grid-template-rows: auto minmax(0, 1.75fr) minmax(0, 1fr);
+    gap: 24px;
+    padding: 28px 36px;
+  }
+
+  .dash > .today {
+    grid-column: span 8;
+  }
+
+  .dash > .weather-card {
+    grid-column: span 4;
+  }
+}
+
+@media (min-width: 2200px) {
+  .dash {
+    gap: 32px;
+    padding: 40px 56px;
+  }
+}
+
+/* iPad liggend: groot en middel onder elkaar, klein 2 × 2. */
+@media (min-width: 900px) and (max-width: 1279.98px) {
+  .slot[data-slot='groot'],
+  .slot[data-slot='middel'] {
+    grid-column: 1 / -1;
+  }
+
+  .slot[data-slot='groot'] {
+    height: 460px;
+  }
+
+  .slot[data-slot='middel'] {
+    height: 380px;
+  }
+
+  .slot[data-slot='klein'] {
+    grid-column: span 6;
+    height: 220px;
+  }
+}
+
+/* Smal: onder elkaar; klein 2 × 2 vanaf 600 px. */
+@media (max-width: 899.98px) {
+  .slot[data-slot='groot'],
+  .slot[data-slot='middel'],
+  .slot[data-slot='klein'] {
+    grid-column: 1 / -1;
+  }
+
+  .slot[data-slot='groot'] {
+    height: 440px;
+  }
+
+  .slot[data-slot='middel'] {
+    min-height: 300px;
+  }
+
+  .slot[data-slot='klein'] {
+    min-height: 180px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 899.98px) {
+  .dash {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dash > .today,
+  .dash > .weather-card,
+  .slot[data-slot='groot'],
+  .slot[data-slot='middel'] {
+    grid-column: 1 / -1;
+  }
+
+  .slot[data-slot='klein'] {
+    grid-column: span 1;
+  }
+}
+
+/* ---------- Tegels ---------- */
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  padding: 20px 22px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 200ms ease, transform 200ms var(--ease-out);
+}
+
+@media (hover: hover) {
+  .widget:hover {
+    box-shadow: var(--shadow-lift), inset 0 1px 0 var(--card-gloss);
+  }
+}
+
+.widget[data-size='klein'] {
+  gap: 8px;
+  padding: 16px 18px;
+}
+
+.widget-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.widget-icon {
+  display: grid;
+  color: var(--accent);
+}
+
+.widget-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.widget[data-size='klein'] .widget-title {
+  font-size: 1.25rem;
+}
+
+.widget-open {
+  flex-shrink: 0;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.86rem;
+}
+
+.widget[data-size='klein'] .widget-open {
+  font-size: 0;
+}
+
+.widget[data-size='klein'] .widget-open span {
+  font-size: 1rem;
+}
+
+@media (hover: hover) {
+  .widget-open:hover {
+    color: var(--accent-ink);
+  }
+}
+
+.widget-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.widget-clip {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+
+.widget-muted {
+  margin: 0;
+  color: var(--muted);
+}
+
+.widget-tag {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--now);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.widget-list,
+.widget-tasks {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+.widget-list {
+  gap: 6px;
+}
+
+.widget-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.widget-time {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-big {
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.widget-count {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.widget-todo-small {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.widget-tasks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 8px 2px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.widget-tasks li:last-child {
+  border-bottom: 0;
+}
+
+.widget-check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid var(--muted);
+  border-radius: 7px;
+  background: transparent;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+@media (hover: hover) {
+  .widget-check:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+}
+
+.widget-star {
+  flex-shrink: 0;
+  color: var(--gold);
+}
+
+.widget-add {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.widget-undo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.widget-topic-body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 16px;
+  min-height: 0;
+}
+
+.widget-art {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+}
+
+.widget-art svg {
+  width: 60px;
+  height: 60px;
+}
+
+.widget-topic-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.widget-soon {
+  color: var(--muted);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.widget[data-size='groot'] .widget-topic-body,
+.widget[data-size='middel'] .widget-topic-body {
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.widget[data-size='groot'] .widget-art {
+  width: 150px;
+  height: 150px;
+  border-radius: 40px;
+}
+
+.widget[data-size='groot'] .widget-art svg {
+  width: 116px;
+  height: 116px;
+}
+
+.widget[data-size='middel'] .widget-art {
+  width: 110px;
+  height: 110px;
+  border-radius: 30px;
+}
+
+.widget[data-size='middel'] .widget-art svg {
+  width: 86px;
+  height: 86px;
+}
+
+/* Agenda groot: tijdlijn vult de tegel. */
+.timeline[data-embedded] {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+}
+
+.timeline[data-embedded] .tl-body {
+  flex: 1;
+  min-height: 0;
+}
+
+.timeline[data-embedded] .tl-scroll {
+  height: 100%;
+  max-height: none;
+}
+
+/* ---------- Dagbalk ---------- */
+
+.daystrip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.daystrip-track {
+  position: relative;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--line) 45%, transparent);
+}
+
+.daystrip-past {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 2;
+  background: color-mix(in srgb, var(--card) 50%, transparent);
+}
+
+.daystrip-block {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--tint) 60%, var(--ink));
+  border-radius: 6px;
+  background: var(--tint);
+}
+
+.daystrip-now {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 2px;
+  background: var(--now);
+}
+
+.daystrip-hours {
+  position: relative;
+  height: 15px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.daystrip-hours span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+/* In de tegel staat "Agenda" al in de kop: alleen de Dag/Week-schakelaar tonen. */
+.timeline[data-embedded] .tl-title {
+  display: none;
+}
+
+.timeline[data-embedded] .tl-head {
+  margin-top: -6px;
+}
+
+/* Krappe tegel: de takenlijst scrollt binnen de tegel, het invoerveld blijft staan. */
+.widget-todo .widget-tasks {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+/* Lange afspraaktitel in de kop: maximaal 2 regels. */
+.today-agenda {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}

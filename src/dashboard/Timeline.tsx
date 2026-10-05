@@ -5,7 +5,14 @@ import { colorIndex, dayWindow, layoutDay, nextDayStart, weekDays, type DayBlock
 import { useNow } from '../lib/relativeTime'
 
 type View = 'day' | 'week'
-type Props = { events: CalEvent[]; status: CalendarStatus; onConnect: () => void; onRetry: () => void }
+type Props = {
+  events: CalEvent[]
+  status: CalendarStatus
+  onConnect: () => void
+  onRetry: () => void
+  /** In een tegel: zonder eigen kaartrand. */
+  embedded?: boolean
+}
 
 const VIEW_KEY = 'dashboard.view'
 const timeFmt = new Intl.DateTimeFormat('nl-NL', { hour: '2-digit', minute: '2-digit' })
@@ -69,7 +76,7 @@ function NowLine({ now, windowStart, windowEnd, label }: { now: Date; windowStar
 }
 
 /** Agenda-tijdlijn: dag (uurraster) of week (7 kolommen), met meelopende NU-lijn. */
-export function Timeline({ events, status, onConnect, onRetry }: Props) {
+export function Timeline({ events, status, onConnect, onRetry, embedded }: Props) {
   const [view, setView] = useState<View>(readView)
   const nowMs = useNow(30_000)
   const now = new Date(nowMs)
@@ -153,7 +160,7 @@ export function Timeline({ events, status, onConnect, onRetry }: Props) {
   const showAllDayRow = columns.some((c) => c.allDay.length > 0)
 
   return (
-    <section className="timeline dash-card" data-view={view} aria-label="Agenda" style={{ '--cols': days.length } as CSSProperties}>
+    <section className={embedded ? "timeline" : "timeline dash-card"} data-embedded={embedded || undefined} data-view={view} aria-label="Agenda" style={{ '--cols': days.length } as CSSProperties}>
       <header className="tl-head">
         <h2 className="tl-title">{week ? 'Deze week' : 'Vandaag'}</h2>
         {status === 'stale' && <span className="stale-label">niet bijgewerkt</span>}
