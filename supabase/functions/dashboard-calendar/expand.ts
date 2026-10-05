@@ -17,7 +17,8 @@ type Ical = any
 type IcalTime = any
 
 const TZ = 'Europe/Amsterdam'
-const MAX_OCCURRENCES = 10000
+const MAX_OCCURRENCES = 100_000 // veiligheidsgrens; een dagelijkse reeks sinds 1990 is ± 13.000
+const DAY_MS = 24 * 60 * 60 * 1000
 
 /** Verschil (ms) tussen Amsterdamse wandkloktijd en UTC op een bepaald moment. */
 function amsterdamOffsetMs(utcMs: number): number {
@@ -46,6 +47,19 @@ function fromAmsterdamWallClock(y: number, mo: number, d: number, h = 0, mi = 0,
 export function amsterdamDayStart(now: Date): Date {
   const local = new Date(now.getTime() + amsterdamOffsetMs(now.getTime()))
   return new Date(fromAmsterdamWallClock(local.getUTCFullYear(), local.getUTCMonth() + 1, local.getUTCDate()))
+}
+
+/**
+ * Op te halen bereik: maandag 00:00 van deze week (zodat de weekweergave ook de eerdere dagen toont)
+ * tot en met 7 dagen na vandaag, in Amsterdamse middernachten.
+ */
+export function calendarRange(now: Date): { start: Date; end: Date } {
+  const local = new Date(now.getTime() + amsterdamOffsetMs(now.getTime()))
+  const y = local.getUTCFullYear()
+  const m = local.getUTCMonth() + 1
+  const d = local.getUTCDate()
+  const sinceMonday = (local.getUTCDay() + 6) % 7
+  return { start: new Date(fromAmsterdamWallClock(y, m, d - sinceMonday)), end: new Date(fromAmsterdamWallClock(y, m, d + 8)) }
 }
 
 /** ical.js-tijd → UTC-moment. Datums en "zwevende" tijden gelden als Amsterdamse tijd. */
@@ -106,9 +120,15 @@ export function expandEvents(ICAL: Ical, ics: string, rangeStart: Date, rangeEnd
       push(event, event.startDate, event.endDate)
       continue
     }
+    // Oude herhalingen alleen doorlopen, niet uitwerken (getOccurrenceDetails is duur): een reeks kan
+    // tientallen jaren teruggaan. Marge van een dag voor verplaatste instanties.
+    const duration = Math.max(0, toUtcMs(event.endDate ?? event.startDate) - toUtcMs(event.startDate))
+    const skipBefore = from - duration - DAY_MS
     const it = event.iterator()
     for (let i = 0, next = it.next(); next && i < MAX_OCCURRENCES; i++, next = it.next()) {
-      if (toUtcMs(next) >= to) break
+      const t = toUtcMs(next)
+      if (t >= to) break
+      if (t < skipBefore) continue
       const details = event.getOccurrenceDetails(next)
       push(details.item, details.startDate, details.endDate)
     }

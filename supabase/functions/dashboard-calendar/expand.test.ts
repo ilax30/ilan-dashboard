@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import ICAL from 'ical.js'
 import { describe, expect, it } from 'vitest'
-import { amsterdamDayStart, expandEvents } from './expand'
+import { amsterdamDayStart, calendarRange, expandEvents } from './expand'
 
 const fixture = (name: string) => readFileSync(fileURLToPath(new URL(`./fixtures/${name}`, import.meta.url)), 'utf8')
 // Bereik in UTC-momenten: 5 okt 00:00 t/m 13 okt 00:00 Amsterdamse tijd (CEST = UTC+2).
@@ -59,8 +59,39 @@ describe('expandEvents', () => {
     expect([...starts].sort()).toEqual(starts)
   })
 
+  it('vindt afspraken van een dagelijkse reeks die al sinds 1990 loopt', () => {
+    const t0 = performance.now()
+    const events = expandEvents(ICAL, fixture('daily-old.ics'), START, END)
+    expect(events.map((e) => e.start)[0]).toBe('2026-10-05T07:00:00.000Z')
+    expect(events).toHaveLength(8)
+    expect(performance.now() - t0).toBeLessThan(1500)
+  })
+
   it('gooit parse_failed bij een ongeldig bestand (bijv. een 404-pagina)', () => {
     expect(() => expandEvents(ICAL, '<html>404</html>', START, END)).toThrow('parse_failed')
+  })
+})
+
+describe('calendarRange', () => {
+  it('loopt van maandag van deze week tot en met 7 dagen na vandaag', () => {
+    // woensdag 7 okt 2026
+    expect(calendarRange(new Date('2026-10-07T10:00:00Z'))).toEqual({
+      start: new Date('2026-10-04T22:00:00Z'),
+      end: new Date('2026-10-14T22:00:00Z'),
+    })
+  })
+  it('begint op maandag zelf als het maandag is, en zondag hoort bij dezelfde week', () => {
+    expect(calendarRange(new Date('2026-10-05T06:00:00Z')).start).toEqual(new Date('2026-10-04T22:00:00Z'))
+    expect(calendarRange(new Date('2026-10-11T20:00:00Z')).start).toEqual(new Date('2026-10-04T22:00:00Z'))
+  })
+  it('gebruikt Amsterdamse middernachten rond de wintertijd', () => {
+    // maandag 26 okt 2026, net na de overgang: UTC+1
+    expect(calendarRange(new Date('2026-10-26T10:00:00Z')).start).toEqual(new Date('2026-10-25T23:00:00Z'))
+    // zondag 25 okt: week begon op ma 19 okt (nog zomertijd)
+    expect(calendarRange(new Date('2026-10-25T10:00:00Z'))).toEqual({
+      start: new Date('2026-10-18T22:00:00Z'),
+      end: new Date('2026-11-01T23:00:00Z'),
+    })
   })
 })
 

@@ -2,7 +2,7 @@
 // Gedeployed als Supabase Edge Function "dashboard-calendar" (verify_jwt aan + eigen getUser-check:
 // alleen ingelogde gebruikers; de publieke sleutel alleen is niet genoeg).
 //
-// POST {}                 -> { events: CalEvent[], fetchedAt }   (vandaag t/m +8 dagen, Amsterdamse tijd)
+// POST {}                 -> { events: CalEvent[], fetchedAt }   (maandag van deze week t/m vandaag +7, Amsterdamse tijd)
 // POST { testUrl }        -> { ok: true, count } | { ok: false, error }   (link testen zonder op te slaan)
 // Fouten: { error: 'no_calendar' | 'fetch_failed' | 'parse_failed' }
 //
@@ -10,7 +10,7 @@
 // JWT van de gebruiker, zodat RLS bepaalt wat zichtbaar is.
 import ICAL from 'npm:ical.js@2'
 import { createClient } from 'npm:@supabase/supabase-js@2'
-import { amsterdamDayStart, expandEvents } from './expand.ts'
+import { calendarRange, expandEvents } from './expand.ts'
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -21,19 +21,21 @@ const cors = {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } })
 
-const DAY = 24 * 60 * 60 * 1000
+const MAX_BYTES = 15 * 1024 * 1024 // grote agenda-exports zijn een paar MB; daarboven weigeren
 
 async function fetchIcs(url: string): Promise<string> {
   const normalized = url.trim().replace(/^webcal:\/\//i, 'https://')
   if (!/^https:\/\//i.test(normalized)) throw new Error('fetch_failed')
   const res = await fetch(normalized, { signal: AbortSignal.timeout(8000), headers: { Accept: 'text/calendar' } })
   if (!res.ok) throw new Error('fetch_failed')
-  return await res.text()
+  if (Number(res.headers.get('content-length') ?? 0) > MAX_BYTES) throw new Error('fetch_failed')
+  const text = await res.text()
+  if (text.length > MAX_BYTES) throw new Error('fetch_failed')
+  return text
 }
 
 function load(ics: string) {
-  const start = amsterdamDayStart(new Date())
-  const end = new Date(start.getTime() + 8 * DAY)
+  const { start, end } = calendarRange(new Date())
   return expandEvents(ICAL, ics, start, end)
 }
 
