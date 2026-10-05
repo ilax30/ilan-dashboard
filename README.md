@@ -1,6 +1,6 @@
-# Ilan's To-Do lijst
+# Ilan Dashboard
 
-Een rustige, persoonlijke to-do app. Je zet taken erin, ziet hoe lang ze er al staan, en sleept ze naar **Gedaan**. Ze verdwijnen dan meteen, en tot 5 seconden later kun je dat nog ongedaan maken.
+Een persoonlijk dashboard: agenda, taken, weer en (later) doelen, financiën, notities en projecten. Op de takenpagina zet je taken erin, zie je hoe lang ze er al staan, en sleep je ze naar **Gedaan**. Ze verdwijnen dan meteen, en tot 5 seconden later kun je dat nog ongedaan maken.
 
 Gebouwd met Vite, React en TypeScript, `@dnd-kit` voor het slepen en (optioneel) Supabase voor opslag en login.
 
@@ -22,8 +22,9 @@ op de telefoon een menuknop.
   maandag. Klik in de maand op een dag om die dag te openen.
 - Doelen, Financiën, Notities en Projecten zijn er nog als lege pagina; de inhoud volgt later.
 
-**Look**: licht thema "Zandsteen", donker thema warm espresso. Op de achtergrond een getekend landschap dat
-meekleurt met ochtend, dag, avond en nacht (op basis van zonsopkomst en -ondergang in je woonplaats). Tijdens het
+**Look**: licht thema "Zandsteen", donker thema warm espresso, lettertype Inter en Phosphor-iconen. Op de achtergrond
+een natuurfoto per dagdeel (ochtend, dag, avond, nacht; op basis van zonsopkomst en -ondergang in je woonplaats) en
+in de weerkaart een foto bij het weer. Bronnen: `public/landschap/BRONNEN.md`. Tijdens het
 ontwikkelen kun je een dagdeel bekijken met `?dagdeel=ochtend|dag|avond|nacht` in de adresbalk.
 
 **Instellingen** (zijbalk):

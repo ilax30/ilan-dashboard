@@ -5108,3 +5108,19 @@ body {
 .today-progress-label {
   text-shadow: 0 1px 12px color-mix(in srgb, var(--bg) 70%, transparent);
 }
+
+/* Kop leesbaar op elke foto: zacht glasvlak achter datum, begroeting, afspraak en dagbalk. */
+.today {
+  padding: 14px 20px 16px;
+  border: 1px solid color-mix(in srgb, var(--card-edge) 55%, transparent);
+  border-radius: var(--tile-radius);
+  background: color-mix(in srgb, var(--bg) 62%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
+}
+
+.today-date,
+.today-agenda,
+.today-progress-label {
+  color: color-mix(in srgb, var(--ink) 78%, var(--muted));
+}

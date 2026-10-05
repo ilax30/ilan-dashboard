@@ -1,4 +1,4 @@
-// Ilan's To-Do lijst: inloggen met alleen een pincode.
+// Ilan Dashboard: inloggen met alleen een pincode.
 // Gedeployed als Supabase Edge Function "todo-pin-login" (verify_jwt uit; eigen controle hieronder).
 //
 // POST { pin }                 -> { token_hash }  (client ruilt die in voor een sessie via verifyOtp)

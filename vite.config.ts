@@ -10,11 +10,11 @@ const pwa = VitePWA({
   injectRegister: false,
   includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'icon.svg'],
   manifest: {
-    name: "Ilan's To-Do lijst",
-    short_name: 'To-Do',
-    description: 'Cozy to-do lijst met taken als trading cards.',
+    name: 'Ilan Dashboard',
+    short_name: 'Dashboard',
+    description: 'Persoonlijk dashboard: agenda, taken, weer en meer.',
     lang: 'nl',
-    // Relatief, zodat de app ook in een submap werkt (GitHub Pages: /ilans-todo-lijst/).
+    // Relatief, zodat de app ook in een submap werkt (GitHub Pages: /<reponaam>/).
     start_url: './',
     scope: './',
     display: 'standalone',
@@ -60,7 +60,7 @@ const pwa = VitePWA({
 
 // `npm run build:single` maakt één losstaand HTML-bestand (handig om te delen/testen).
 export default defineConfig(({ mode }) => ({
-  // GitHub Pages zet BASE_PATH (bijv. /ilans-todo-lijst/); lokaal draait alles op /.
+  // GitHub Pages zet BASE_PATH (bijv. /ilan-dashboard/); lokaal draait alles op /.
   base: process.env.BASE_PATH ?? '/',
   // Versie = bouwtijdstip; zichtbaar als <html data-build> om te checken welke versie een apparaat draait.
   define: { __BUILD__: JSON.stringify(new Date().toISOString()) },

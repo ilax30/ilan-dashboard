@@ -79,7 +79,7 @@ export function Sidebar({ route, controls }: Props) {
           <span className="side-logo" aria-hidden="true">
             <Icon name="logo" size={20} weight="bold" />
           </span>
-          <span className="side-label side-title">Ilan's dashboard</span>
+          <span className="side-label side-title">Ilan Dashboard</span>
         </div>
 
         <ul className="side-nav">

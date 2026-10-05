@@ -50,7 +50,7 @@ export function PinPad({ title, hint, error, onComplete, footer }: Props) {
 
   return (
     <main className="login pin">
-      <h1 className="title">Ilan's To-Do lijst</h1>
+      <h1 className="title">Ilan Dashboard</h1>
       <Sprig className="sprig" />
       <p className="pin-title">{title}</p>
       <p className="login-text">{hint}</p>

@@ -1,4 +1,4 @@
-// Ilan's To-Do lijst — dashboard-agenda.
+// Ilan Dashboard — agenda.
 // Gedeployed als Supabase Edge Function "dashboard-calendar" (verify_jwt aan + eigen getUser-check:
 // alleen ingelogde gebruikers; de publieke sleutel alleen is niet genoeg).
 //

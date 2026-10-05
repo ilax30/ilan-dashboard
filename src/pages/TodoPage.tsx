@@ -352,7 +352,7 @@ export function TodoPage(_props: PageProps) {
         <header className="header">
           <h1 className="title">
             <Sparks className="spark spark-l" />
-            Ilan's To-Do lijst
+            Taken
             <Sparks className="spark spark-r" />
           </h1>
           <Sprig className="sprig" />
