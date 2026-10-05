@@ -74,7 +74,7 @@ export function SettingsDialog({ open, onClose, onSaved }: Props) {
       setLink('')
       setLinkMsg({
         ok: true,
-        text: `Gekoppeld: ${result.count} ${result.count === 1 ? 'afspraak' : 'afspraken'} deze week`,
+        text: `Gekoppeld: ${result.count} ${result.count === 1 ? 'afspraak' : 'afspraken'} in de komende 5 weken`,
       })
       onSaved()
     } catch {

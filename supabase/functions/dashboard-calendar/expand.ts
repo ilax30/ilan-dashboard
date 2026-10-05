@@ -50,8 +50,8 @@ export function amsterdamDayStart(now: Date): Date {
 }
 
 /**
- * Op te halen bereik: maandag 00:00 van deze week (zodat de weekweergave ook de eerdere dagen toont)
- * tot en met 7 dagen na vandaag, in Amsterdamse middernachten.
+ * Op te halen bereik: 5 weken vanaf maandag 00:00 van deze week (voor de week- en maandweergave),
+ * in Amsterdamse middernachten.
  */
 export function calendarRange(now: Date): { start: Date; end: Date } {
   const local = new Date(now.getTime() + amsterdamOffsetMs(now.getTime()))
@@ -59,7 +59,7 @@ export function calendarRange(now: Date): { start: Date; end: Date } {
   const m = local.getUTCMonth() + 1
   const d = local.getUTCDate()
   const sinceMonday = (local.getUTCDay() + 6) % 7
-  return { start: new Date(fromAmsterdamWallClock(y, m, d - sinceMonday)), end: new Date(fromAmsterdamWallClock(y, m, d + 8)) }
+  return { start: new Date(fromAmsterdamWallClock(y, m, d - sinceMonday)), end: new Date(fromAmsterdamWallClock(y, m, d - sinceMonday + 35)) }
 }
 
 /** ical.js-tijd → UTC-moment. Datums en "zwevende" tijden gelden als Amsterdamse tijd. */

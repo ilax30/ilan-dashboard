@@ -2,7 +2,7 @@
 // Gedeployed als Supabase Edge Function "dashboard-calendar" (verify_jwt aan + eigen getUser-check:
 // alleen ingelogde gebruikers; de publieke sleutel alleen is niet genoeg).
 //
-// POST {}                 -> { events: CalEvent[], fetchedAt }   (maandag van deze week t/m vandaag +7, Amsterdamse tijd)
+// POST {}                 -> { events: CalEvent[], fetchedAt }   (5 weken vanaf maandag van deze week, Amsterdamse tijd)
 // POST { testUrl }        -> { ok: true, count } | { ok: false, error }   (link testen zonder op te slaan)
 // Fouten: { error: 'no_calendar' | 'fetch_failed' | 'parse_failed' }
 //
