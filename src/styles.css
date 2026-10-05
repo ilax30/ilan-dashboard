@@ -2524,3 +2524,267 @@ button {
   color: var(--muted);
   font-size: 0.88rem;
 }
+
+/* ---------- Dashboard: raster en kaarten ---------- */
+
+.dash {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 28px;
+  max-width: 2300px;
+  margin: 0 auto;
+  padding: 88px 40px 64px;
+}
+
+.dash > .today {
+  grid-column: 1 / -1;
+}
+
+.dash-card {
+  position: relative;
+  background: linear-gradient(160deg, var(--card-hi), var(--card) 60%);
+  border-radius: 28px;
+  box-shadow: var(--shadow), inset 0 1px 0 var(--card-gloss);
+}
+
+.stale-label {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 0.72rem;
+  font-weight: 600;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* ---------- Dashboard: live kop ---------- */
+
+.today {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px 48px;
+  padding: 30px 92px 32px 40px;
+}
+
+.today-main {
+  min-width: 0;
+}
+
+.today-date {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.2rem;
+}
+
+.today-clock {
+  color: var(--ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.today-greeting {
+  margin: 4px 0 8px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 3.1rem;
+  line-height: 1.05;
+}
+
+.today-agenda {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.today-label {
+  color: var(--muted);
+}
+
+.today-countdown {
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.today-muted {
+  color: var(--muted);
+}
+
+.today-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 600;
+}
+
+.today-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.today-gear {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+}
+
+.today-weather {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  column-gap: 14px;
+  row-gap: 10px;
+  flex-shrink: 0;
+}
+
+.today-weather-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.today-temp {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  line-height: 1;
+}
+
+.today-weather-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.today-minmax {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.today-weather-text .stale-label {
+  align-self: flex-start;
+  margin: 4px 0 0;
+}
+
+.today-hours {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.today-hours li {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-width: 56px;
+  padding: 6px 8px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-hour {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.today-hour-temp {
+  font-weight: 600;
+}
+
+.today-hour-rain {
+  color: #5f88a6;
+  font-size: 0.75rem;
+}
+
+.today-weather-empty {
+  flex-shrink: 0;
+}
+
+.weather-icon {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.wi-sun circle {
+  fill: var(--gold);
+}
+
+.wi-sun line {
+  stroke: var(--gold);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+}
+
+.wi-cloud {
+  fill: color-mix(in srgb, var(--ink) 9%, var(--card-hi));
+  stroke: color-mix(in srgb, var(--ink) 30%, var(--card));
+  stroke-width: 1.6;
+}
+
+.wi-rain {
+  stroke: #7fa6c0;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.wi-snow {
+  fill: #a9c4d6;
+}
+
+.wi-bolt {
+  fill: var(--gold);
+}
+
+.wi-fog {
+  stroke: var(--muted);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+@media (min-width: 2200px) {
+  .dash {
+    gap: 36px;
+    padding: 96px 72px 96px;
+  }
+
+  .today {
+    padding: 36px 104px 38px 52px;
+  }
+}
+
+@media (max-width: 900px) {
+  .dash {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 80px 20px 48px;
+  }
+
+  .today {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 24px 26px;
+  }
+
+  .today-greeting {
+    font-size: 2.4rem;
+  }
+
+  .today-date,
+  .today-agenda {
+    font-size: 1.05rem;
+  }
+}
