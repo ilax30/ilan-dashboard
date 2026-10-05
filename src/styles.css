@@ -3833,7 +3833,8 @@ button {
 }
 
 .side-menu-button,
-.side-backdrop {
+.side-backdrop,
+.side-expand {
   display: none;
 }
 
@@ -3950,5 +3951,65 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .sidebar {
     transition: none;
+  }
+}
+
+/* iPad: '⋯' klapt de icoonbalk uit tot een volledige zijbalk over de pagina. */
+@media (min-width: 900px) and (max-width: 1279.98px) {
+  .side-expand {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 40px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted);
+  }
+
+  .side-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 7;
+    display: block;
+    background: rgb(30 20 15 / 0.3);
+  }
+
+  .sidebar[data-open] {
+    align-items: stretch;
+    width: 260px;
+    padding: 22px 14px 16px;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .sidebar[data-open] .side-label,
+  .sidebar[data-open] .side-quick,
+  .sidebar[data-open] .side-more {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .sidebar[data-open] .side-link {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  .sidebar[data-open] .side-bottom {
+    align-items: stretch;
+  }
+
+  .sidebar[data-open] .side-theme {
+    width: auto;
+    height: auto;
+    padding: 2px 4px;
+  }
+
+  .sidebar[data-open] .side-theme .theme-toggle {
+    transform: none;
   }
 }

@@ -135,6 +135,12 @@ export function Sidebar({ route, controls }: Props) {
           <div className="side-more">
             <MoreFooter onLock={controls?.onLock} onSetPin={controls?.onSetPin ?? (() => {})} onLogout={controls?.onLogout} />
           </div>
+          {/* Icoonbalk (iPad): uitklappen voor snel toevoegen en Meer…. */}
+          {!open && (
+            <button className="side-expand" type="button" aria-label="Menu uitklappen" title="Meer" onClick={() => setOpen(true)}>
+              {icon(<path d="M6 12h.01M12 12h.01M18 12h.01" strokeWidth="3" />)}
+            </button>
+          )}
         </div>
       </nav>
     </>
