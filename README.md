@@ -12,11 +12,11 @@ het dag/nacht-schuifje, Instellingen (ook vergrendelen, pincode en uitloggen) en
 op de telefoon een menuknop.
 
 - **Kop**: datum en klok, begroeting, je volgende afspraak met aftellen ("over 1u 14m") en hoeveel van je dag
-  (07:00–23:00) voorbij is. Daarnaast de eerstvolgende afspraak en betaling, ook als die pas over dagen zijn.
+  (00:00–24:00) voorbij is. Daarnaast de eerstvolgende afspraak en betaling, ook als die pas over dagen zijn.
   Rechts het **weer** voor je woonplaats.
 - **Tegels** op vaste plekken: 1 groot, 1 middel en 4 klein. Standaard Agenda groot, To-do middel en Financiën,
   Doelen, Notities en Projecten klein. Elke tegel past zich aan de maat aan (Agenda klein = volgende afspraak +
-  dagbalk, groot = uurrooster; To-do middel = 5 taken met vinkje, groot = 10 + toevoegen).
+  dagbalk, groot = uurrooster; To-do middel = 10 taken met vinkje, groot = 20 + toevoegen; wat niet past valt weg).
 - **Indeling aanpassen** (in de zijbalk): sleep een tegel op een andere plek en ze ruilen. "Standaardindeling"
   zet alles terug. Je indeling wordt in je account bewaard (zelfde op pc en iPad) én op het apparaat.
 - **Agenda** (`#/agenda`): links een mini-maand en de komende 14 dagen, rechts Dag, Week en Maand met een

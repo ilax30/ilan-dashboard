@@ -6306,3 +6306,16 @@ a.wish-title:hover {
     grid-template-columns: minmax(0, 1fr) 360px;
   }
 }
+
+/* To-do-tegel: tot 10 (middel) / 20 (groot) taken; wat niet past valt helemaal weg i.p.v. half afgekapt. */
+.widget-todo .widget-tasks {
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  column-gap: 200px;
+  min-height: 0;
+}
+
+.widget-todo .widget-tasks li {
+  width: 100%;
+}

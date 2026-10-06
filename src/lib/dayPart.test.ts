@@ -35,10 +35,11 @@ describe('dayPart', () => {
 })
 
 describe('dayProgress', () => {
-  it('meet de dag van 07:00 tot 23:00', () => {
-    expect(dayProgress(at('2026-10-05T06:00'))).toBe(0)
-    expect(dayProgress(at('2026-10-05T07:00'))).toBe(0)
-    expect(dayProgress(at('2026-10-05T15:00'))).toBe(50)
-    expect(dayProgress(at('2026-10-05T23:30'))).toBe(100)
+  it('meet de hele dag, van 00:00 tot 24:00 (afgerond naar beneden, dus pas 100% om middernacht)', () => {
+    expect(dayProgress(at('2026-10-05T00:00'))).toBe(0)
+    expect(dayProgress(at('2026-10-05T06:00'))).toBe(25)
+    expect(dayProgress(at('2026-10-05T12:00'))).toBe(50)
+    expect(dayProgress(at('2026-10-05T23:03'))).toBe(96)
+    expect(dayProgress(at('2026-10-05T23:59'))).toBe(99)
   })
 })

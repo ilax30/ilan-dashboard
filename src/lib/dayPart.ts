@@ -3,8 +3,7 @@
 export type DayPart = 'ochtend' | 'dag' | 'avond' | 'nacht'
 
 const MIN = 60_000
-const DAY_START = 7 * 60 // 07:00
-const DAY_END = 23 * 60 // 23:00
+const DAY_MINUTES = 24 * 60
 
 /**
  * Ochtend = zonsopkomst −45 … +90 min, avond = zonsondergang −90 … +45 min, daartussen dag, anders nacht.
@@ -24,10 +23,10 @@ export function dayPart(now: Date, sunrise: Date | null, sunset: Date | null): D
   return 'nacht'
 }
 
-/** Percentage van de dag (07:00–23:00) dat voorbij is, 0–100. */
+/** Percentage van de dag (00:00–24:00) dat voorbij is, 0–99; naar beneden afgerond, dus nooit 100% vóór middernacht. */
 export function dayProgress(now: Date): number {
   const min = now.getHours() * 60 + now.getMinutes()
-  return Math.round(Math.min(100, Math.max(0, ((min - DAY_START) / (DAY_END - DAY_START)) * 100)))
+  return Math.floor((min / DAY_MINUTES) * 100)
 }
 
 /** Kloktijd uit een (eventueel oude) tijdstempel "2026-10-05T07:58" toepassen op de dag van `now`. */

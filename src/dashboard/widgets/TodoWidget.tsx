@@ -6,7 +6,7 @@ import { supabase } from '../../lib/supabase'
 import { compareTodos, type Todo } from '../../lib/types'
 import { WidgetCard, type WidgetProps } from './WidgetCard'
 
-const SHOWN = { klein: 1, middel: 5, groot: 10 } as const
+const SHOWN = { klein: 1, middel: 10, groot: 20 } as const
 const UNDO_MS = 5000
 
 /** Open taken, live bijgewerkt (realtime, terugkomen in de app, snel toevoegen in de zijbalk). */
