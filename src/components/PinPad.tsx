@@ -1,4 +1,5 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { createPinEntry } from '../lib/pinEntry'
 import { Sprig } from './Decor'
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫']
@@ -15,27 +16,26 @@ type Props = {
 
 /** Cijfertoetsenbord met 4 bolletjes; werkt met vinger, muis en toetsenbord. */
 export function PinPad({ title, hint, error, onComplete, footer }: Props) {
+  // Wat er is ingetikt staat buiten de React-state: bij snel tikken ziet elke toets meteen de vorige.
+  const entry = useRef(createPinEntry(LENGTH)).current
   const [pin, setPin] = useState('')
   const [shake, setShake] = useState(0)
-  const [busy, setBusy] = useState(false)
 
   async function press(k: string) {
-    if (busy) return
-    if (k === '⌫') return setPin((p) => p.slice(0, -1))
-    if (!/\d/.test(k) || pin.length >= LENGTH) return
-    const next = pin + k
-    setPin(next)
-    if (next.length === LENGTH) {
-      setBusy(true)
-      const ok = await onComplete(next)
-      setBusy(false)
-      if (!ok) {
-        setShake((n) => n + 1)
-        navigator.vibrate?.(60)
-        setTimeout(() => setPin(''), 260)
-      } else {
+    const { value, complete } = entry.press(k)
+    setPin(value)
+    if (!complete) return
+    const ok = await onComplete(complete)
+    if (!ok) {
+      setShake((n) => n + 1)
+      navigator.vibrate?.(60)
+      setTimeout(() => {
+        entry.reset()
         setPin('')
-      }
+      }, 260)
+    } else {
+      entry.reset()
+      setPin('')
     }
   }
 
