@@ -62,6 +62,8 @@ export function NotesPage() {
   const [error, setError] = useState<string | null>(null)
   const saveTimer = useRef(0)
   const undoTimer = useRef(0)
+  /** Was de verwijderde notitie de open notitie? Dan opent "Ongedaan maken" hem weer. */
+  const undoWasOpen = useRef(false)
   const draftRef = useRef<Draft | null>(null)
   draftRef.current = draft
   const titleRef = useRef<HTMLInputElement>(null)
@@ -156,10 +158,26 @@ export function NotesPage() {
     if (d.isNew) return
     const removed = notes?.find((n) => n.id === d.id) ?? { ...d, updated_at: new Date().toISOString() }
     setNotes((list) => list && list.filter((n) => n.id !== d.id))
+    undoWasOpen.current = true
     setUndo({ id: d.id, title: d.title, body: d.body, pinned: d.pinned, created_at: d.created_at, updated_at: removed.updated_at })
     window.clearTimeout(undoTimer.current)
     undoTimer.current = window.setTimeout(() => setUndo(null), UNDO_MS)
     await notesStore.remove(d.id).catch(() => {
+      setError('Verwijderen mislukt.')
+      load()
+    })
+    notesChanged()
+  }
+
+  /** Prullenbakje in de lijst: de open notitie via remove(), een andere direct (ook met ongedaan maken). */
+  async function removeFromList(n: Note) {
+    if (draftRef.current?.id === n.id) return remove()
+    setNotes((list) => list && list.filter((x) => x.id !== n.id))
+    undoWasOpen.current = false
+    setUndo(n)
+    window.clearTimeout(undoTimer.current)
+    undoTimer.current = window.setTimeout(() => setUndo(null), UNDO_MS)
+    await notesStore.remove(n.id).catch(() => {
       setError('Verwijderen mislukt.')
       load()
     })
@@ -171,7 +189,8 @@ export function NotesPage() {
     if (!n) return
     setUndo(null)
     setNotes((list) => list && sortNotes([n, ...list]))
-    setDraft(toDraft(n))
+    // Alleen openen als er niets open staat (verwijderd vanuit de lijst terwijl je een andere notitie had open).
+    setDraft((cur) => (undoWasOpen.current ? toDraft(n) : cur ?? toDraft(n)))
     await notesStore.create(n).catch(() => load())
     notesChanged()
   }
@@ -292,6 +311,15 @@ export function NotesPage() {
                     {when(n.updated_at)} <span className="notes-item-preview">{preview(view)}</span>
                   </span>
                 </button>
+                <button
+                  className="notes-item-delete"
+                  type="button"
+                  title="Verwijderen"
+                  aria-label={`"${noteTitle(view)}" verwijderen`}
+                  onClick={() => void removeFromList(n)}
+                >
+                  <Trash size={16} />
+                </button>
               </li>
             )
           })}
@@ -308,9 +336,6 @@ export function NotesPage() {
               </button>
               <button className="icon-button" type="button" title={draft.pinned ? 'Losmaken' : 'Vastpinnen'} aria-pressed={draft.pinned} aria-label="Vastpinnen" onClick={() => void togglePin()}>
                 <PushPin size={18} weight={draft.pinned ? 'fill' : 'regular'} />
-              </button>
-              <button className="icon-button" type="button" title="Verwijderen" aria-label="Notitie verwijderen" onClick={() => void remove()}>
-                <Trash size={18} />
               </button>
             </div>
             <input

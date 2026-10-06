@@ -6343,3 +6343,47 @@ a.wish-title:hover {
   background: color-mix(in srgb, var(--card-hi) 86%, #fff);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
 }
+
+/* Notitielijst: prullenbakje rechtsboven in elke notitie (bij aanwijzen en bij de open notitie). */
+.notes-list li {
+  position: relative;
+}
+
+.notes-item-title {
+  padding-right: 30px;
+}
+
+.notes-item-delete {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.notes-list li:hover .notes-item-delete,
+.notes-item[data-active] + .notes-item-delete,
+.notes-item-delete:focus-visible {
+  opacity: 1;
+}
+
+.notes-item-delete:hover {
+  background: color-mix(in srgb, var(--now) 14%, transparent);
+  color: var(--now);
+}
+
+/* Zonder muis (aanraken): altijd zichtbaar. */
+@media (hover: none) {
+  .notes-item-delete {
+    opacity: 1;
+  }
+}
