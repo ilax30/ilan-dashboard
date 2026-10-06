@@ -6344,23 +6344,26 @@ a.wish-title:hover {
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.4);
 }
 
-/* Notitielijst: prullenbakje rechtsboven in elke notitie (bij aanwijzen en bij de open notitie). */
+/* Notitielijst: prullenbakje links naast elke notitie, in een eigen smalle kolom (overlapt nooit met de titel). */
 .notes-list li {
-  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
 }
 
-.notes-item-title {
-  padding-right: 30px;
+.notes-list li > .notes-item {
+  flex: 1;
+  min-width: 0;
 }
 
 .notes-item-delete {
-  position: absolute;
-  top: 6px;
-  right: 6px;
+  order: -1;
   display: grid;
+  flex-shrink: 0;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
+  margin-top: 8px;
   padding: 0;
   border: 0;
   border-radius: 9px;
