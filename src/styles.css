@@ -4461,8 +4461,9 @@ button {
   display: none;
 }
 
+/* Geen negatieve marge: de tegel knipt alles boven zijn inhoud af, dan valt de bovenrand van de schakelaar weg. */
 .timeline[data-embedded] .tl-head {
-  margin-top: -6px;
+  margin-top: 0;
 }
 
 /* Krappe tegel: de takenlijst scrollt binnen de tegel, het invoerveld blijft staan. */
