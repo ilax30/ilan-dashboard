@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { bankroll, betPage, betProfit, bookmakerStats, parseOdds, totals, type Bet, type Bookmaker } from './bets'
+import { bankroll, betPage, betProfit, bookmakerStats, categoryStats, parseOdds, totals, type Bet, type Bookmaker } from './bets'
 
 // Geen echte database in tests.
 vi.mock('./supabase', () => ({ supabase: null }))
@@ -76,6 +76,22 @@ describe('bookmakerStats', () => {
     expect(s.map((x) => [x.bookmaker.name, x.bankroll, x.profit, x.count])).toEqual([
       ['Toto', 390, 90, 2],
       ['Bet365', 500, 0, 0],
+    ])
+  })
+})
+
+describe('categoryStats', () => {
+  it('geeft per categorie de totalen, ook voor een categorie zonder weddenschappen', () => {
+    const s = categoryStats([
+      bet('a', { result: 'won' }),
+      bet('b', { result: 'lost', category: 'ITF', stake: 40 }),
+      bet('c', { category: 'ITF' }),
+    ])
+    expect(s.map((x) => x.category)).toEqual(['ATP', 'Challenger', 'ITF'])
+    expect(s.map((x) => [x.profit, x.count, x.winPct])).toEqual([
+      [90, 1, 100],
+      [0, 0, null],
+      [-40, 2, 0],
     ])
   })
 })

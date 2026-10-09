@@ -87,6 +87,16 @@ export function bookmakerStats(bookmakers: Bookmaker[], bets: Bet[]): BookmakerS
     })
 }
 
+export type CategoryStat = Totals & { category: BetCategory; count: number }
+
+/** Per categorie (ATP, Challenger, ITF) de totalen; een categorie zonder weddenschappen staat er ook bij. */
+export function categoryStats(bets: Bet[]): CategoryStat[] {
+  return BET_CATEGORIES.map((category) => {
+    const own = bets.filter((b) => b.category === category)
+    return { category, count: own.length, ...totals(own) }
+  })
+}
+
 /** Eén pagina met de nieuwste weddenschappen eerst; de pagina blijft binnen het bereik. */
 export function betPage(bets: Bet[], page: number, size = PAGE_SIZE): { items: Bet[]; page: number; pages: number } {
   const sorted = [...bets].sort((a, b) => b.placed_on.localeCompare(a.placed_on) || b.created_at.localeCompare(a.created_at))

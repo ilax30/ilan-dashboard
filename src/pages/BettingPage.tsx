@@ -7,6 +7,7 @@ import {
   betProfit,
   betsStore,
   bookmakerStats,
+  categoryStats,
   formatOdds,
   parseOdds,
   totals,
@@ -34,14 +35,15 @@ const todayIso = () => {
 const signed = (n: number) => (n > 0 ? `+ ${formatEuro(n)}` : n < 0 ? `− ${formatEuro(-n)}` : formatEuro(0))
 const tone = (n: number) => (n > 0 ? 'win' : n < 0 ? 'lose' : undefined)
 
-type Tab = 'bets' | 'bookmakers'
+type Tab = 'bets' | 'bookmakers' | 'categories'
 type Undo = { text: string; restore: () => void }
 
-/** Weddenschappen (#/weddenschappen): tennisweddenschappen invoeren, afsluiten en de bankroll per bookmaker volgen. */
+/** Tennis (#/tennis): weddenschappen invoeren, afsluiten en de bankroll per bookmaker volgen. */
 export function BettingPage() {
   const { bookmakers, setBookmakers, bets, setBets, failed, load } = useBets()
   const [tab, setTab] = useState<Tab>('bets')
   const [filter, setFilter] = useState<string | null>(null)
+  const [catFilter, setCatFilter] = useState<BetCategory | null>(null)
   const [page, setPage] = useState(1)
   const [editBet, setEditBet] = useState<Bet | null>(null)
   const [editBookmaker, setEditBookmaker] = useState<Bookmaker | 'new' | null>(null)
@@ -55,10 +57,11 @@ export function BettingPage() {
   const allBets = bets ?? []
   const allBookmakers = bookmakers ?? []
   const activeFilter = filter && allBookmakers.some((b) => b.id === filter) ? filter : null
-  const shown = activeFilter ? allBets.filter((b) => b.bookmaker_id === activeFilter) : allBets
+  const shown = allBets.filter((b) => (!activeFilter || b.bookmaker_id === activeFilter) && (!catFilter || b.category === catFilter))
   const paged = betPage(shown, page)
   const sum = totals(allBets)
   const stats = bookmakerStats(allBookmakers, allBets)
+  const catStats = categoryStats(allBets)
   const nameOf = (id: string) => allBookmakers.find((b) => b.id === id)?.name ?? '–'
   const totalBankroll = stats.reduce((s, x) => s + x.bankroll, 0)
 
@@ -134,6 +137,12 @@ export function BettingPage() {
     u.restore()
   }
 
+  function openCategory(c: BetCategory) {
+    setCatFilter(c)
+    setPage(1)
+    setTab('bets')
+  }
+
   function openBookmaker(id: string) {
     setFilter(id)
     setPage(1)
@@ -143,7 +152,7 @@ export function BettingPage() {
   return (
     <main className="fin-page bet-page">
       <header className="fin-head">
-        <h1 className="fin-heading">Weddenschappen</h1>
+        <h1 className="fin-heading">Tennis</h1>
         <button className="settings-button fin-new" type="button" onClick={() => setEditBookmaker('new')}>
           <Plus size={16} weight="bold" /> Bookmaker
         </button>
@@ -185,6 +194,9 @@ export function BettingPage() {
         <button type="button" role="tab" aria-selected={tab === 'bookmakers'} data-active={tab === 'bookmakers' || undefined} onClick={() => setTab('bookmakers')}>
           Bookmakers
         </button>
+        <button type="button" role="tab" aria-selected={tab === 'categories'} data-active={tab === 'categories' || undefined} onClick={() => setTab('categories')}>
+          Categorieën
+        </button>
       </div>
 
       {!ready ? (
@@ -204,7 +216,7 @@ export function BettingPage() {
           />
           <section className="fin-list dash-card bet-list" aria-label="Weddenschappen">
             <header className="bet-list-head">
-              <h2 className="wish-heading">{activeFilter ? nameOf(activeFilter) : 'Alle weddenschappen'}</h2>
+              <h2 className="wish-heading">{[catFilter, activeFilter ? nameOf(activeFilter) : null].filter(Boolean).join(' · ') || 'Alle weddenschappen'}</h2>
               <div className="bet-chips" role="group" aria-label="Bookmaker">
                 <button type="button" data-active={!activeFilter || undefined} onClick={() => (setFilter(null), setPage(1))}>
                   Alle
@@ -212,6 +224,16 @@ export function BettingPage() {
                 {allBookmakers.map((b) => (
                   <button key={b.id} type="button" data-active={activeFilter === b.id || undefined} onClick={() => (setFilter(b.id), setPage(1))}>
                     {b.name}
+                  </button>
+                ))}
+              </div>
+              <div className="bet-chips" role="group" aria-label="Categorie">
+                <button type="button" data-active={!catFilter || undefined} onClick={() => (setCatFilter(null), setPage(1))}>
+                  Alle categorieën
+                </button>
+                {BET_CATEGORIES.map((c) => (
+                  <button key={c} type="button" data-active={catFilter === c || undefined} onClick={() => (setCatFilter(c), setPage(1))}>
+                    {c}
                   </button>
                 ))}
               </div>
@@ -288,6 +310,24 @@ export function BettingPage() {
             )}
           </section>
         </>
+      ) : tab === 'categories' ? (
+        <section className="bet-bms" aria-label="Categorieën">
+          {catStats.map((c) => (
+            <div key={c.category} className="bet-bm-card dash-card">
+              <button className="bet-bm-open" type="button" onClick={() => openCategory(c.category)} title={`Weddenschappen in ${c.category} bekijken`}>
+                <span className="bet-bm-name">{c.category}</span>
+                <span className="fin-stat-value bet-amount" data-tone={tone(c.profit)}>
+                  {signed(c.profit)}
+                </span>
+                <span className="fin-stat-sub">
+                  {c.winPct === null ? 'Nog niets afgesloten' : `${c.winPct}% gewonnen (${c.won} van ${c.settled})`}
+                  {c.roi !== null && ` · rendement ${c.roi > 0 ? '+ ' : c.roi < 0 ? '− ' : ''}${Math.abs(c.roi).toFixed(1).replace('.', ',')}%`}
+                </span>
+                <span className="fin-stat-sub">{c.count === 1 ? '1 weddenschap' : `${c.count} weddenschappen`}{c.open > 0 && ` · ${c.open} open`}</span>
+              </button>
+            </div>
+          ))}
+        </section>
       ) : (
         <section className="bet-bms" aria-label="Bookmakers">
           {stats.map(({ bookmaker: bm, bankroll: roll, profit, count }) => (

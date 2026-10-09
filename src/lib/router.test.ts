@@ -17,7 +17,7 @@ describe('parseRoute', () => {
     expect(parseRoute('#/notities')).toBe('/notities')
     expect(parseRoute('#/projecten')).toBe('/projecten')
     expect(parseRoute('#/agenda')).toBe('/agenda')
-    expect(parseRoute('#/weddenschappen')).toBe('/weddenschappen')
+    expect(parseRoute('#/tennis')).toBe('/tennis')
     expect(parseRoute('#/onbekend')).toBe('/')
   })
 })

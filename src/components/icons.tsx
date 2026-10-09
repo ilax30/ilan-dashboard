@@ -25,7 +25,7 @@ const MAP = {
   doelen: Target,
   financien: Wallet,
   notities: NotePencil,
-  weddenschappen: TennisBall,
+  tennis: TennisBall,
   projecten: FolderSimple,
   settings: GearSix,
   menu: List,

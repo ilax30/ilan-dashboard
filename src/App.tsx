@@ -28,7 +28,7 @@ function Page({ route, controls }: { route: Route; controls?: PageControls }) {
   if (route === '/agenda') return <AgendaPage />
   if (route === '/notities') return <NotesPage />
   if (route === '/financien') return <FinancePage />
-  if (route === '/weddenschappen') return <BettingPage />
+  if (route === '/tennis') return <BettingPage />
   const topic = topicFor(route)
   return topic ? <TopicPage topic={topic} /> : <DashboardPage {...controls} />
 }
