@@ -267,7 +267,7 @@ export function BettingPage() {
               <ul className="bet-rows">
                 <li className="bet-row bet-row-head" aria-hidden="true">
                   <span>Datum</span>
-                  <span>Wedstrijd</span>
+                  <span>Weddenschap</span>
                   <span>Bookmaker</span>
                   <span className="bet-num">Inzet</span>
                   <span className="bet-num">Odds</span>
@@ -280,7 +280,7 @@ export function BettingPage() {
                     <li key={b.id} className="bet-row">
                       <span className="bet-date">{formatDay(b.placed_on)}</span>
                       <span className="bet-match">
-                        <span className="bet-match-name">{b.match || 'Zonder naam'}</span>
+                        <span className="bet-match-name">{b.match || 'Zonder omschrijving'}</span>
                         <span className="fin-badge">{b.category}</span>
                         {b.live && <span className="fin-badge bet-live-badge">Live</span>}
                       </span>
@@ -380,13 +380,13 @@ export function BettingPage() {
               <button className="bet-bm-open" type="button" onClick={() => openBookmaker(bm.id)} title={`Weddenschappen bij ${bm.name} bekijken`}>
                 <span className="bet-bm-name">{bm.name}</span>
                 <span className="fin-stat-value">{formatEuro(roll)}</span>
-                <span className="fin-stat-sub">
-                  Start {formatEuro(bm.start_bankroll)} ·{' '}
-                  <span className="bet-amount" data-tone={tone(profit)}>
-                    {signed(profit)}
-                  </span>
+                <span className="bet-delta" data-tone={tone(profit)}>
+                  {signed(profit)}
+                  {bm.start_bankroll > 0 && ` · ${profit > 0 ? '+' : profit < 0 ? '−' : ''}${Math.abs((profit / bm.start_bankroll) * 100).toFixed(1).replace('.', ',')}%`}
                 </span>
-                <span className="fin-stat-sub">{count === 1 ? '1 weddenschap' : `${count} weddenschappen`}</span>
+                <span className="fin-stat-sub">
+                  Gestart met {formatEuro(bm.start_bankroll)} · {count === 1 ? '1 weddenschap' : `${count} weddenschappen`}
+                </span>
               </button>
               <button className="icon-button bet-bm-edit" type="button" title="Bewerken" aria-label={`${bm.name} bewerken`} onClick={() => setEditBookmaker(bm)}>
                 <PencilSimple size={18} />
@@ -454,7 +454,7 @@ function readBet(f: BetFields): string | { bookmaker_id: string; category: BetCa
 function NewBetForm({ bookmakers, preferred, onAddBookmaker, onSave }: { bookmakers: Bookmaker[]; preferred: string | null; onAddBookmaker: () => void; onSave: (b: Bet) => void }) {
   const [f, setF] = useState<BetFields>({ bookmaker: '', category: 'ATP', live: false, stake: '', odds: '', date: todayIso(), match: '' })
   const [msg, setMsg] = useState<string | null>(null)
-  const stakeRef = useRef<HTMLInputElement>(null)
+  const matchRef = useRef<HTMLInputElement>(null)
   const set = (patch: Partial<BetFields>) => setF((cur) => ({ ...cur, ...patch }))
   const bookmaker = bookmakers.some((b) => b.id === f.bookmaker) ? f.bookmaker : (preferred ?? bookmakers[0]?.id ?? '')
 
@@ -475,11 +475,15 @@ function NewBetForm({ bookmakers, preferred, onAddBookmaker, onSave }: { bookmak
     setMsg(null)
     onSave({ id: crypto.randomUUID(), ...r, result: 'open', created_at: new Date().toISOString() })
     set({ bookmaker, live: false, stake: '', odds: '', match: '', date: todayIso() })
-    stakeRef.current?.focus()
+    matchRef.current?.focus()
   }
 
   return (
     <form className="bet-form dash-card" onSubmit={submit} noValidate>
+      <label className="fin-field bet-form-match">
+        <span>Weddenschap</span>
+        <input ref={matchRef} className="settings-input" value={f.match} maxLength={200} placeholder="Fonseca −1,5 sets" onChange={(e) => set({ match: e.target.value })} />
+      </label>
       <label className="fin-field">
         <span>Bookmaker</span>
         <select className="settings-input" value={bookmaker} onChange={(e) => set({ bookmaker: e.target.value })}>
@@ -504,7 +508,7 @@ function NewBetForm({ bookmakers, preferred, onAddBookmaker, onSave }: { bookmak
       </label>
       <label className="fin-field">
         <span>Inzet (€)</span>
-        <input ref={stakeRef} className="settings-input" value={f.stake} inputMode="decimal" placeholder="100" onChange={(e) => set({ stake: e.target.value })} />
+        <input className="settings-input" value={f.stake} inputMode="decimal" placeholder="100" onChange={(e) => set({ stake: e.target.value })} />
       </label>
       <label className="fin-field">
         <span>Odds</span>
@@ -513,10 +517,6 @@ function NewBetForm({ bookmakers, preferred, onAddBookmaker, onSave }: { bookmak
       <label className="fin-field">
         <span>Datum</span>
         <input className="settings-input" type="date" value={f.date} onChange={(e) => set({ date: e.target.value })} />
-      </label>
-      <label className="fin-field bet-form-match">
-        <span>Wedstrijd (niet verplicht)</span>
-        <input className="settings-input" value={f.match} maxLength={200} placeholder="Alcaraz – Sinner" onChange={(e) => set({ match: e.target.value })} />
       </label>
       <button className="settings-button bet-form-submit" type="submit">
         Plaatsen
@@ -584,8 +584,8 @@ function BetDialog({ bet, bookmakers, onClose, onSave, onDelete }: { bet: Bet | 
         <DialogHead id="bet-dialog-title" title="Weddenschap bewerken" onClose={onClose} />
         <div className="fin-form">
           <label className="fin-field fin-field-wide">
-            <span>Wedstrijd</span>
-            <input className="settings-input" value={f.match} maxLength={200} placeholder="Alcaraz – Sinner" onChange={(e) => set({ match: e.target.value })} />
+            <span>Weddenschap</span>
+            <input className="settings-input" value={f.match} maxLength={200} placeholder="Fonseca −1,5 sets" onChange={(e) => set({ match: e.target.value })} />
           </label>
           <label className="fin-field">
             <span>Bookmaker</span>
