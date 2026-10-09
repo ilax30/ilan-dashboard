@@ -1,4 +1,4 @@
-import { ListChecks, MagnifyingGlass, NotePencil, Plus, PushPin, Trash } from '@phosphor-icons/react'
+import { ArrowLeft, ListChecks, MagnifyingGlass, NotePencil, Plus, PushPin, Trash } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { LinkifiedText } from '../components/LinkifiedText'
 import { isEmptyNote, noteTitle, notesStore, parseChecklist, remoteUpdate, searchNotes, sortNotes, toggleLine, type Note } from '../lib/notes'
@@ -58,6 +58,8 @@ export function NotesPage() {
   const [query, setQuery] = useState('')
   const [draft, setDraft] = useState<Draft | null>(null)
   const [editing, setEditing] = useState(false)
+  /** Alleen op telefoon: lijst of notitie tonen (op een groot scherm staan ze naast elkaar). */
+  const [showEditor, setShowEditor] = useState(false)
   const [undo, setUndo] = useState<Note | null>(null)
   const [error, setError] = useState<string | null>(null)
   const saveTimer = useRef(0)
@@ -128,16 +130,26 @@ export function NotesPage() {
   }
 
   async function select(note: Note) {
-    if (draft?.id === note.id) return
+    if (draft?.id === note.id) return setShowEditor(true)
     if (!(await leave())) return
     setDraft(toDraft(note))
     setEditing(false)
+    setShowEditor(true)
+  }
+
+  /** Telefoon: terug naar de lijst (eerst opslaan; een lege nieuwe notitie verdwijnt). */
+  async function closeEditor() {
+    const d = draftRef.current
+    if (!(await leave())) return
+    if (d?.isNew && isEmptyNote(d)) setDraft(null)
+    setShowEditor(false)
   }
 
   async function createNote() {
     if (!(await leave())) return
     const now = new Date().toISOString()
     setDraft({ id: crypto.randomUUID(), title: '', body: '', pinned: false, created_at: now, isNew: true, dirty: false })
+    setShowEditor(true)
     setEditing(true)
     setQuery('')
     window.setTimeout(() => titleRef.current?.focus(), 0)
@@ -159,6 +171,7 @@ export function NotesPage() {
     if (!d) return
     window.clearTimeout(saveTimer.current)
     setDraft(null)
+    setShowEditor(false)
     if (d.isNew) return
     const removed = notes?.find((n) => n.id === d.id) ?? { ...d, updated_at: new Date().toISOString() }
     setNotes((list) => list && list.filter((n) => n.id !== d.id))
@@ -195,6 +208,7 @@ export function NotesPage() {
     setNotes((list) => list && sortNotes([n, ...list]))
     // Alleen openen als er niets open staat (verwijderd vanuit de lijst terwijl je een andere notitie had open).
     setDraft((cur) => (undoWasOpen.current ? toDraft(n) : cur ?? toDraft(n)))
+    if (undoWasOpen.current) setShowEditor(true)
     await notesStore.create(n).catch(() => load())
     notesChanged()
   }
@@ -240,6 +254,7 @@ export function NotesPage() {
     if (concept) {
       // Tekst die vorige keer niet opgeslagen kon worden: terugzetten en opnieuw proberen.
       setDraft(concept)
+      setShowEditor(true)
       void save(concept)
     } else if (wantsNew) void createNote()
     else if (notes[0]) setDraft(toDraft(notes[0]))
@@ -279,7 +294,7 @@ export function NotesPage() {
   const shown = searchNotes(notes ?? [], query)
 
   return (
-    <main className="notes-page">
+    <main className="notes-page" data-phone-view={showEditor && draft ? 'editor' : 'list'}>
       <aside className="notes-side dash-card" aria-label="Notities">
         <div className="notes-side-head">
           <h1 className="notes-heading">Notities</h1>
@@ -334,6 +349,9 @@ export function NotesPage() {
         {draft ? (
           <>
             <div className="notes-toolbar">
+              <button className="icon-button notes-back" type="button" aria-label="Terug naar notities" onClick={() => void closeEditor()}>
+                <ArrowLeft size={18} />
+              </button>
               <span className="notes-saved">{draft.dirty ? 'Opslaan…' : draft.isNew ? 'Nieuw' : `Bewaard · ${when(notes?.find((n) => n.id === draft.id)?.updated_at ?? draft.created_at)}`}</span>
               <button className="icon-button" type="button" title="Lijstje met vinkjes" aria-label="Lijstje met vinkjes toevoegen" onClick={addChecklist}>
                 <ListChecks size={18} />
