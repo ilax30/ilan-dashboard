@@ -16,6 +16,7 @@ import { BettingPage } from './pages/BettingPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { FinancePage } from './pages/FinancePage'
 import { NotesPage } from './pages/NotesPage'
+import { TennisGate } from './pages/TennisGate'
 import { TodoPage } from './pages/TodoPage'
 import { TopicPage } from './pages/TopicPage'
 
@@ -28,7 +29,12 @@ function Page({ route, controls }: { route: Route; controls?: PageControls }) {
   if (route === '/agenda') return <AgendaPage />
   if (route === '/notities') return <NotesPage />
   if (route === '/financien') return <FinancePage />
-  if (route === '/tennis') return <BettingPage />
+  if (route === '/tennis')
+    return (
+      <TennisGate>
+        <BettingPage />
+      </TennisGate>
+    )
   const topic = topicFor(route)
   return topic ? <TopicPage topic={topic} /> : <DashboardPage {...controls} />
 }
