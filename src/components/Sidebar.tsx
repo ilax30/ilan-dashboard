@@ -98,7 +98,9 @@ export function Sidebar({ route }: Props) {
           {item('home', 'Home', route === '/', () => navigate('/'))}
           {item('todo', 'Taken', route === '/todo', () => navigate('/todo'))}
           {item('agenda', 'Agenda', route === '/agenda', () => navigate('/agenda'))}
-          {TOPICS.map((t) => item(t.id, t.title, route === t.route, () => navigate(t.route), t.later))}
+          {TOPICS.filter((t) => !t.later).map((t) => item(t.id, t.title, route === t.route, () => navigate(t.route)))}
+          {item('weddenschappen', 'Weddenschappen', route === '/weddenschappen', () => navigate('/weddenschappen'))}
+          {TOPICS.filter((t) => t.later).map((t) => item(t.id, t.title, route === t.route, () => navigate(t.route), true))}
         </ul>
 
         <div className="side-bottom">

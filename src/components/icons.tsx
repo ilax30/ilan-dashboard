@@ -11,6 +11,7 @@ import {
   SquaresFour,
   NotePencil,
   Target,
+  TennisBall,
   Wallet,
   type IconWeight,
 } from '@phosphor-icons/react'
@@ -24,6 +25,7 @@ const MAP = {
   doelen: Target,
   financien: Wallet,
   notities: NotePencil,
+  weddenschappen: TennisBall,
   projecten: FolderSimple,
   settings: GearSix,
   menu: List,

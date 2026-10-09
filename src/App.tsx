@@ -12,6 +12,7 @@ import { CalendarContext, useCalendar } from './lib/calendar'
 import { useHashRoute, type Route } from './lib/router'
 import { supabase } from './lib/supabase'
 import { AgendaPage } from './pages/AgendaPage'
+import { BettingPage } from './pages/BettingPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { FinancePage } from './pages/FinancePage'
 import { NotesPage } from './pages/NotesPage'
@@ -27,6 +28,7 @@ function Page({ route, controls }: { route: Route; controls?: PageControls }) {
   if (route === '/agenda') return <AgendaPage />
   if (route === '/notities') return <NotesPage />
   if (route === '/financien') return <FinancePage />
+  if (route === '/weddenschappen') return <BettingPage />
   const topic = topicFor(route)
   return topic ? <TopicPage topic={topic} /> : <DashboardPage {...controls} />
 }

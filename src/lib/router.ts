@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 
 /** Pagina's van de app. Hash-routes werken op GitHub Pages en in de geïnstalleerde app zonder server-instellingen. */
-export type Route = '/' | '/todo' | '/agenda' | '/doelen' | '/financien' | '/notities' | '/projecten'
+export type Route = '/' | '/todo' | '/agenda' | '/doelen' | '/financien' | '/notities' | '/projecten' | '/weddenschappen'
 
-const ROUTES: Route[] = ['/', '/todo', '/agenda', '/doelen', '/financien', '/notities', '/projecten']
+const ROUTES: Route[] = ['/', '/todo', '/agenda', '/doelen', '/financien', '/notities', '/projecten', '/weddenschappen']
 
 export function parseRoute(hash: string): Route {
   const path = hash.startsWith('#') ? hash.slice(1) : hash
