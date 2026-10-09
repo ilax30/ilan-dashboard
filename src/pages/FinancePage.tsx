@@ -17,6 +17,7 @@ import {
 } from '../lib/bills'
 import { billsChanged, useBills } from '../lib/useBills'
 import { Wishlist, type UndoOffer } from './Wishlist'
+import { backdropClose } from '../lib/dialogBackdrop'
 
 const UNDO_MS = 5000
 export const NEW_BILL_FLAG = 'bills.new'
@@ -49,6 +50,7 @@ export function FinancePage() {
   const [undo, setUndo] = useState<Undo | null>(null)
   const [error, setError] = useState<string | null>(null)
   const undoTimer = useRef(0)
+  const paying = useRef(new Set<string>())
   const now = new Date()
 
   useEffect(() => () => window.clearTimeout(undoTimer.current), [])
@@ -84,6 +86,10 @@ export function FinancePage() {
   }
 
   async function markPaid(bill: Bill) {
+    // Dubbelklik: de tweede klik ziet nog de oude datum en zou een periode extra opschuiven.
+    if (paying.current.has(bill.id)) return
+    paying.current.add(bill.id)
+    window.setTimeout(() => paying.current.delete(bill.id), 1500)
     // Eenmalig: na betalen klaar, dus uit de lijst (wel ongedaan te maken).
     if (bill.cadence === 'eenmalig') return remove(bill, `${bill.name} betaald`)
     const next = { ...bill, next_due: nextDueAfter(bill.next_due, bill.cadence, bill.due_day) }
@@ -302,9 +308,7 @@ function BillDialog({ bill, onClose, onSave, onDelete }: DialogProps) {
       aria-labelledby="fin-dialog-title"
       onClose={onClose}
       onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
+      {...backdropClose(onClose)}
     >
       <form className="calendar-inner" onSubmit={submit} noValidate>
         <header className="calendar-head">

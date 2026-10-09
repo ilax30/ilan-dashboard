@@ -35,6 +35,8 @@ describe('bedragen', () => {
     expect(parseAmount('1.234,50')).toBe(1234.5)
     expect(parseAmount('12')).toBe(12)
     expect(parseAmount('12.5')).toBe(12.5)
+    expect(parseAmount('1,234.50')).toBe(1234.5)
+    expect(parseAmount('1.234.567,89')).toBe(1234567.89)
     expect(parseAmount('abc')).toBeNull()
     expect(parseAmount('-3')).toBeNull()
   })

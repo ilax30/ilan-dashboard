@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { formatEuro, parseAmount } from '../lib/bills'
 import { useWishlist, wishlistChanged } from '../lib/useWishlist'
 import { OTHER_GROUP, safeUrl, visibleWishes, wishGroups, wishTotal, wishlistStore, type Wish } from '../lib/wishlist'
+import { backdropClose } from '../lib/dialogBackdrop'
 
 export type UndoOffer = { text: string; restore: () => void }
 
@@ -193,9 +194,7 @@ function WishDialog({ wish, groups, onClose, onSave, onDelete }: DialogProps) {
       aria-labelledby="wish-dialog-title"
       onClose={onClose}
       onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
+      {...backdropClose(onClose)}
     >
       <form className="calendar-inner" onSubmit={submit} noValidate>
         <header className="calendar-head">

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { store } from '../lib/store'
 import type { Todo } from '../lib/types'
 import { LinkifiedText } from './LinkifiedText'
+import { backdropClose } from '../lib/dialogBackdrop'
 
 const MONTHS_BACK = 12
 const WEEKDAYS = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo']
@@ -94,9 +95,7 @@ export function CalendarDialog({ open, now, onClose }: Props) {
       onClose={onClose}
       // Esc: meteen bijwerken via "cancel" (het "close"-event kan later of niet komen).
       onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
+      {...backdropClose(onClose)}
     >
       <div className="calendar-inner">
         <header className="calendar-head">

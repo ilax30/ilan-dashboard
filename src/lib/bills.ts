@@ -75,7 +75,12 @@ export function parseAmount(input: string): number | null {
   const s = input.replace(/[€\s]/g, '')
   if (!/^\d[\d.,]*$/.test(s)) return null
   let normalized: string
-  if (s.includes(',')) normalized = s.replace(/\./g, '').replace(',', '.')
+  if (s.includes(',') && s.includes('.')) {
+    // Beide tekens: het laatste is de decimaalteken ("1.234,50" en "1,234.50"), het andere scheidt duizendtallen.
+    const decimal = s.lastIndexOf(',') > s.lastIndexOf('.') ? ',' : '.'
+    const thousands = decimal === ',' ? /\./g : /,/g
+    normalized = s.replace(thousands, '').replace(decimal, '.')
+  } else if (s.includes(',')) normalized = s.replace(',', '.')
   else if (/^\d{1,3}(\.\d{3})+$/.test(s)) normalized = s.replace(/\./g, '')
   else normalized = s
   const n = Number(normalized)

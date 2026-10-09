@@ -3,6 +3,7 @@ import type { PageControls } from '../components/PinGate'
 import { getSettings, saveSettings, testCalendarUrl, type DashboardSettings } from '../lib/settings'
 import { supabase } from '../lib/supabase'
 import { searchCity, type CityResult } from '../lib/weather'
+import { backdropClose } from '../lib/dialogBackdrop'
 
 type Props = { open: boolean; onClose: () => void; onSaved: () => void; /** Vergrendelen, pincode, uitloggen (alleen met inloggen). */ account?: PageControls }
 
@@ -141,9 +142,7 @@ export function SettingsDialog({ open, onClose, onSaved, account }: Props) {
       onClose={onClose}
       // Esc: meteen bijwerken via "cancel" (het "close"-event kan later of niet komen).
       onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
+      {...backdropClose(onClose)}
     >
       <div className="calendar-inner">
         <header className="calendar-head">

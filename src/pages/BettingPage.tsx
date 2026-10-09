@@ -18,6 +18,7 @@ import {
   type Bookmaker,
 } from '../lib/bets'
 import { betsChanged, useBets } from '../lib/useBets'
+import { backdropClose } from '../lib/dialogBackdrop'
 
 const UNDO_MS = 5000
 
@@ -566,9 +567,7 @@ function BetDialog({ bet, bookmakers, onClose, onSave, onDelete }: { bet: Bet | 
       aria-labelledby="bet-dialog-title"
       onClose={onClose}
       onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
+      {...backdropClose(onClose)}
     >
       <form className="calendar-inner" onSubmit={submit} noValidate>
         <DialogHead id="bet-dialog-title" title="Weddenschap bewerken" onClose={onClose} />
@@ -699,9 +698,7 @@ function BookmakerDialog({
       aria-labelledby="bm-dialog-title"
       onClose={onClose}
       onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
+      {...backdropClose(onClose)}
     >
       <form className="calendar-inner" onSubmit={submit} noValidate>
         <DialogHead id="bm-dialog-title" title={existing ? 'Bookmaker bewerken' : 'Nieuwe bookmaker'} onClose={onClose} />

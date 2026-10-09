@@ -140,6 +140,10 @@ export function AgendaPage() {
             <button className="today-link" type="button" onClick={() => emit('open-settings')}>
               Koppel je agenda →
             </button>
+          ) : status === 'loading' && list.length === 0 ? (
+            <p className="widget-muted">Agenda laden…</p>
+          ) : status === 'error' && list.length === 0 ? (
+            <p className="widget-muted">Je agenda kon niet laden. Probeer het straks opnieuw.</p>
           ) : list.length === 0 ? (
             <p className="widget-muted">Niks in je agenda de komende twee weken.</p>
           ) : (

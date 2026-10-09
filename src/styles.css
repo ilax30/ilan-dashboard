@@ -1092,25 +1092,6 @@ button {
   gap: 8px 18px;
 }
 
-.footer-more summary {
-  padding: 4px 8px;
-  color: var(--muted);
-  cursor: pointer;
-  list-style: none;
-}
-
-.footer-more summary::-webkit-details-marker {
-  display: none;
-}
-
-.footer-more-items {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px 14px;
-  margin-top: 6px;
-}
-
 /* ---------- Lokale taken overzetten ---------- */
 
 .import-banner {
@@ -3709,16 +3690,6 @@ button {
   left: auto;
 }
 
-.side-more .footer {
-  margin: 0;
-  justify-content: flex-start;
-}
-
-.side-more .footer-more-items {
-  flex-direction: column;
-  align-items: flex-start;
-}
-
 .side-menu-button,
 .side-backdrop,
 .side-expand {
@@ -3733,8 +3704,7 @@ button {
   }
 
   .side-label,
-  .side-quick,
-  .side-more {
+  .side-quick {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -3870,8 +3840,7 @@ button {
   }
 
   .sidebar[data-open] .side-label,
-  .sidebar[data-open] .side-quick,
-  .sidebar[data-open] .side-more {
+  .sidebar[data-open] .side-quick {
     position: static;
     width: auto;
     height: auto;

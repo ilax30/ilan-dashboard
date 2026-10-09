@@ -118,7 +118,11 @@ export function NotesPage() {
       if (!cur) return cur
       const next = { ...cur, ...patch, dirty: true }
       window.clearTimeout(saveTimer.current)
-      saveTimer.current = window.setTimeout(() => void save(next), SAVE_MS)
+      // Opslaan wat er dán staat (niet wat er stond bij het tikken): tussendoor vastpinnen telt zo mee.
+      saveTimer.current = window.setTimeout(() => {
+        const latest = draftRef.current
+        void save(latest && latest.id === next.id ? latest : next)
+      }, SAVE_MS)
       return next
     })
   }
