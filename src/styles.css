@@ -6527,6 +6527,7 @@ a.wish-title:hover {
 
 .bet-row-head {
   padding-block: 6px;
+  color: var(--ink);
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 600;
@@ -6744,4 +6745,13 @@ a.wish-title:hover {
 .bet-delta[data-tone='lose'] {
   background: color-mix(in srgb, var(--lose) 18%, transparent);
   color: var(--lose);
+}
+
+.bet-select {
+  flex: none;
+  width: auto;
+  padding-block: 6px;
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
 }

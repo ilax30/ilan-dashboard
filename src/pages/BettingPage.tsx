@@ -236,32 +236,22 @@ export function BettingPage() {
                   </button>
                 ))}
               </div>
-              <div className="bet-chips" role="group" aria-label="Categorie">
-                <button type="button" data-active={!catFilter || undefined} onClick={() => (setCatFilter(null), setPage(1))}>
-                  Alle categorieën
-                </button>
+              <select className="settings-input bet-select" aria-label="Categorie" value={catFilter ?? ''} onChange={(e) => (setCatFilter((e.target.value || null) as BetCategory | null), setPage(1))}>
+                <option value="">Alle categorieën</option>
                 {BET_CATEGORIES.map((c) => (
-                  <button key={c} type="button" data-active={catFilter === c || undefined} onClick={() => (setCatFilter(c), setPage(1))}>
-                    {c}
-                  </button>
+                  <option key={c}>{c}</option>
                 ))}
-              </div>
-              <div className="bet-chips" role="group" aria-label="Live of pre-match">
-                <button type="button" data-active={!liveFilter || undefined} onClick={() => (setLiveFilter(null), setPage(1))}>
-                  Live en pre-match
-                </button>
-                <button type="button" data-active={liveFilter === 'live' || undefined} onClick={() => (setLiveFilter('live'), setPage(1))}>
-                  Live
-                </button>
-                <button type="button" data-active={liveFilter === 'prematch' || undefined} onClick={() => (setLiveFilter('prematch'), setPage(1))}>
-                  Pre-match
-                </button>
-              </div>
+              </select>
+              <select className="settings-input bet-select" aria-label="Live of pre-match" value={liveFilter ?? ''} onChange={(e) => (setLiveFilter((e.target.value || null) as 'live' | 'prematch' | null), setPage(1))}>
+                <option value="">Live en pre-match</option>
+                <option value="live">Live</option>
+                <option value="prematch">Pre-match</option>
+              </select>
             </header>
             {paged.items.length === 0 ? (
               <div className="fin-empty">
                 <TennisBall size={56} weight="duotone" aria-hidden="true" />
-                <p>Nog geen weddenschappen. Vul hierboven je eerste tennisweddenschap in.</p>
+                <p>{allBets.length > 0 ? 'Geen weddenschappen met deze keuze. Pas de filters hierboven aan.' : 'Nog geen weddenschappen. Vul hierboven je eerste tennisweddenschap in.'}</p>
               </div>
             ) : (
               <ul className="bet-rows">
