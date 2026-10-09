@@ -8,6 +8,7 @@ import {
   betsStore,
   bookmakerStats,
   categoryStats,
+  liveStats,
   formatOdds,
   parseOdds,
   totals,
@@ -44,6 +45,7 @@ export function BettingPage() {
   const [tab, setTab] = useState<Tab>('bets')
   const [filter, setFilter] = useState<string | null>(null)
   const [catFilter, setCatFilter] = useState<BetCategory | null>(null)
+  const [liveFilter, setLiveFilter] = useState<'live' | 'prematch' | null>(null)
   const [page, setPage] = useState(1)
   const [editBet, setEditBet] = useState<Bet | null>(null)
   const [editBookmaker, setEditBookmaker] = useState<Bookmaker | 'new' | null>(null)
@@ -57,11 +59,12 @@ export function BettingPage() {
   const allBets = bets ?? []
   const allBookmakers = bookmakers ?? []
   const activeFilter = filter && allBookmakers.some((b) => b.id === filter) ? filter : null
-  const shown = allBets.filter((b) => (!activeFilter || b.bookmaker_id === activeFilter) && (!catFilter || b.category === catFilter))
+  const shown = allBets.filter((b) => (!activeFilter || b.bookmaker_id === activeFilter) && (!catFilter || b.category === catFilter) && (!liveFilter || (liveFilter === 'live') === (b.live === true)))
   const paged = betPage(shown, page)
   const sum = totals(allBets)
   const stats = bookmakerStats(allBookmakers, allBets)
   const catStats = categoryStats(allBets)
+  const liveSplit = liveStats(allBets)
   const nameOf = (id: string) => allBookmakers.find((b) => b.id === id)?.name ?? '–'
   const totalBankroll = stats.reduce((s, x) => s + x.bankroll, 0)
 
@@ -143,6 +146,12 @@ export function BettingPage() {
     setTab('bets')
   }
 
+  function openLive(kind: 'live' | 'prematch') {
+    setLiveFilter(kind)
+    setPage(1)
+    setTab('bets')
+  }
+
   function openBookmaker(id: string) {
     setFilter(id)
     setPage(1)
@@ -195,7 +204,7 @@ export function BettingPage() {
           Bookmakers
         </button>
         <button type="button" role="tab" aria-selected={tab === 'categories'} data-active={tab === 'categories' || undefined} onClick={() => setTab('categories')}>
-          Categorieën
+          Statistieken
         </button>
       </div>
 
@@ -216,7 +225,7 @@ export function BettingPage() {
           />
           <section className="fin-list dash-card bet-list" aria-label="Weddenschappen">
             <header className="bet-list-head">
-              <h2 className="wish-heading">{[catFilter, activeFilter ? nameOf(activeFilter) : null].filter(Boolean).join(' · ') || 'Alle weddenschappen'}</h2>
+              <h2 className="wish-heading">{[catFilter, liveFilter === 'live' ? 'Live' : liveFilter === 'prematch' ? 'Pre-match' : null, activeFilter ? nameOf(activeFilter) : null].filter(Boolean).join(' · ') || 'Alle weddenschappen'}</h2>
               <div className="bet-chips" role="group" aria-label="Bookmaker">
                 <button type="button" data-active={!activeFilter || undefined} onClick={() => (setFilter(null), setPage(1))}>
                   Alle
@@ -236,6 +245,17 @@ export function BettingPage() {
                     {c}
                   </button>
                 ))}
+              </div>
+              <div className="bet-chips" role="group" aria-label="Live of pre-match">
+                <button type="button" data-active={!liveFilter || undefined} onClick={() => (setLiveFilter(null), setPage(1))}>
+                  Live en pre-match
+                </button>
+                <button type="button" data-active={liveFilter === 'live' || undefined} onClick={() => (setLiveFilter('live'), setPage(1))}>
+                  Live
+                </button>
+                <button type="button" data-active={liveFilter === 'prematch' || undefined} onClick={() => (setLiveFilter('prematch'), setPage(1))}>
+                  Pre-match
+                </button>
               </div>
             </header>
             {paged.items.length === 0 ? (
@@ -262,6 +282,7 @@ export function BettingPage() {
                       <span className="bet-match">
                         <span className="bet-match-name">{b.match || 'Zonder naam'}</span>
                         <span className="fin-badge">{b.category}</span>
+                        {b.live && <span className="fin-badge bet-live-badge">Live</span>}
                       </span>
                       <span className="bet-bm">{nameOf(b.bookmaker_id)}</span>
                       <span className="bet-num">{formatEuro(b.stake)}</span>
@@ -311,7 +332,9 @@ export function BettingPage() {
           </section>
         </>
       ) : tab === 'categories' ? (
-        <section className="bet-bms" aria-label="Categorieën">
+        <section className="bet-stats-tab" aria-label="Statistieken">
+          <h2 className="bet-section-title">Per categorie</h2>
+          <div className="bet-bms">
           {catStats.map((c) => (
             <div key={c.category} className="bet-bm-card dash-card">
               <button className="bet-bm-open" type="button" onClick={() => openCategory(c.category)} title={`Weddenschappen in ${c.category} bekijken`}>
@@ -327,6 +350,28 @@ export function BettingPage() {
               </button>
             </div>
           ))}
+          </div>
+          <h2 className="bet-section-title">Live of pre-match</h2>
+          <div className="bet-bms">
+            {([['live', 'Live', liveSplit.live], ['prematch', 'Pre-match', liveSplit.prematch]] as const).map(([kind, label, c]) => (
+              <div key={kind} className="bet-bm-card dash-card">
+                <button className="bet-bm-open" type="button" onClick={() => openLive(kind)} title={`${label} weddenschappen bekijken`}>
+                  <span className="bet-bm-name">{label}</span>
+                  <span className="fin-stat-value bet-amount" data-tone={tone(c.profit)}>
+                    {signed(c.profit)}
+                  </span>
+                  <span className="fin-stat-sub">
+                    {c.winPct === null ? 'Nog niets afgesloten' : `${c.winPct}% gewonnen (${c.won} van ${c.settled})`}
+                    {c.roi !== null && ` · rendement ${c.roi > 0 ? '+ ' : c.roi < 0 ? '− ' : ''}${Math.abs(c.roi).toFixed(1).replace('.', ',')}%`}
+                  </span>
+                  <span className="fin-stat-sub">
+                    {c.count === 1 ? '1 weddenschap' : `${c.count} weddenschappen`}
+                    {c.open > 0 && ` · ${c.open} open`}
+                  </span>
+                </button>
+              </div>
+            ))}
+          </div>
         </section>
       ) : (
         <section className="bet-bms" aria-label="Bookmakers">
@@ -392,22 +437,22 @@ export function BettingPage() {
   )
 }
 
-type BetFields = { bookmaker: string; category: BetCategory; stake: string; odds: string; date: string; match: string }
+type BetFields = { bookmaker: string; category: BetCategory; live: boolean; stake: string; odds: string; date: string; match: string }
 
 /** Valideert de invoer; geeft een melding of de waarden terug. */
-function readBet(f: BetFields): string | { bookmaker_id: string; category: BetCategory; stake: number; odds: number; placed_on: string; match: string } {
+function readBet(f: BetFields): string | { bookmaker_id: string; category: BetCategory; live: boolean; stake: number; odds: number; placed_on: string; match: string } {
   const stake = parseAmount(f.stake)
   const odds = parseOdds(f.odds)
   if (!f.bookmaker) return 'Kies een bookmaker.'
   if (stake === null || stake <= 0) return 'Vul een geldige inzet in, bijvoorbeeld 100.'
   if (odds === null) return 'Vul geldige odds in, bijvoorbeeld 1,90.'
   if (!/^\d{4}-\d{2}-\d{2}$/.test(f.date)) return 'Kies een datum.'
-  return { bookmaker_id: f.bookmaker, category: f.category, stake, odds, placed_on: f.date, match: f.match.trim().slice(0, 200) }
+  return { bookmaker_id: f.bookmaker, category: f.category, live: f.live, stake, odds, placed_on: f.date, match: f.match.trim().slice(0, 200) }
 }
 
 /** Invoerbalk bovenaan: een nieuwe weddenschap in een paar seconden. */
 function NewBetForm({ bookmakers, preferred, onAddBookmaker, onSave }: { bookmakers: Bookmaker[]; preferred: string | null; onAddBookmaker: () => void; onSave: (b: Bet) => void }) {
-  const [f, setF] = useState<BetFields>({ bookmaker: '', category: 'ATP', stake: '', odds: '', date: todayIso(), match: '' })
+  const [f, setF] = useState<BetFields>({ bookmaker: '', category: 'ATP', live: false, stake: '', odds: '', date: todayIso(), match: '' })
   const [msg, setMsg] = useState<string | null>(null)
   const stakeRef = useRef<HTMLInputElement>(null)
   const set = (patch: Partial<BetFields>) => setF((cur) => ({ ...cur, ...patch }))
@@ -429,7 +474,7 @@ function NewBetForm({ bookmakers, preferred, onAddBookmaker, onSave }: { bookmak
     if (typeof r === 'string') return setMsg(r)
     setMsg(null)
     onSave({ id: crypto.randomUUID(), ...r, result: 'open', created_at: new Date().toISOString() })
-    set({ bookmaker, stake: '', odds: '', match: '', date: todayIso() })
+    set({ bookmaker, live: false, stake: '', odds: '', match: '', date: todayIso() })
     stakeRef.current?.focus()
   }
 
@@ -452,6 +497,10 @@ function NewBetForm({ bookmakers, preferred, onAddBookmaker, onSave }: { bookmak
             <option key={c}>{c}</option>
           ))}
         </select>
+      </label>
+      <label className="fin-check bet-live">
+        <input type="checkbox" checked={f.live} onChange={(e) => set({ live: e.target.checked })} />
+        Live
       </label>
       <label className="fin-field">
         <span>Inzet (€)</span>
@@ -486,7 +535,7 @@ const RESULT_LABEL: Record<BetResult, string> = { open: 'Nog open', won: 'Gewonn
 /** Venster om een weddenschap te corrigeren of te verwijderen. */
 function BetDialog({ bet, bookmakers, onClose, onSave, onDelete }: { bet: Bet | null; bookmakers: Bookmaker[]; onClose: () => void; onSave: (b: Bet) => void; onDelete: (b: Bet) => void }) {
   const ref = useRef<HTMLDialogElement>(null)
-  const [f, setF] = useState<BetFields>({ bookmaker: '', category: 'ATP', stake: '', odds: '', date: '', match: '' })
+  const [f, setF] = useState<BetFields>({ bookmaker: '', category: 'ATP', live: false, stake: '', odds: '', date: '', match: '' })
   const [result, setResult] = useState<BetResult>('open')
   const [msg, setMsg] = useState<string | null>(null)
   const open = bet !== null
@@ -499,6 +548,7 @@ function BetDialog({ bet, bookmakers, onClose, onSave, onDelete }: { bet: Bet | 
       setF({
         bookmaker: bet.bookmaker_id,
         category: bet.category,
+        live: bet.live === true,
         stake: String(bet.stake).replace('.', ','),
         odds: String(bet.odds).replace('.', ','),
         date: bet.placed_on,
@@ -554,6 +604,10 @@ function BetDialog({ bet, bookmakers, onClose, onSave, onDelete }: { bet: Bet | 
                 <option key={c}>{c}</option>
               ))}
             </select>
+          </label>
+          <label className="fin-check">
+            <input type="checkbox" checked={f.live} onChange={(e) => set({ live: e.target.checked })} />
+            Live geplaatst
           </label>
           <label className="fin-field">
             <span>Inzet (€)</span>

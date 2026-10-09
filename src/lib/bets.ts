@@ -18,6 +18,8 @@ export type Bet = {
   id: string
   bookmaker_id: string
   category: BetCategory
+  /** Live geplaatst (tijdens de wedstrijd); anders pre-match. Oude weddenschappen zonder veld zijn pre-match. */
+  live: boolean
   /** Vrij veld: wedstrijd of speler, mag leeg. */
   match: string
   stake: number
@@ -97,6 +99,15 @@ export function categoryStats(bets: Bet[]): CategoryStat[] {
   })
 }
 
+export type LiveStat = Totals & { count: number }
+
+/** Live tegenover pre-match: zo zie je of live wedden winst oplevert. */
+export function liveStats(bets: Bet[]): { live: LiveStat; prematch: LiveStat } {
+  const live = bets.filter((b) => b.live === true)
+  const prematch = bets.filter((b) => b.live !== true)
+  return { live: { count: live.length, ...totals(live) }, prematch: { count: prematch.length, ...totals(prematch) } }
+}
+
 /** Eén pagina met de nieuwste weddenschappen eerst; de pagina blijft binnen het bereik. */
 export function betPage(bets: Bet[], page: number, size = PAGE_SIZE): { items: Bet[]; page: number; pages: number } {
   const sorted = [...bets].sort((a, b) => b.placed_on.localeCompare(a.placed_on) || b.created_at.localeCompare(a.created_at))
@@ -126,9 +137,9 @@ export interface BetsStore {
   removeBet(id: string): Promise<void>
 }
 
-const BET_COLUMNS = 'id, bookmaker_id, category, match, stake, odds, placed_on, result, created_at'
+const BET_COLUMNS = 'id, bookmaker_id, category, live, match, stake, odds, placed_on, result, created_at'
 
-const toBet = (r: Bet): Bet => ({ ...r, stake: Number(r.stake), odds: Number(r.odds) })
+const toBet = (r: Bet): Bet => ({ ...r, live: r.live === true, stake: Number(r.stake), odds: Number(r.odds) })
 
 function createSupabaseBets(db: SupabaseClient): BetsStore {
   return {

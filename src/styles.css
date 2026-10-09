@@ -6444,7 +6444,7 @@ a.wish-title:hover {
 
 .bet-form {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 0.9fr 0.8fr 1fr 2fr auto;
+  grid-template-columns: 1.3fr 1fr auto 0.9fr 0.8fr 1fr 2fr auto;
   align-items: end;
   gap: 12px;
   padding: 16px 18px;
@@ -6696,4 +6696,31 @@ a.wish-title:hover {
   .bet-result {
     margin-left: auto;
   }
+}
+
+.bet-live {
+  align-self: end;
+  height: 42px;
+  font-weight: 600;
+}
+
+.bet-live-badge {
+  background: var(--accent);
+  color: #fff;
+}
+
+.bet-section-title {
+  margin: 0 0 10px;
+  font-size: 1.1rem;
+  font-weight: 650;
+}
+
+.bet-stats-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bet-stats-tab .bet-bms + .bet-section-title {
+  margin-top: 16px;
 }

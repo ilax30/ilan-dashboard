@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { bankroll, betPage, betProfit, bookmakerStats, categoryStats, parseOdds, totals, type Bet, type Bookmaker } from './bets'
+import { bankroll, betPage, betProfit, bookmakerStats, categoryStats, liveStats, parseOdds, totals, type Bet, type Bookmaker } from './bets'
 
 // Geen echte database in tests.
 vi.mock('./supabase', () => ({ supabase: null }))
@@ -8,6 +8,7 @@ const bet = (id: string, over: Partial<Bet> = {}): Bet => ({
   id,
   bookmaker_id: 'toto',
   category: 'ATP',
+  live: false,
   match: '',
   stake: 100,
   odds: 1.9,
@@ -93,6 +94,16 @@ describe('categoryStats', () => {
       [0, 0, null],
       [-40, 2, 0],
     ])
+  })
+})
+
+describe('liveStats', () => {
+  it('splitst live en pre-match; een oude weddenschap zonder live-veld telt als pre-match', () => {
+    const old: Partial<Bet> = { ...bet('old', { result: 'won' }) }
+    delete old.live
+    const s = liveStats([bet('a', { live: true, result: 'lost' }), bet('b', { live: true, result: 'won', stake: 50, odds: 2 }), old as Bet, bet('open')])
+    expect([s.live.count, s.live.profit, s.live.winPct]).toEqual([2, -50, 50])
+    expect([s.prematch.count, s.prematch.profit, s.prematch.open]).toEqual([2, 90, 1])
   })
 })
 
